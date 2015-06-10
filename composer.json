@@ -1,5 +1,5 @@
 {
-    "name": "jeroen-g/packager",
+    "name": "jeroen-g/laravel-packager",
     "description": "A cli tool for creating Laravel packages.",
     "keywords": [
         "Packager",
@@ -8,7 +8,7 @@
         "skeleton",
         "Github"
     ],
-    "homepage": "https://github.com/Jeroen-G/packager",
+    "homepage": "https://github.com/Jeroen-G/laravel-packager",
     "license": "MIT",
     "authors": [
         {

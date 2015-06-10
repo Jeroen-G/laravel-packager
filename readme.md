@@ -1,6 +1,6 @@
-# Packager
+# Laravel Packager
 
-[![Latest Version](https://img.shields.io/github/release/jeroen-g/packager.svg?style=flat)](https://github.com/jeroen-g/packager/releases)
+[![Latest Version](https://img.shields.io/github/release/jeroen-g/laravel-packager.svg?style=flat)](https://github.com/jeroen-g/laravel-packager/releases)
 [![License](https://img.shields.io/badge/License-EUPL--1.1-blue.svg?style=flat)](license.md)
 
 This package provides you with a simple tool to set up a new package. Nothing more, nothing less.
@@ -9,7 +9,7 @@ This package provides you with a simple tool to set up a new package. Nothing mo
 
 Via Composer
 
-    $ composer require jeroen-g/packager
+    $ composer require jeroen-g/laravel-packager
 
 Then add the service provider in `config/app.php`:
 
