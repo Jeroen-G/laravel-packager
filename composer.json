@@ -1,0 +1,35 @@
+{
+    "name": "jeroen-g/packager",
+    "description": "A cli tool for creating packages.",
+    "keywords": [
+        "Packager",
+        "Laravel",
+        "package",
+        "skeleton"
+    ],
+    "homepage": "https://github.com/Jeroen-G/packager",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "JeroenG",
+            "email": "jeroengjeroeng@gmail.com",
+            "homepage": "https://github.com/Jeroen-G"
+        }
+    ],
+    "require": {
+        "illuminate/support": "~5",
+        "illuminate/console": "~5",
+        "illuminate/filesystem": "~5",
+        "guzzlehttp/guzzle": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "JeroenG\\Packager\\": "src"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1-dev"
+        }
+    }
+}
