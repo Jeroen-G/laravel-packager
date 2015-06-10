@@ -5,6 +5,13 @@ namespace JeroenG\Packager;
 use Illuminate\Console\Command;
 use JeroenG\Packager\PackagerHelper;
 
+/**
+ * Get an existing package from a remote Github repository.
+ *
+ * @package Packager
+ * @author JeroenG
+ * 
+ **/
 class PackagerGetCommand extends Command
 {
     /**

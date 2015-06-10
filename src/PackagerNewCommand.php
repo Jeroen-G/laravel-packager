@@ -5,6 +5,13 @@ namespace JeroenG\Packager;
 use Illuminate\Console\Command;
 use JeroenG\Packager\PackagerHelper;
 
+/**
+ * Create a brand new package.
+ *
+ * @package Packager
+ * @author JeroenG
+ * 
+ **/
 class PackagerNewCommand extends Command
 {
     /**
@@ -21,6 +28,10 @@ class PackagerNewCommand extends Command
      */
     protected $description = 'Create a new package.';
 
+    /**
+     * Packager helper class
+     * @var object
+     */
     protected $helper;
 
     /**

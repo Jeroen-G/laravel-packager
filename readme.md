@@ -1,6 +1,5 @@
 # Packager
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Jeroen-G/packager/badges/quality-score.png)](https://scrutinizer-ci.com/g/Jeroen-G//)
 [![Latest Version](https://img.shields.io/github/release/jeroen-g/packager.svg?style=flat)](https://github.com/jeroen-g/packager/releases)
 [![License](https://img.shields.io/badge/License-EUPL--1.1-blue.svg?style=flat)](license.md)
 
@@ -18,11 +17,20 @@ Then add the service provider in `config/app.php`:
 
 ## Usage
 
+### New package
+The command will handle practically everything for you. It will create a packages directory, creates the vendor and package directory in it, pulls in a skeleton package, sets up composer.json, creates a service provider, registers the package in config/app.php and the app's composer.json. So you can start right away with only this command:
 ``` bash
 $ artisan packager:new MyVendor MyPackage
 ```
 
-If you would like to use [league/skeleton](https://github.com/thephpleague/skeleton), add the `--skeleton` flag to it.
+The new package will be based on [league/skeleton](https://github.com/thephpleague/skeleton), plus a Laravel service provider.
+
+### Existing package
+If you already have your package on Github, it is possible to download that:
+``` bash
+$ artisan packager:get https://github.com/author/repository
+```
+This will too register the package in config/app.php and the app's composer.json file.
 
 ## Contributing
 

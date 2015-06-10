@@ -7,15 +7,35 @@ use RuntimeException;
 use GuzzleHttp\Client;
 use Illuminate\Filesystem\Filesystem;
 
+/**
+ * Helper functions for the Packager commands.
+ *
+ * @package Packager
+ * @author JeroenG
+ * 
+ **/
 class PackagerHelper
 {
+    /**
+     * The filesystem handler
+     * @var object
+     */
     protected $files;
 
+    /**
+     * Create a new instance
+     * @param Illuminate\Filesystem\Filesystem $files
+     */
     public function __construct(Filesystem $files)
     {
         $this->files = $files;
     }
 
+    /**
+     * Setting custom formatting for the progress bar
+     * @param  object $bar Symfony ProgressBar instance
+     * @return object $bar Symfony ProgressBar instance
+     */
     public function barSetup($bar)
     {
         // the finished part of the bar
@@ -33,6 +53,14 @@ class PackagerHelper
         return $bar;
     }
 
+    /**
+     * Open haystack, find and replace needles, save haystack
+     * @param  string $oldFile The haystack
+     * @param  mixed  $search  String or array to look for (the needles)
+     * @param  mixed  $replace What to replace the needles for?
+     * @param  string $newFile Where to save, defaults to $oldFile
+     * @return void
+     */
     public function replaceAndSave($oldFile, $search, $replace, $newFile = null)
     {
         $newFile = ($newFile == null) ? $oldFile : $newFile ;
@@ -41,6 +69,13 @@ class PackagerHelper
         $this->files->put($newFile, $replacing);
     }
 
+    /**
+     * Check if the package already exists
+     * @param  string $path   Path to the package directory
+     * @param  string $vendor The vendor
+     * @param  string $name   Name of the package
+     * @return void           Throws error if package exists, aborts process
+     */
     public function checkExistingPackage($path, $vendor, $name)
     {
         if(is_dir($path.$vendor.'/'.$name)){
@@ -48,6 +83,11 @@ class PackagerHelper
         }
     }
 
+    /**
+     * Create a directory if it doesn't exist
+     * @param  string $path Path of the directory to make
+     * @return void
+     */
     public function makeDir($path)
     {
         if(!is_dir($path)) {
@@ -56,7 +96,7 @@ class PackagerHelper
     }
 
     /**
-     * Generate a random temporary filename.
+     * Generate a random temporary filename for the package zipfile
      *
      * @return string
      */
@@ -66,7 +106,7 @@ class PackagerHelper
     }
 
     /**
-     * Download the temporary Zip to the given file.
+     * Download the temporary Zip to the given file
      *
      * @param  string  $zipFile
      * @return $this
@@ -79,7 +119,7 @@ class PackagerHelper
     }
 
     /**
-     * Extract the zip file into the given directory.
+     * Extract the zip file into the given directory
      *
      * @param  string  $zipFile
      * @param  string  $directory
@@ -95,7 +135,7 @@ class PackagerHelper
     }
 
     /**
-     * Clean-up the Zip file.
+     * Clean-up the Zip file
      *
      * @param  string  $zipFile
      * @return $this

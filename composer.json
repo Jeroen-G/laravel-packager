@@ -1,11 +1,12 @@
 {
     "name": "jeroen-g/packager",
-    "description": "A cli tool for creating packages.",
+    "description": "A cli tool for creating Laravel packages.",
     "keywords": [
         "Packager",
         "Laravel",
         "package",
-        "skeleton"
+        "skeleton",
+        "Github"
     ],
     "homepage": "https://github.com/Jeroen-G/packager",
     "license": "MIT",
