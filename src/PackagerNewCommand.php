@@ -10,10 +10,17 @@ use JeroenG\Packager\PackagerHelper;
  *
  * @package Packager
  * @author JeroenG
- * 
+ *
  **/
 class PackagerNewCommand extends Command
 {
+    /**
+     * The name of the command that creates a new package based on the stub
+     *
+     * @var string
+     */
+    protected $name = 'packager:new';
+
     /**
      * The name and signature of the console command.
      *
@@ -71,7 +78,7 @@ class PackagerNewCommand extends Command
 
         '.ucfirst($vendor).'\\'.ucfirst($name).'\\'.ucfirst($name).'ServiceProvider::class,';
 
-        // Start creating the package        
+        // Start creating the package
         $this->info('Creating package '.$vendor.'\\'.$name.'...');
             $this->helper->checkExistingPackage($path, $vendor, $name);
         $bar->advance();
