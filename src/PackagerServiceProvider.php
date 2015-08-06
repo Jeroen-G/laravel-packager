@@ -10,9 +10,7 @@ use Illuminate\Support\ServiceProvider;
  * Place the line below in the providers array inside app/config/app.php
  * <code>'JeroenG\Packager\PackagerServiceProvider',</code>
  *
- * @package Packager
  * @author JeroenG
- * 
  **/
 class PackagerServiceProvider extends ServiceProvider
 {
@@ -30,7 +28,7 @@ class PackagerServiceProvider extends ServiceProvider
      */
     protected $commands = [
         'JeroenG\Packager\PackagerNewCommand',
-        'JeroenG\Packager\PackagerGetCommand'
+        'JeroenG\Packager\PackagerGetCommand',
     ];
 
     /**
@@ -60,6 +58,6 @@ class PackagerServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('packager');
+        return ['packager'];
     }
 }
