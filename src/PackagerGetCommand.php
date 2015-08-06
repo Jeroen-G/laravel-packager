@@ -4,16 +4,26 @@ namespace JeroenG\Packager;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\PackagerHelper;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
 /**
  * Get an existing package from a remote Github repository.
  *
  * @package Packager
  * @author JeroenG
- * 
+ *
  **/
 class PackagerGetCommand extends Command
 {
+
+    /**
+     * Then name of the console command
+     *
+     * @var string
+     */
+    protected $name = 'packager:get';
+
     /**
      * The name and signature of the console command.
      *
@@ -67,7 +77,7 @@ class PackagerGetCommand extends Command
 
         '.ucfirst($vendor).'\\'.ucfirst($name).'\\'.ucfirst($name).'ServiceProvider::class,';
 
-        // Start creating the package        
+        // Start creating the package
         $this->info('Creating package '.$vendor.'\\'.$name.'...');
             $this->helper->checkExistingPackage($path, $vendor, $name);
         $bar->advance();
@@ -102,5 +112,29 @@ class PackagerGetCommand extends Command
         $this->info('Package created successfully!');
         $this->output->newLine(2);
         $bar = null;
+    }
+
+    /**
+     * Command's arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['url', InputArgument::REQUIRED, 'The url of the Github repository']
+        ];
+    }
+
+    /**
+     * Command's options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['branch', null, InputOption::VALUE_OPTIONAL, 'The branch to download', 'master']
+        ];
     }
 }
