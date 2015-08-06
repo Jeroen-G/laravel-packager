@@ -4,16 +4,25 @@ namespace JeroenG\Packager;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\PackagerHelper;
+use Symfony\Component\Console\Input\InputArgument;
 
 /**
  * Create a brand new package.
  *
  * @package Packager
  * @author JeroenG
- * 
+ *
  **/
 class PackagerNewCommand extends Command
 {
+
+    /**
+     * The name of the console command
+     *
+     * @var string
+     */
+    protected $name = 'packager:new';
+
     /**
      * The name and signature of the console command.
      *
@@ -63,7 +72,7 @@ class PackagerNewCommand extends Command
         $fullPath = $path.$vendor.'/'.$name;
         $cVendor = ucfirst($vendor);
         $cName = ucfirst($name);
-        $requireSupport = '"illuminate/support": "~5.1",
+        $requireSupport = '"illuminate/support": "~5",
         "php"';
         $requirement = '"psr-4": {
             "'.$cVendor.'\\\\'.$cName.'\\\\": "packages/'.$vendor.'/'.$name.'/src",';
@@ -71,7 +80,7 @@ class PackagerNewCommand extends Command
 
         '.ucfirst($vendor).'\\'.ucfirst($name).'\\'.ucfirst($name).'ServiceProvider::class,';
 
-        // Start creating the package        
+        // Start creating the package
         $this->info('Creating package '.$vendor.'\\'.$name.'...');
             $this->helper->checkExistingPackage($path, $vendor, $name);
         $bar->advance();
@@ -121,4 +130,18 @@ class PackagerNewCommand extends Command
         $this->output->newLine(2);
         $bar = null;
     }
+
+    /**
+     * Command's arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['vendor', InputArgument::REQUIRED, 'Vendor name'],
+            ['name', InputArgument::REQUIRED, 'Package name']
+        ];
+    }
+
 }
