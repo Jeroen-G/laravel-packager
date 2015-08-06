@@ -3,17 +3,25 @@
 namespace JeroenG\Packager;
 
 use Illuminate\Console\Command;
-use JeroenG\Packager\PackagerHelper;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Get an existing package from a remote Github repository.
  *
- * @package Packager
  * @author JeroenG
- * 
  **/
 class PackagerGetCommand extends Command
 {
+    use ProgressBarTrait;
+
+    /**
+     * Then name of the console command.
+     *
+     * @var string
+     */
+    protected $name = 'packager:get';
+
     /**
      * The name and signature of the console command.
      *
@@ -49,7 +57,7 @@ class PackagerGetCommand extends Command
     public function handle()
     {
         // Start the progress bar
-        $bar = $this->helper->barSetup($this->output->createProgressBar(5));
+        $bar = $this->helper->barSetup($this->createProgressBar(5));
         $bar->start();
 
         // Common variables
@@ -67,32 +75,32 @@ class PackagerGetCommand extends Command
 
         '.ucfirst($vendor).'\\'.ucfirst($name).'\\'.ucfirst($name).'ServiceProvider::class,';
 
-        // Start creating the package        
+        // Start creating the package
         $this->info('Creating package '.$vendor.'\\'.$name.'...');
-            $this->helper->checkExistingPackage($path, $vendor, $name);
+        $this->helper->checkExistingPackage($path, $vendor, $name);
         $bar->advance();
 
         // Create the package directory
         $this->info('Creating packages directory...');
-            $this->helper->makeDir($path);
+        $this->helper->makeDir($path);
         $bar->advance();
 
         // Create the vendor directory
         $this->info('Creating vendor...');
-         $this->helper->makeDir($path.$vendor);
+        $this->helper->makeDir($path.$vendor);
         $bar->advance();
 
         // Get the skeleton repo from the PHP League
         $this->info('Downloading from Github...');
-            $this->helper->download($zipFile = $this->helper->makeFilename(), $origin)
+        $this->helper->download($zipFile = $this->helper->makeFilename(), $origin)
                  ->extract($zipFile, $path.$vendor)
                  ->cleanUp($zipFile);
-            rename($path.$vendor.'/'.$name. '-'.$this->option('branch'), $fullPath);
+        rename($path.$vendor.'/'.$name.'-'.$this->option('branch'), $fullPath);
         $bar->advance();
 
         // Add it to composer.json
         $this->info('Adding package to composer and app...');
-            $this->helper->replaceAndSave(getcwd().'/composer.json', '"psr-4": {', $requirement);
+        $this->helper->replaceAndSave(getcwd().'/composer.json', '"psr-4": {', $requirement);
             // And add it to the providers array in config/app.php
             $this->helper->replaceAndSave(getcwd().'/config/app.php', 'App\Providers\RouteServiceProvider::class,', $appConfigLine);
         $bar->advance();
@@ -100,7 +108,31 @@ class PackagerGetCommand extends Command
         // Finished creating the package, end of the progress bar
         $bar->finish();
         $this->info('Package created successfully!');
-        $this->output->newLine(2);
+        $this->output->write(str_repeat(PHP_EOL, 2));
         $bar = null;
+    }
+
+    /**
+     * Command's arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [
+            ['url', InputArgument::REQUIRED, 'The url of the Github repository'],
+        ];
+    }
+
+    /**
+     * Command's options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['branch', null, InputOption::VALUE_OPTIONAL, 'The branch to download', 'master'],
+        ];
     }
 }
