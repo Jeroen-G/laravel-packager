@@ -17,6 +17,8 @@ use Symfony\Component\Console\Input\InputArgument;
 class PackagerGetCommand extends Command
 {
 
+    use ProgressBarTrait;
+
     /**
      * Then name of the console command
      *
@@ -59,7 +61,7 @@ class PackagerGetCommand extends Command
     public function handle()
     {
         // Start the progress bar
-        $bar = $this->helper->barSetup($this->output->createProgressBar(5));
+        $bar = $this->helper->barSetup($this->createProgressBar(5));
         $bar->start();
 
         // Common variables
@@ -110,7 +112,7 @@ class PackagerGetCommand extends Command
         // Finished creating the package, end of the progress bar
         $bar->finish();
         $this->info('Package created successfully!');
-        $this->output->newLine(2);
+        $this->output->write(str_repeat(PHP_EOL, 2));
         $bar = null;
     }
 
