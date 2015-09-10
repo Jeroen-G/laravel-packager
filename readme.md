@@ -32,6 +32,12 @@ $ artisan packager:get https://github.com/author/repository
 ```
 This will too register the package in config/app.php and the app's composer.json file.
 
+### Issues with cURL SSL certificate
+It turns out that, especially on windows, there might arise some problems with the downloading of the skeleton, due to a file regarding SSL certificates missing on the OS. This can be solved by opening up your .env file and putting this in it:
+```
+CURL_VERIFY=false
+```
+
 ## Contributing
 
 Please see [contributing.md](contributing.md) for details.

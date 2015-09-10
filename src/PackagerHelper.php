@@ -109,11 +109,13 @@ class PackagerHelper
      * Download the temporary Zip to the given file
      *
      * @param  string  $zipFile
+     * @param  string  $source
      * @return $this
      */
     public function download($zipFile, $source)
     {
-        $response = (new Client)->get($source);
+        $client = new Client(['verify' => env('CURL_VERIFY', true)]);
+        $response = $client->get($source);
         file_put_contents($zipFile, $response->getBody());
         return $this;
     }
