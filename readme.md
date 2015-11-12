@@ -30,7 +30,10 @@ If you already have your package on Github, it is possible to download that:
 ``` bash
 $ artisan packager:get https://github.com/author/repository
 ```
-This will too register the package in config/app.php and the app's composer.json file.
+This will too register the package in config/app.php and the app's composer.json file. It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url. For example:
+```bash
+$ artisan packager:get https://github.com/author/repository Author PackageRepository
+```
 
 ### Issues with cURL SSL certificate
 It turns out that, especially on windows, there might arise some problems with the downloading of the skeleton, due to a file regarding SSL certificates missing on the OS. This can be solved by opening up your .env file and putting this in it:

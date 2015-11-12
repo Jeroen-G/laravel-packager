@@ -21,6 +21,8 @@ class PackagerGetCommand extends Command
      */
     protected $signature = 'packager:get
                             {url : The url of the Github repository}
+                            {vendor? : The vendor part of the namespace}
+                            {name? : The name of package for the namespace}
                             {--branch=master : The branch to download}';
 
     /**
@@ -53,19 +55,23 @@ class PackagerGetCommand extends Command
         $bar->start();
 
         // Common variables
-        $origin = rtrim($this->argument('url'), '/').'/archive/'.$this->option('branch').'.zip';
+        $origin = rtrim(strtolower($this->argument('url')), '/').'/archive/'.$this->option('branch').'.zip';
         $pieces = explode('/', $origin);
-        $vendor = $pieces[3];
-        $name = $pieces[4];
-        $cVendor = ucfirst($vendor);
-        $cName = ucfirst($name);
+        if(is_null($this->argument('vendor')) or is_null($this->argument('name')))
+        {
+            $vendor = $pieces[3];
+            $name = $pieces[4];
+        } else {
+            $vendor = $this->argument('vendor');
+            $name = $this->argument('name');
+        }
         $path = getcwd().'/packages/';
         $fullPath = $path.$vendor.'/'.$name;
         $requirement = '"psr-4": {
-            "'.$cVendor.'\\\\'.$cName.'\\\\": "packages/'.$vendor.'/'.$name.'/src",';
+            "'.$vendor.'\\\\'.$name.'\\\\": "packages/'.$vendor.'/'.$name.'/src",';
         $appConfigLine = 'App\Providers\RouteServiceProvider::class,
 
-        '.ucfirst($vendor).'\\'.ucfirst($name).'\\'.ucfirst($name).'ServiceProvider::class,';
+        '.$vendor.'\\'.$name.'\\'.$name.'ServiceProvider::class,';
 
         // Start creating the package        
         $this->info('Creating package '.$vendor.'\\'.$name.'...');
@@ -87,7 +93,7 @@ class PackagerGetCommand extends Command
             $this->helper->download($zipFile = $this->helper->makeFilename(), $origin)
                  ->extract($zipFile, $path.$vendor)
                  ->cleanUp($zipFile);
-            rename($path.$vendor.'/'.$name. '-'.$this->option('branch'), $fullPath);
+            rename($path.$vendor.'/'.$pieces[4]. '-'.$this->option('branch'), $fullPath);
         $bar->advance();
 
         // Add it to composer.json

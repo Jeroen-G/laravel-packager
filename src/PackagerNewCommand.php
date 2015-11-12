@@ -61,15 +61,13 @@ class PackagerNewCommand extends Command
         $name = $this->argument('name');
         $path = getcwd().'/packages/';
         $fullPath = $path.$vendor.'/'.$name;
-        $cVendor = ucfirst($vendor);
-        $cName = ucfirst($name);
         $requireSupport = '"illuminate/support": "~5.1",
         "php"';
         $requirement = '"psr-4": {
-            "'.$cVendor.'\\\\'.$cName.'\\\\": "packages/'.$vendor.'/'.$name.'/src",';
+            "'.$vendor.'\\\\'.$name.'\\\\": "packages/'.$vendor.'/'.$name.'/src",';
         $appConfigLine = 'App\Providers\RouteServiceProvider::class,
 
-        '.ucfirst($vendor).'\\'.ucfirst($name).'\\'.ucfirst($name).'ServiceProvider::class,';
+        '.$vendor.'\\'.$name.'\\'.$name.'ServiceProvider::class,';
 
         // Start creating the package        
         $this->info('Creating package '.$vendor.'\\'.$name.'...');
@@ -96,15 +94,15 @@ class PackagerNewCommand extends Command
 
         // Creating a Laravel Service Provider in the src directory
         $this->info('Creating service provider...');
-            $newProvider = $fullPath.'/src/'.ucfirst($name).'ServiceProvider.php';
-            $this->helper->replaceAndSave(__DIR__.'/ServiceProvider.stub', ['{{vendor}}', '{{name}}'], [$cVendor, $cName], $newProvider);
+            $newProvider = $fullPath.'/src/'.$name.'ServiceProvider.php';
+            $this->helper->replaceAndSave(__DIR__.'/ServiceProvider.stub', ['{{vendor}}', '{{name}}'], [$vendor, $name], $newProvider);
         $bar->advance();
 
         // Replacing skeleton namespaces
         $this->info('Replacing skeleton namespaces...');
-            $this->helper->replaceAndSave($fullPath.'/src/SkeletonClass.php', 'namespace League\Skeleton;', 'namespace '.$cVendor.'\\'.$cName.';');
+            $this->helper->replaceAndSave($fullPath.'/src/SkeletonClass.php', 'namespace League\Skeleton;', 'namespace '.$vendor.'\\'.$name.';');
             $search = ['league/:package_name',  '"php"',            'League\\\\Skeleton\\\\',       'League\\\\Skeleton\\\\Test\\\\'];
-            $replace = [$vendor.'/'.$name,      $requireSupport,    $cVendor.'\\\\'.$cName.'\\\\',  $cVendor.'\\\\'.$cName.'\\\\Test\\\\'];
+            $replace = [$vendor.'/'.$name,      $requireSupport,    $vendor.'\\\\'.$name.'\\\\',  $vendor.'\\\\'.$name.'\\\\Test\\\\'];
             $this->helper->replaceAndSave($fullPath.'/composer.json', $search, $replace);
         $bar->advance();
 
