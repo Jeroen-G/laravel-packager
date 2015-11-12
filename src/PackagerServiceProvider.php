@@ -30,6 +30,7 @@ class PackagerServiceProvider extends ServiceProvider
      */
     protected $commands = [
         'JeroenG\Packager\PackagerNewCommand',
+        'JeroenG\Packager\PackagerRemoveCommand',
         'JeroenG\Packager\PackagerGetCommand'
     ];
 

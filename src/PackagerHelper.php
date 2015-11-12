@@ -96,6 +96,30 @@ class PackagerHelper
     }
 
     /**
+     * Remove a directory if it exists
+     * @param  string $path Path of the directory to remove
+     * @return void
+     */
+    public function removeDir($path)
+    {
+        if ($path == 'packages' or $path == '/') {
+        return false;
+        }
+
+        $files = array_diff(scandir($path), array('.', '..'));
+        foreach ($files as $file) {
+            if(is_dir("$path/$file")) {
+                $this->removeDir("$path/$file");
+            } else {
+                @chmod("$path/$file", 0777);
+                @unlink("$path/$file");
+            }
+
+        }
+        return rmdir($path);
+    }
+
+    /**
      * Generate a random temporary filename for the package zipfile
      *
      * @return string
