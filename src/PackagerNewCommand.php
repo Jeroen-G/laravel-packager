@@ -19,7 +19,7 @@ class PackagerNewCommand extends Command
      *
      * @var string
      */
-    protected $signature = "packager:new {vendor} {name}";
+    protected $signature = 'packager:new {vendor} {name}';
 
     /**
      * The console command description.
@@ -29,7 +29,7 @@ class PackagerNewCommand extends Command
     protected $description = 'Create a new package.';
 
     /**
-     * Packager helper class
+     * Packager helper class.
      * @var object
      */
     protected $helper;
@@ -69,7 +69,7 @@ class PackagerNewCommand extends Command
 
         '.$vendor.'\\'.$name.'\\'.$name.'ServiceProvider::class,';
 
-        // Start creating the package        
+        // Start creating the package
         $this->info('Creating package '.$vendor.'\\'.$name.'...');
             $this->helper->checkExistingPackage($path, $vendor, $name);
         $bar->advance();
@@ -81,7 +81,7 @@ class PackagerNewCommand extends Command
 
         // Create the vendor directory
         $this->info('Creating vendor...');
-         $this->helper->makeDir($path.$vendor);
+            $this->helper->makeDir($path.$vendor);
         $bar->advance();
 
         // Get the skeleton repo from the PHP League

@@ -31,7 +31,7 @@ class PackagerServiceProvider extends ServiceProvider
     protected $commands = [
         'JeroenG\Packager\PackagerNewCommand',
         'JeroenG\Packager\PackagerRemoveCommand',
-        'JeroenG\Packager\PackagerGetCommand'
+        'JeroenG\Packager\PackagerGetCommand',
     ];
 
     /**
@@ -61,6 +61,6 @@ class PackagerServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('packager');
+        return ['packager'];
     }
 }

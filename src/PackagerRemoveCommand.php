@@ -29,7 +29,7 @@ class PackagerRemoveCommand extends Command
     protected $description = 'Remove an existing package.';
 
     /**
-     * Packager helper class
+     * Packager helper class.
      * @var object
      */
     protected $helper;
@@ -64,7 +64,7 @@ class PackagerRemoveCommand extends Command
         $requirement = '"'.$vendor.'\\\\'.$name.'\\\\": "packages/'.$vendor.'/'.$name.'/src",';
         $appConfigLine = $vendor.'\\'.$name.'\\'.$name.'ServiceProvider::class,';
 
-        // Start removing the package        
+        // Start removing the package
         $this->info('Removing package '.$vendor.'\\'.$name.'...');
         $bar->advance();
 

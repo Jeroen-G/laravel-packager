@@ -33,11 +33,11 @@ class PackagerGetCommand extends Command
     protected $description = 'Retrieve an existing package from Github.';
 
     /**
-     * Packager helper class
+     * Packager helper class.
      * @var object
      */
     protected $helper;
-    
+
     /**
      * Create a new command instance.
      *
@@ -63,8 +63,7 @@ class PackagerGetCommand extends Command
         // Common variables
         $origin = rtrim(strtolower($this->argument('url')), '/').'/archive/'.$this->option('branch').'.zip';
         $pieces = explode('/', $origin);
-        if(is_null($this->argument('vendor')) or is_null($this->argument('name')))
-        {
+        if (is_null($this->argument('vendor')) or is_null($this->argument('name'))) {
             $vendor = $pieces[3];
             $name = $pieces[4];
         } else {
@@ -79,7 +78,7 @@ class PackagerGetCommand extends Command
 
         '.$vendor.'\\'.$name.'\\'.$name.'ServiceProvider::class,';
 
-        // Start creating the package        
+        // Start creating the package
         $this->info('Creating package '.$vendor.'\\'.$name.'...');
             $this->helper->checkExistingPackage($path, $vendor, $name);
         $bar->advance();
@@ -91,7 +90,7 @@ class PackagerGetCommand extends Command
 
         // Create the vendor directory
         $this->info('Creating vendor...');
-         $this->helper->makeDir($path.$vendor);
+            $this->helper->makeDir($path.$vendor);
         $bar->advance();
 
         // Get the skeleton repo from the PHP League
