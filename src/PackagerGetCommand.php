@@ -33,6 +33,12 @@ class PackagerGetCommand extends Command
     protected $description = 'Retrieve an existing package from Github.';
 
     /**
+     * Packager helper class
+     * @var object
+     */
+    protected $helper;
+    
+    /**
      * Create a new command instance.
      *
      * @return void
