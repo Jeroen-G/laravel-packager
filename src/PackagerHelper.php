@@ -99,7 +99,7 @@ class PackagerHelper
     public function makeDir($path)
     {
         if (!is_dir($path)) {
-            return mkdir($path);
+            return mkdir($path, 0777, true);
         }
     }
 
