@@ -32,6 +32,7 @@ class PackagerServiceProvider extends ServiceProvider
         'JeroenG\Packager\PackagerNewCommand',
         'JeroenG\Packager\PackagerRemoveCommand',
         'JeroenG\Packager\PackagerGetCommand',
+        'JeroenG\Packager\PackagerGitCommand',
     ];
 
     /**
