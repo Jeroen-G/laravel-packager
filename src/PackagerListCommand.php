@@ -5,7 +5,7 @@ namespace JeroenG\Packager;
 use Illuminate\Console\Command;
 
 /**
- * Get an existing package from a remote Github repository with its git repository.
+ * List all locally installed packages.
  *
  * @package Packager
  * @author JeroenG
@@ -36,10 +36,12 @@ class PackagerListCommand extends Command
     {
         $composer = json_decode(file_get_contents('composer.json'), true);
         foreach ($composer['autoload']['psr-4'] as $package => $path) {
-            $packages[] = [rtrim($package, '\\'), $path];
+            if($package !== 'App\\') {
+                $packages[] = [rtrim($package, '\\'), $path];
+            }
         }
-        $headers = ['Package', 'Path'];
 
+        $headers = ['Package', 'Path'];
         $this->table($headers, $packages);
     }
 }
