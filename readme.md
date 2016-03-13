@@ -35,6 +35,13 @@ This will too register the package in config/app.php and the app's composer.json
 $ artisan packager:get https://github.com/author/repository Author PackageRepository
 ```
 
+### Tests
+If you want to test your package in a Laravel environment, run the command
+```bash
+$ artisan packager:tests MyVendor MyPackage
+```
+The vendor and name are optional, if left out, all packages (see `packager:list` for an overview) will be handled. If a tests folder exists, the files will be copied to a dedicated folder in the Laravel App tests folder. This allows you to use all of Laravel's own testing functions without any hassle.
+
 ### Issues with cURL SSL certificate
 It turns out that, especially on windows, there might arise some problems with the downloading of the skeleton, due to a file regarding SSL certificates missing on the OS. This can be solved by opening up your .env file and putting this in it:
 ```

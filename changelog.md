@@ -2,6 +2,14 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 1.2
+
+### Added
+- Added command to move package test files to the Laravel app tests folder.
+
+### Fixed
+- 'App' is no longer showing in the package list command.
+
 ## Version 1.1
 
 ### Added
