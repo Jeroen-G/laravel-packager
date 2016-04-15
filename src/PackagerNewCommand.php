@@ -101,8 +101,28 @@ class PackagerNewCommand extends Command
         // Replacing skeleton namespaces
         $this->info('Replacing skeleton namespaces...');
             $this->helper->replaceAndSave($fullPath.'/src/SkeletonClass.php', 'namespace League\Skeleton;', 'namespace '.$vendor.'\\'.$name.';');
-            $search =   ['thephpleague/:package_name',  'league/:package_name',    '"php"',            'League\\\\Skeleton\\\\',       'League\\\\Skeleton\\\\Test\\\\'];
-            $replace =  [$vendor.'/'.$name,             $vendor.'/'.$name,         $requireSupport,    $vendor.'\\\\'.$name.'\\\\',    $vendor.'\\\\'.$name.'\\\\Test\\\\'];
+            $search =   [
+                ':vendor',
+                ':package_name',
+                ':vendor\\\\:package_name\\\\',
+                ':vendor/:package_name',
+                'thephpleague/:package_name',
+                'league/:package_name',
+                '"php"',
+                'League\\\\Skeleton\\\\',
+                'League\\\\Skeleton\\\\Test\\\\'
+            ];
+            $replace =  [
+                $vendor,
+                $name,
+                $vendor.'\\\\'.$name.'\\\\',
+                $vendor.'/'.$name,
+                $vendor.'/'.$name,
+                $vendor.'/'.$name,
+                $requireSupport,
+                $vendor.'\\\\'.$name.'\\\\',
+                $vendor.'\\\\'.$name.'\\\\Test\\\\'
+            ];
             $this->helper->replaceAndSave($fullPath.'/composer.json', $search, $replace);
         $bar->advance();
 
