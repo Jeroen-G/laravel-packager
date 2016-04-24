@@ -1,61 +1,129 @@
 # Laravel Packager
 
-[![Latest Version](https://img.shields.io/github/release/jeroen-g/laravel-packager.svg?style=flat)](https://github.com/jeroen-g/laravel-packager/releases)
-[![License](https://img.shields.io/badge/License-EUPL--1.1-blue.svg?style=flat)](license.md)
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Total Downloads][ico-downloads]][link-downloads]
+[![Software License][ico-license]](license.md)
 
-This package provides you with a simple tool to set up a new package. Nothing more, nothing less.
+This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate.
 
 ## Installation
 
 Via Composer
 
-    $ composer require jeroen-g/laravel-packager
+```bash
+$ composer require jeroen-g/laravel-packager
+```
 
 Then add the service provider in `config/app.php`:
 
-    'JeroenG\Packager\PackagerServiceProvider',
-
-## Usage
-
-### New package
-The command will handle practically everything for you. It will create a packages directory, creates the vendor and package directory in it, pulls in a skeleton package, sets up composer.json, creates a service provider, registers the package in config/app.php and the app's composer.json. So you can start right away with only this command:
-``` bash
-$ artisan packager:new MyVendor MyPackage
+```php
+JeroenG\Packager\PackagerServiceProvider::class,
 ```
 
+## Available commands
+
+### New
+**Command:**
+```bash
+$ php artisan packager:new MyVendor MyPackage
+```
+
+**Result:**
+The command will handle practically everything for you. It will create a packages directory, creates the vendor and package directory in it, pulls in a skeleton package, sets up composer.json, creates a service provider, registers the package in config/app.php and the app's composer.json.
+
+**Options:**
+```bash
+$ php artisan packager:new MyVendor MyPackage -i
+$ php artisan packager:new -i
+```
+The package will be created interactively, allowing to configure everything in the package's `composer.json`, such as the license and package description.
+
+**Remarks:**
 The new package will be based on [league/skeleton](https://github.com/thephpleague/skeleton), plus a Laravel service provider.
 
-### Existing package
-If you already have your package on Github, it is possible to download that:
+### Get & Git
+**Command:**
 ``` bash
-$ artisan packager:get https://github.com/author/repository
+$ php artisan packager:get https://github.com/author/repository
+$ php artisan packager:git https://github.com/author/repository
 ```
-This will too register the package in config/app.php and the app's composer.json file. It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url. For example:
+
+**Result:**
+This will register the package in `config/app.php` and in the app's `composer.json` file.
+If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository.
+
+**Options:**
 ```bash
-$ artisan packager:get https://github.com/author/repository Author PackageRepository
+$ php artisan packager:get https://github.com/author/repository --branch=develop
+$ php artisan packager:get https://github.com/author/repository MyVendor MyPackage
+$ php artisan packager:git https://github.com/author/repository MyVendor MyPackage
 ```
+It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url.
 
 ### Tests
-If you want to test your package in a Laravel environment, run the command
+**Command:**
 ```bash
-$ artisan packager:tests MyVendor MyPackage
+$ php artisan packager:tests
 ```
-The vendor and name are optional, if left out, all packages (see `packager:list` for an overview) will be handled. If a tests folder exists, the files will be copied to a dedicated folder in the Laravel App tests folder. This allows you to use all of Laravel's own testing functions without any hassle.
 
-### Issues with cURL SSL certificate
+**Result:**
+Packager will go through all maintaining packages (in `packages/`) and publish their tests to `tests/packages`.
+
+**Options:**
+```bash
+$ php artisan packager:tests MyVendor MyPackage
+```
+
+**Remarks:**
+If a tests folder exists, the files will be copied to a dedicated folder in the Laravel App tests folder. This allows you to use all of Laravel's own testing functions without any hassle.
+
+### List
+**Command:**
+```bash
+$ php artisan packager:list
+```
+
+**Result:**
+An overview of all packages in the `/packages` directory.
+
+### Remove
+**Command:**
+```bash
+$ php artisan packager:remove MyVendor MyPackage
+```
+
+**Result:**
+The `MyVendor\MyPackage` package is deleted, including its references in `composer.json` and `config/app.php`.
+
+## Issues with cURL SSL certificate
 It turns out that, especially on windows, there might arise some problems with the downloading of the skeleton, due to a file regarding SSL certificates missing on the OS. This can be solved by opening up your .env file and putting this in it:
 ```
 CURL_VERIFY=false
 ```
 
+## Changelog
+
+Please see [changelog.md](changelog.md) for what has changed recently.
+
 ## Contributing
 
 Please see [contributing.md](contributing.md) for details.
+
+## Credits
+
+- [JeroenG][link-author]
+- [All Contributors][link-contributors]
 
 ## License
 
 The EU Public License. Please see [license.md](license.md) for more information.
 
-## Changelog
 
-Please see [changelog.md](changelog.md) for the changes made.
+[ico-version]: https://img.shields.io/packagist/v/jeroen-g/laravel-packager.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/license-EUPL-yellow.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/jeroen-g/laravel-packager.svg?style=flat-square
+
+[link-packagist]: https://packagist.org/packages/jeroen-g/laravel-packager
+[link-downloads]: https://packagist.org/packages/jeroen-g/laravel-packager
+[link-author]: https://github.com/Jeroen-G
+[link-contributors]: ../../contributors]
