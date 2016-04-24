@@ -19,7 +19,7 @@ class PackagerNewCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'packager:new {vendor} {name}';
+    protected $signature = 'packager:new {vendor} {name} {--i}';
 
     /**
      * The console command description.
@@ -57,8 +57,14 @@ class PackagerNewCommand extends Command
         $bar->start();
 
         // Common variables
-        $vendor = $this->argument('vendor');
-        $name = $this->argument('name');
+        // Starting with vendor/package, optionally defined interactively
+        if ($this->option('i')) {
+            $vendor = $this->ask('What will be the vendor name?', $this->argument('vendor'));
+            $name = $this->ask('What will be the package name?', $this->argument('name'));
+        } else {
+            $vendor = $this->argument('vendor');
+            $name = $this->argument('name');
+        }
         $path = getcwd().'/packages/';
         $fullPath = $path.$vendor.'/'.$name;
         $requireSupport = '"illuminate/support": "~5.1",
@@ -98,8 +104,8 @@ class PackagerNewCommand extends Command
             $this->helper->replaceAndSave(__DIR__.'/ServiceProvider.stub', ['{{vendor}}', '{{name}}'], [$vendor, $name], $newProvider);
         $bar->advance();
 
-        // Replacing skeleton namespaces
-        $this->info('Replacing skeleton namespaces...');
+        // Replacing skeleton placeholders
+        $this->info('Replacing skeleton placeholders...');
             $this->helper->replaceAndSave($fullPath.'/src/SkeletonClass.php', 'namespace League\Skeleton;', 'namespace '.$vendor.'\\'.$name.';');
             $search =   [
                 ':vendor',
@@ -124,7 +130,12 @@ class PackagerNewCommand extends Command
                 $vendor.'\\\\'.$name.'\\\\Test\\\\'
             ];
             $this->helper->replaceAndSave($fullPath.'/composer.json', $search, $replace);
+            if ($this->option('i')) {
+                $this->interactiveReplace($vendor, $name, $fullPath);
+            }
         $bar->advance();
+
+        
 
         // Add it to composer.json
         $this->info('Adding package to composer and app...');
@@ -138,5 +149,33 @@ class PackagerNewCommand extends Command
         $this->info('Package created successfully!');
         $this->output->newLine(2);
         $bar = null;
+    }
+
+    protected function interactiveReplace($vendor, $name, $fullPath)
+    {
+        $author = $this->ask('Who is the author?');
+        $authorEmail = $this->ask('What is the author\'s e-mail?');
+        $authorSite = $this->ask('What is the author\'s website?');
+        $description = $this->ask('How would you describe the package?');
+        $license = $this->ask('Under which license will it be released?');
+        $homepage = $this->ask('What is going to be the package website?', 'https://github.com/'.$vendor.'/'.$name);
+
+        $search =   [
+                ':author_name',
+                ':author_email',
+                ':author_website',
+                ':package_description',
+                'MIT',
+                'https://github.com/'.$vendor.'/'.$name,
+            ];
+            $replace =  [
+                $author,
+                $authorEmail,
+                $authorSite,
+                $description,
+                $license,
+                $homepage,
+            ];
+            $this->helper->replaceAndSave($fullPath.'/composer.json', $search, $replace);
     }
 }
