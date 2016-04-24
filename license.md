@@ -1,6 +1,6 @@
 # The EU Public License v1.1
 
-Copyright (c) 2015 JeroenG
+Copyright (c) 2016 JeroenG
 
 Licensed under the EUPL, Version 1.1 or – as soon they
 will be approved by the European Commission - subsequent

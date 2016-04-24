@@ -2,6 +2,17 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 1.5
+
+### Added
+- The `new` command now also accepts an option `--i` To interactively make a package and change all Skeleton placholders.
+
+### Fixed
+- Replacing of the Skeleton placeholders.
+
+### Updated
+- The readme is now up to date with information on all commands.
+
 ## Version 1.4
 
 ### Added

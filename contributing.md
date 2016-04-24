@@ -6,9 +6,6 @@ An interesting read is [Contributing to a Github Project](http://jasonlewis.me/a
 
 Also try to code in the same style as Laravel (which followes the [PSR standard](http://www.php-fig.org/) guidelines)
 
-**Happy coding**!
-
-
 ## Pull Requests
 
 - **Add tests!** - Your patch likely won't be accepted if it doesn't have tests.
@@ -21,11 +18,7 @@ Also try to code in the same style as Laravel (which followes the [PSR standard]
 
 - **One pull request per feature** - If you want to do more than one thing, send multiple pull requests.
 
-- **Send coherent history** - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please squash them before submitting.
+- **Send coherent history** - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please [squash them](http://www.git-scm.com/book/en/v2/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages) before submitting.
 
 
-## Running Tests
-
-``` bash
-$ phpunit
-```
+**Happy coding**!
