@@ -33,8 +33,8 @@ The command will handle practically everything for you. It will create a package
 
 **Options:**
 ```bash
-$ php artisan packager:new MyVendor MyPackage -i
-$ php artisan packager:new -i
+$ php artisan packager:new MyVendor MyPackage --i
+$ php artisan packager:new --i
 ```
 The package will be created interactively, allowing to configure everything in the package's `composer.json`, such as the license and package description.
 
