@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
  *
  * @package Packager
  * @author JeroenG
- * 
+ *
  **/
 class PackagerListCommand extends Command
 {
@@ -35,6 +35,8 @@ class PackagerListCommand extends Command
     public function handle()
     {
         $composer = json_decode(file_get_contents('composer.json'), true);
+        $packages = [];
+
         foreach ($composer['autoload']['psr-4'] as $package => $path) {
             if($package !== 'App\\') {
                 $packages[] = [rtrim($package, '\\'), $path];
