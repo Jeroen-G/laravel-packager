@@ -185,4 +185,13 @@ class PackagerHelper
         @unlink($zipFile);
         return $this;
     }
+    
+    /**
+     * New composer instance that dumps autoloads.
+     * @return mixed
+     */
+    public function dumpAutoloads()
+    {
+        return (app()['composer'])->dumpAutoloads();
+    }
 }
