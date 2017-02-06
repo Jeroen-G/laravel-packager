@@ -35,6 +35,13 @@ class PackagerNewCommand extends Command
     protected $helper;
 
     /**
+     * Instance of the composer class.
+     *
+     * @var Composer
+     */
+    protected $composer;
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -43,6 +50,7 @@ class PackagerNewCommand extends Command
     {
         parent::__construct();
         $this->helper = $helper;
+        $this->composer = app()['composer'];
     }
 
     /**
@@ -149,6 +157,9 @@ class PackagerNewCommand extends Command
         $this->info('Package created successfully!');
         $this->output->newLine(2);
         $bar = null;
+
+        //composer dump-autoload to identify new MyPackageServiceProvider
+        $this->composer->dumpAutoloads();
     }
 
     protected function interactiveReplace($vendor, $name, $fullPath)
