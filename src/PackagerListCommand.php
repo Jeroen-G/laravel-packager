@@ -63,7 +63,7 @@ class PackagerListCommand extends Command
 
         $headers = ['Package', 'Path'];
         $this->table($headers, $packages);
+        
+        $this->composer->dumpAutoloads();
     }
-    
-    $this->composer->dumpAutoloads();
 }
