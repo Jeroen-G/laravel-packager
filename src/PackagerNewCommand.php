@@ -35,13 +35,6 @@ class PackagerNewCommand extends Command
     protected $helper;
 
     /**
-     * Instance of the composer class.
-     *
-     * @var Composer
-     */
-    protected $composer;
-
-    /**
      * Create a new command instance.
      *
      * @return void
@@ -50,7 +43,6 @@ class PackagerNewCommand extends Command
     {
         parent::__construct();
         $this->helper = $helper;
-        $this->composer = app()['composer'];
     }
 
     /**
