@@ -159,7 +159,7 @@ class PackagerNewCommand extends Command
         $bar = null;
 
         //composer dump-autoload to identify new MyPackageServiceProvider
-        $this->composer->dumpAutoloads();
+        $this->helper->dumpAutoloads();
     }
 
     protected function interactiveReplace($vendor, $name, $fullPath)
