@@ -26,7 +26,25 @@ class PackagerListCommand extends Command
      * @var string
      */
     protected $description = 'List all locally installed packages.';
-
+    
+    /**
+     * Instance of the composer class.
+     *
+     * @var Composer
+     */
+    private $composer;
+    
+    
+    /**
+     * Create a new command instance.
+     *
+     * @param Filesystem $filesystem
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->composer = app()['composer'];
+    }
     /**
      * Execute the console command.
      *
@@ -46,4 +64,6 @@ class PackagerListCommand extends Command
         $headers = ['Package', 'Path'];
         $this->table($headers, $packages);
     }
+    
+    $this->composer->dumpAutoloads();
 }
