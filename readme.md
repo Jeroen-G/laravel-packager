@@ -1,8 +1,8 @@
 # Laravel Packager
 
-[![Latest Version on Packagist][ico-version]][link-packagist]
-[![Total Downloads][ico-downloads]][link-downloads]
-[![Software License][ico-license]](license.md)
+[![Latest Stable Version](https://poser.pugx.org/jeroen-g/laravel-packager/v/stable)](https://packagist.org/packages/jeroen-g/laravel-packager)
+[![Total Downloads](https://poser.pugx.org/jeroen-g/laravel-packager/downloads)](https://packagist.org/packages/jeroen-g/laravel-packager)
+[![License](https://poser.pugx.org/jeroen-g/laravel-packager/license)](https://packagist.org/packages/jeroen-g/laravel-packager)
 
 This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate.
 
