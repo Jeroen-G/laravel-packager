@@ -149,6 +149,9 @@ class PackagerNewCommand extends Command
         $this->info('Package created successfully!');
         $this->output->newLine(2);
         $bar = null;
+
+        //composer dump-autoload to identify new MyPackageServiceProvider
+        $this->helper->dumpAutoloads();
     }
 
     protected function interactiveReplace($vendor, $name, $fullPath)
