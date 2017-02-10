@@ -113,5 +113,8 @@ class PackagerGetCommand extends Command
         $this->info('Package created successfully!');
         $this->output->newLine(2);
         $bar = null;
+
+        // Composer dump-autoload to identify new MyPackageServiceProvider
+        $this->helper->dumpAutoloads();
     }
 }

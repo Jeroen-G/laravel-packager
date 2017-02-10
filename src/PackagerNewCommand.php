@@ -150,7 +150,7 @@ class PackagerNewCommand extends Command
         $this->output->newLine(2);
         $bar = null;
 
-        //composer dump-autoload to identify new MyPackageServiceProvider
+        // Composer dump-autoload to identify new MyPackageServiceProvider
         $this->helper->dumpAutoloads();
     }
 

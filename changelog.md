@@ -2,10 +2,11 @@
 
 All Notable changes to Packager will be documented in this file.
 
-## Version 1.5
+## Version 1.5.x
 
 ### Added
 - The `new` command now also accepts an option `--i` To interactively make a package and change all Skeleton placholders.
+- Composer autoloads are dumped after installing or creating a package.
 
 ### Fixed
 - Replacing of the Skeleton placeholders.
