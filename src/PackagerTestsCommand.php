@@ -54,7 +54,7 @@ class PackagerTestsCommand extends Command
      */
     public function handle()
     {
-        if(is_null($this->argument('vendor')) or is_null($this->argument('name'))) {
+        if(is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->info('Moving tests for all local packages');
 
             $composer = json_decode(file_get_contents('composer.json'), true);
@@ -84,7 +84,7 @@ class PackagerTestsCommand extends Command
 
             if($this->files->exists($path)) {   
                 $this->info('Moving tests for the package: '.$vendor.'/'.$name);
-                $r = $this->files->copyDirectory($path, getcwd().'/tests/packages/'.$vendor.'/'.$name);
+                $this->files->copyDirectory($path, getcwd().'/tests/packages/'.$vendor.'/'.$name);
             }
             else {
                 $this->info('No tests found for: '.$vendor.'/'.$name);

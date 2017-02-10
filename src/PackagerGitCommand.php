@@ -63,7 +63,7 @@ class PackagerGitCommand extends Command
         $source = $this->argument('url');
         $origin = rtrim(strtolower($source), '/');
         $pieces = explode('/', $origin);
-        if (is_null($this->argument('vendor')) or is_null($this->argument('name'))) {
+        if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $vendor = $pieces[3];
             $name = $pieces[4];
         } else {
