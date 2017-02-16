@@ -5,6 +5,7 @@ namespace JeroenG\Packager;
 use ZipArchive;
 use RuntimeException;
 use GuzzleHttp\Client;
+use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
 
 /**
@@ -29,6 +30,7 @@ class PackagerHelper
     public function __construct(Filesystem $files)
     {
         $this->files = $files;
+        $this->composer = new Composer($files);
     }
 
     /**
@@ -188,10 +190,11 @@ class PackagerHelper
     
     /**
      * New composer instance that dumps autoloads.
+     * 
      * @return mixed
      */
     public function dumpAutoloads()
     {
-        return (app()['composer'])->dumpAutoloads();
+        return $this->composer->dumpAutoloads();
     }
 }
