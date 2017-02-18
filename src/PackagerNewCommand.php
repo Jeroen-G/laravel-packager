@@ -10,10 +10,17 @@ use JeroenG\Packager\PackagerHelper;
  *
  * @package Packager
  * @author JeroenG
- * 
+ *
  **/
 class PackagerNewCommand extends Command
 {
+    /**
+     * The name of the command that creates a new package based on the stub
+     *
+     * @var string
+     */
+    protected $name = 'packager:new';
+
     /**
      * The name and signature of the console command.
      *

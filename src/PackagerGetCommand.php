@@ -10,10 +10,17 @@ use JeroenG\Packager\PackagerHelper;
  *
  * @package Packager
  * @author JeroenG
- * 
+ *
  **/
 class PackagerGetCommand extends Command
 {
+    /**
+     * The name of the remote command
+     *
+     * @var string
+     */
+    protected $name = 'packager:get';
+    
     /**
      * The name and signature of the console command.
      *
