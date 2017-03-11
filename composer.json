@@ -21,7 +21,8 @@
         "illuminate/support": "~5",
         "illuminate/console": "~5",
         "illuminate/filesystem": "~5",
-        "guzzlehttp/guzzle": "~6"
+        "guzzlehttp/guzzle": "~6",
+        "sensiolabs/security-checker": "^4.0"
     },
     "autoload": {
         "psr-4": {
