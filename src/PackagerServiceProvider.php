@@ -35,6 +35,7 @@ class PackagerServiceProvider extends ServiceProvider
         'JeroenG\Packager\PackagerGitCommand',
         'JeroenG\Packager\PackagerListCommand',
         'JeroenG\Packager\PackagerTestsCommand',
+        'JeroenG\Packager\PackagerCheckCommand',
     ];
 
     /**
