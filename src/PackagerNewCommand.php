@@ -70,7 +70,7 @@ class PackagerNewCommand extends Command
         $requireSupport = '"illuminate/support": "~5.1",
         "php"';
         $requirement = '"psr-4": {
-            "'.$vendor.'\\\\'.$name.'\\\\": "packages/'.$vendor.'/'.$name.'/src",';
+            "'.$vendor.'\\\\'.$name.'\\\\": "packages/'.$vendor.'/'.$name.'/src/",';
         $appConfigLine = 'App\Providers\RouteServiceProvider::class,
 
         '.$vendor.'\\'.$name.'\\'.$name.'ServiceProvider::class,';
