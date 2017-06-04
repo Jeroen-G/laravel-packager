@@ -28,5 +28,12 @@
         "psr-4": {
             "JeroenG\\Packager\\": "src"
         }
+    },
+    "extras": {
+        "laravel": {
+            "providers": [
+                "JeroenG\\Packager\\PackagerServiceProvider"
+            ]
+        }
     }
 }
