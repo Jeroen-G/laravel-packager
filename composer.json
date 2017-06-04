@@ -29,7 +29,7 @@
             "JeroenG\\Packager\\": "src"
         }
     },
-    "extras": {
+    "extra": {
         "laravel": {
             "providers": [
                 "JeroenG\\Packager\\PackagerServiceProvider"
