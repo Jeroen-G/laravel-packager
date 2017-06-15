@@ -66,7 +66,7 @@ class PackagerTestsCommand extends Command
             }
 
             foreach ($packages as $package) {
-                $path = base_path($package[1]).'/tests');
+                $path = base_path($package[1].'/tests');
 
                 if($this->files->exists($path)) {
                     $this->info('Moving tests for the package: '.$package[0]);
