@@ -66,11 +66,11 @@ class PackagerTestsCommand extends Command
             }
 
             foreach ($packages as $package) {
-                $path = dirname(getcwd().'/'.$package[1]).'/tests';
+                $path = base_path($package[1].'/tests');
 
                 if($this->files->exists($path)) {
                     $this->info('Moving tests for the package: '.$package[0]);
-                    $this->files->copyDirectory($path, getcwd().'/tests/packages/'.$package[0]);
+                    $this->files->copyDirectory($path, base_path('tests/packages/'.$package[0]));
                 }
                 else {
                     $this->info('No tests found for: '.$package[0]);
@@ -80,11 +80,11 @@ class PackagerTestsCommand extends Command
         else {
             $vendor = $this->argument('vendor');
             $name = $this->argument('name');
-            $path = getcwd().'/packages/'.$vendor.'/'.$name.'/tests';
+            $path = base_path('packages/'.$vendor.'/'.$name.'/tests');
 
             if($this->files->exists($path)) {   
                 $this->info('Moving tests for the package: '.$vendor.'/'.$name);
-                $this->files->copyDirectory($path, getcwd().'/tests/packages/'.$vendor.'/'.$name);
+                $this->files->copyDirectory($path, base_path('tests/packages/'.$vendor.'/'.$name));
             }
             else {
                 $this->info('No tests found for: '.$vendor.'/'.$name);
