@@ -60,13 +60,13 @@ class PackagerTestsCommand extends Command
             $composer = json_decode(file_get_contents('composer.json'), true);
 
             foreach ($composer['autoload']['psr-4'] as $package => $path) {
-                if($package !== 'App\\') {
+                if($package !== 'App\\' && $package !== 'Tests\\') {
                     $packages[] = [rtrim($package, '\\'), $path];
                 }
             }
 
             foreach ($packages as $package) {
-                $path = base_path($package[1].'/tests');
+                $path = dirname(getcwd().'/'.$package[1]).'/tests';
 
                 if($this->files->exists($path)) {
                     $this->info('Moving tests for the package: '.$package[0]);

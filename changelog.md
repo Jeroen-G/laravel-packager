@@ -11,6 +11,7 @@ All Notable changes to Packager will be documented in this file.
 
 ### Fixed
 - Replacing of the Skeleton placeholders.
+- Replaced `packager:tests` path creation function.
 
 ### Updated
 - The readme is now up to date with information on all commands.
