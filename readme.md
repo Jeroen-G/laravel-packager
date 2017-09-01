@@ -14,11 +14,13 @@ Via Composer
 $ composer require jeroen-g/laravel-packager
 ```
 
-Then add the service provider in `config/app.php`:
+If you do not run Laravel 5.5 (or higher), then add the service provider in `config/app.php`:
 
 ```php
 JeroenG\Packager\PackagerServiceProvider::class,
 ```
+
+If you do run the package on Laravel 5.5+, [package auto-discovery](https://medium.com/@taylorotwell/package-auto-discovery-in-laravel-5-5-ea9e3ab20518) takes care of the magic of adding the service provider.
 
 ## Available commands
 
@@ -68,6 +70,12 @@ $ php artisan packager:tests
 
 **Result:**
 Packager will go through all maintaining packages (in `packages/`) and publish their tests to `tests/packages`.
+Add the following to phpunit.xml (under the other testsuites) in order to run the tests from the packages:
+```xml
+<testsuite name="Packages">
+    <directory suffix="Test.php">./tests/packages</directory>
+</testsuite>
+```
 
 **Options:**
 ```bash
