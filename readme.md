@@ -70,6 +70,12 @@ $ php artisan packager:tests
 
 **Result:**
 Packager will go through all maintaining packages (in `packages/`) and publish their tests to `tests/packages`.
+Add the following to phpunit.xml (under the other testsuites) in order to run the tests from the packages:
+```xml
+<testsuite name="Packages">
+    <directory suffix="Test.php">./tests/packages</directory>
+</testsuite>
+```
 
 **Options:**
 ```bash
