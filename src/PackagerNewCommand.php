@@ -10,7 +10,7 @@ use JeroenG\Packager\PackagerHelper;
  *
  * @package Packager
  * @author JeroenG
- * 
+ *
  **/
 class PackagerNewCommand extends Command
 {
@@ -101,7 +101,12 @@ class PackagerNewCommand extends Command
         // Creating a Laravel Service Provider in the src directory
         $this->info('Creating service provider...');
             $newProvider = $fullPath.'/src/'.$name.'ServiceProvider.php';
-            $this->helper->replaceAndSave(__DIR__.'/ServiceProvider.stub', ['{{vendor}}', '{{name}}'], [$vendor, $name], $newProvider);
+            $this->helper->replaceAndSave(
+                \Config::get('packager.service_provider_stub', __DIR__.'/ServiceProvider.stub'),
+                ['{{vendor}}', '{{name}}'],
+                [$vendor, $name],
+                $newProvider
+            );
         $bar->advance();
 
         // Replacing skeleton placeholders
@@ -135,7 +140,7 @@ class PackagerNewCommand extends Command
             }
         $bar->advance();
 
-        
+
 
         // Add it to composer.json
         $this->info('Adding package to composer and app...');
@@ -156,9 +161,9 @@ class PackagerNewCommand extends Command
 
     protected function interactiveReplace($vendor, $name, $fullPath)
     {
-        $author = $this->ask('Who is the author?');
-        $authorEmail = $this->ask('What is the author\'s e-mail?');
-        $authorSite = $this->ask('What is the author\'s website?');
+        $author = $this->ask('Who is the author?', \Config::get('packager.author'));
+        $authorEmail = $this->ask('What is the author\'s e-mail?', \Config::get('packager.author_email'));
+        $authorSite = $this->ask('What is the author\'s website?', \Config::get('packager.author_site'));
         $description = $this->ask('How would you describe the package?');
         $license = $this->ask('Under which license will it be released?');
         $homepage = $this->ask('What is going to be the package website?', 'https://github.com/'.$vendor.'/'.$name);
