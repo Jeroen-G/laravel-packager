@@ -5,4 +5,5 @@ return [
     'author' => '',
     'author_email' => '',
     'author_site' => '',
+    'license' => '',
 ];

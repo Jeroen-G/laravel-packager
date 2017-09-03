@@ -165,7 +165,7 @@ class PackagerNewCommand extends Command
         $authorEmail = $this->ask('What is the author\'s e-mail?', \Config::get('packager.author_email'));
         $authorSite = $this->ask('What is the author\'s website?', \Config::get('packager.author_site'));
         $description = $this->ask('How would you describe the package?');
-        $license = $this->ask('Under which license will it be released?');
+        $license = $this->ask('Under which license will it be released?', \Config::get('packager.license'));
         $homepage = $this->ask('What is going to be the package website?', 'https://github.com/'.$vendor.'/'.$name);
 
         $search =   [
