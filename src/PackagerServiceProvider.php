@@ -45,7 +45,9 @@ class PackagerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Not really anything to boot.
+        $this->publishes([
+            __DIR__.'/config/packager.php' => config_path('packager.php'),
+        ]);
     }
 
     /**

@@ -22,6 +22,12 @@ JeroenG\Packager\PackagerServiceProvider::class,
 
 If you do run the package on Laravel 5.5+, [package auto-discovery](https://medium.com/@taylorotwell/package-auto-discovery-in-laravel-5-5-ea9e3ab20518) takes care of the magic of adding the service provider.
 
+Optional you can publish the configuration to provide an own service provider stub.
+
+```bash
+$ php artisan vendor:publish --provider="JeroenG\Packager\PackagerServiceProvider"
+```
+
 ## Available commands
 
 ### New
