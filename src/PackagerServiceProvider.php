@@ -29,13 +29,14 @@ class PackagerServiceProvider extends ServiceProvider
      * @var bool
      */
     protected $commands = [
-        'JeroenG\Packager\PackagerNewCommand',
-        'JeroenG\Packager\PackagerRemoveCommand',
-        'JeroenG\Packager\PackagerGetCommand',
-        'JeroenG\Packager\PackagerGitCommand',
-        'JeroenG\Packager\PackagerListCommand',
-        'JeroenG\Packager\PackagerTestsCommand',
-        'JeroenG\Packager\PackagerCheckCommand',
+        'JeroenG\Packager\Commands\NewPackage',
+        'JeroenG\Packager\Commands\RemovePackage',
+        'JeroenG\Packager\Commands\GetPackage',
+        'JeroenG\Packager\Commands\GitPackage',
+        'JeroenG\Packager\Commands\ListPackages',
+        'JeroenG\Packager\Commands\MoveTests',
+        'JeroenG\Packager\Commands\CheckPackage',
+        'JeroenG\Packager\Commands\PublishPackage',
     ];
 
     /**

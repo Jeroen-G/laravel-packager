@@ -1,6 +1,6 @@
 <?php
 
-namespace JeroenG\Packager;
+namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\PackagerHelper;
@@ -12,7 +12,7 @@ use JeroenG\Packager\PackagerHelper;
  * @author JeroenG
  * 
  **/
-class PackagerPublishCommand extends Command
+class PublishPackage extends Command
 {
     /**
      * The name and signature of the console command.

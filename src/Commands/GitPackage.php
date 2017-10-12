@@ -1,6 +1,6 @@
 <?php
 
-namespace JeroenG\Packager;
+namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\PackagerHelper;
@@ -12,7 +12,7 @@ use JeroenG\Packager\PackagerHelper;
  * @author JeroenG
  * 
  **/
-class PackagerGitCommand extends Command
+class GitPackage extends Command
 {
     /**
      * The name and signature of the console command.
@@ -100,9 +100,9 @@ class PackagerGitCommand extends Command
 
         // Add it to composer.json
         $this->info('Adding package to composer and app...');
-            $this->helper->replaceAndSave(getcwd().'/composer.json', '"psr-4": {', $requirement);
+            $this->helper->replaceAndSave(base_path('composer.json'), '"psr-4": {', $requirement);
             // And add it to the providers array in config/app.php
-            $this->helper->replaceAndSave(getcwd().'/config/app.php', 'App\Providers\RouteServiceProvider::class,', $appConfigLine);
+            $this->helper->replaceAndSave(config_path('app.php'), 'App\Providers\RouteServiceProvider::class,', $appConfigLine);
         $bar->advance();
 
         // Finished creating the package, end of the progress bar
