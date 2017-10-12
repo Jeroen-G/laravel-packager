@@ -1,0 +1,27 @@
+language: php
+
+php:
+  - 7.0
+  - 7.1
+
+env:
+  - TESTBENCH_VERSION=3.4.*
+
+matrix:
+  include:
+    - php: 7.0
+      env: TESTBENCH_VERSION=3.5.*
+    - php: 7.1
+      env: TESTBENCH_VERSION=3.5.*
+
+before_script:
+  - travis_retry composer self-update
+  - travis_retry composer require "orchestra/testbench:${TESTBENCH_VERSION}" --no-update
+  - travis_retry composer update --no-interaction --prefer-source --dev
+
+script:
+  - phpunit --coverage-text --coverage-clover=coverage.clover
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
