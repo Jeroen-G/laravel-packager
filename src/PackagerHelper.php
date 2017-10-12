@@ -11,9 +11,7 @@ use Illuminate\Filesystem\Filesystem;
 /**
  * Helper functions for the Packager commands.
  *
- * @package Packager
  * @author JeroenG
- * 
  **/
 class PackagerHelper
 {
@@ -100,7 +98,7 @@ class PackagerHelper
      */
     public function makeDir($path)
     {
-        if (!is_dir($path)) {
+        if (! is_dir($path)) {
             return mkdir($path, 0777, true);
         }
     }
@@ -126,8 +124,8 @@ class PackagerHelper
                 @chmod("$path/$file", 0777);
                 @unlink("$path/$file");
             }
-
         }
+
         return rmdir($path);
     }
 
@@ -154,6 +152,7 @@ class PackagerHelper
         $client = new Client(['verify' => env('CURL_VERIFY', true)]);
         $response = $client->get($source);
         file_put_contents($zipFile, $response->getBody());
+
         return $this;
     }
 
@@ -171,6 +170,7 @@ class PackagerHelper
         $archive->open($zipFile);
         $archive->extractTo($directory);
         $archive->close();
+
         return $this;
     }
 
@@ -185,12 +185,13 @@ class PackagerHelper
     {
         @chmod($zipFile, 0777);
         @unlink($zipFile);
+
         return $this;
     }
-    
+
     /**
      * New composer instance that dumps autoloads.
-     * 
+     *
      * @return mixed
      */
     public function dumpAutoloads()
