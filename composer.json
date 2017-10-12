@@ -5,8 +5,7 @@
         "Packager",
         "Laravel",
         "package",
-        "skeleton",
-        "Github"
+        "skeleton"
     ],
     "homepage": "https://github.com/Jeroen-G/laravel-packager",
     "license": "EUPL-1.1",
@@ -21,13 +20,24 @@
         "illuminate/support": "~5",
         "illuminate/console": "~5",
         "illuminate/filesystem": "~5",
-        "guzzlehttp/guzzle": "~6",
-        "sensiolabs/security-checker": "^4.0"
+        "guzzlehttp/guzzle": "~6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~6.0",
+        "orchestra/testbench": "~3.0"
     },
     "autoload": {
         "psr-4": {
             "JeroenG\\Packager\\": "src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JeroenG\\Packager\\Tests\\": "tests"
+        }
+    },
+    "suggest": {
+        "sensiolabs/security-checker": "Required to use the security check command"
     },
     "extra": {
         "laravel": {
