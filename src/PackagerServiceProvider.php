@@ -10,9 +10,7 @@ use Illuminate\Support\ServiceProvider;
  * Place the line below in the providers array inside app/config/app.php
  * <code>'JeroenG\Packager\PackagerServiceProvider',</code>
  *
- * @package Packager
  * @author JeroenG
- * 
  **/
 class PackagerServiceProvider extends ServiceProvider
 {

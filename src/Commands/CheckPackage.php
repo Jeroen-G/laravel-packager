@@ -9,9 +9,7 @@ use SensioLabs\Security\Formatters\SimpleFormatter;
 /**
  * List all locally installed packages.
  *
- * @package Packager
  * @author JeroenG
- *
  **/
 class CheckPackage extends Command
 {
@@ -45,7 +43,7 @@ class CheckPackage extends Command
         $name = $this->argument('name');
         $lockfile = getcwd().'/packages/'.$vendor.'/'.$name.'/composer.lock';
         $vulnerabilities = $checker->check($lockfile);
-        
+
         return $formatter->displayResults($this->output, $lockfile, $vulnerabilities);
     }
 }

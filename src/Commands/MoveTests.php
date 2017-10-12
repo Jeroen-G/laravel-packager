@@ -8,9 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 /**
  * Move the packages tests to the Laravel app tests folder.
  *
- * @package Packager
  * @author JeroenG
- * 
  **/
 class MoveTests extends Command
 {
@@ -32,7 +30,7 @@ class MoveTests extends Command
 
     /**
      * The filesystem handler.
-     * 
+     *
      * @var object
      */
     protected $files;
@@ -54,13 +52,13 @@ class MoveTests extends Command
      */
     public function handle()
     {
-        if(is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
+        if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->info('Moving tests for all local packages');
 
             $composer = json_decode(file_get_contents('composer.json'), true);
 
             foreach ($composer['autoload']['psr-4'] as $package => $path) {
-                if($package !== 'App\\' && $package !== 'Tests\\') {
+                if ($package !== 'App\\' && $package !== 'Tests\\') {
                     $packages[] = [rtrim($package, '\\'), $path];
                 }
             }
@@ -68,25 +66,22 @@ class MoveTests extends Command
             foreach ($packages as $package) {
                 $path = dirname(getcwd().'/'.$package[1]).'/tests';
 
-                if($this->files->exists($path)) {
+                if ($this->files->exists($path)) {
                     $this->info('Moving tests for the package: '.$package[0]);
                     $this->files->copyDirectory($path, base_path('tests/packages/'.$package[0]));
-                }
-                else {
+                } else {
                     $this->info('No tests found for: '.$package[0]);
                 }
             }
-        }
-        else {
+        } else {
             $vendor = $this->argument('vendor');
             $name = $this->argument('name');
             $path = base_path('packages/'.$vendor.'/'.$name.'/tests');
 
-            if($this->files->exists($path)) {   
+            if ($this->files->exists($path)) {
                 $this->info('Moving tests for the package: '.$vendor.'/'.$name);
                 $this->files->copyDirectory($path, base_path('tests/packages/'.$vendor.'/'.$name));
-            }
-            else {
+            } else {
                 $this->info('No tests found for: '.$vendor.'/'.$name);
             }
         }

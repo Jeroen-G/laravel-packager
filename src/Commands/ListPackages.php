@@ -7,9 +7,7 @@ use Illuminate\Console\Command;
 /**
  * List all locally installed packages.
  *
- * @package Packager
  * @author JeroenG
- *
  **/
 class ListPackages extends Command
 {
@@ -38,7 +36,7 @@ class ListPackages extends Command
         $packages = [];
 
         foreach ($composer['autoload']['psr-4'] as $package => $path) {
-            if($package !== 'App\\') {
+            if ($package !== 'App\\') {
                 $packages[] = [rtrim($package, '\\'), $path];
             }
         }
