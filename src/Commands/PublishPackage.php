@@ -8,9 +8,7 @@ use JeroenG\Packager\PackagerHelper;
 /**
  * Get an existing package from a remote Github repository with its git repository.
  *
- * @package Packager
  * @author JeroenG
- * 
  **/
 class PublishPackage extends Command
 {
@@ -58,7 +56,7 @@ class PublishPackage extends Command
         $bar->start();
 
         $this->info('Initialising Git if not already done so...');
-        if ( ! file_exists('.git/')) {
+        if (! file_exists('.git/')) {
             exec('git init && git add --all && git commit -m "Initial commit"');
         }
         $bar->advance();

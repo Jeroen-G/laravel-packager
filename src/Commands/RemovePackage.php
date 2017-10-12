@@ -8,9 +8,7 @@ use JeroenG\Packager\PackagerHelper;
 /**
  * remove an existing package.
  *
- * @package Packager
  * @author JeroenG
- * 
  **/
 class RemovePackage extends Command
 {
@@ -33,7 +31,7 @@ class RemovePackage extends Command
      * @var object
      */
     protected $helper;
-    
+
     /**
      * Create a new command instance.
      *
@@ -70,7 +68,7 @@ class RemovePackage extends Command
 
         // remove the package directory
         $this->info('Removing packages directory...');
-            $this->helper->removeDir($fullPath);
+        $this->helper->removeDir($fullPath);
         $bar->advance();
 
         // Remove the vendor directory, if agreed to
@@ -84,8 +82,8 @@ class RemovePackage extends Command
 
         // Remove it from composer.json and app config
         $this->info('Removing package from composer and app config...');
-            $this->helper->replaceAndSave(base_path('composer.json'), $requirement, '');
-            $this->helper->replaceAndSave(config_path('app.php'), $appConfigLine, '');
+        $this->helper->replaceAndSave(base_path('composer.json'), $requirement, '');
+        $this->helper->replaceAndSave(config_path('app.php'), $appConfigLine, '');
         $bar->advance();
 
         // Finished removing the package, end of the progress bar

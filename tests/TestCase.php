@@ -2,7 +2,6 @@
 
 namespace JeroenG\Packager\Tests;
 
-use JeroenG\Packager\PackagerHelper;
 use Illuminate\Contracts\Console\Kernel;
 use Orchestra\Testbench\TestCase as TestBench;
 
@@ -26,20 +25,21 @@ abstract class TestCase extends TestBench
     {
         parent::tearDown();
 
-
         $this->removeDir(getcwd().'/packages');
     }
 
-    public function removeDir($path) {
+    public function removeDir($path)
+    {
         $files = array_diff(scandir($path), ['.', '..']);
         foreach ($files as $file) {
-            if(is_dir("$path/$file")) {
+            if (is_dir("$path/$file")) {
                 $this->removeDir("$path/$file");
             } else {
                 @chmod("$path/$file", 0777);
                 @unlink("$path/$file");
             }
         }
+
         return rmdir($path);
     }
 
@@ -58,6 +58,7 @@ abstract class TestCase extends TestBench
         $consoleOutput = $this->app[Kernel::class]->output();
         $this->assertContains($expectedText, $consoleOutput, "Did not see `{$expectedText}` in console output: `$consoleOutput`");
     }
+
     protected function doNotSeeInConsoleOutput($unExpectedText)
     {
         $consoleOutput = $this->app[Kernel::class]->output();

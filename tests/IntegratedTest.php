@@ -3,7 +3,6 @@
 namespace JeroenG\Packager\Tests;
 
 use Artisan;
-use JeroenG\Packager\Tests\TestCase;
 
 class IntegratedTest extends TestCase
 {
