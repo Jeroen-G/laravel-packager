@@ -1,6 +1,6 @@
 <?php
 
-namespace JeroenG\Packager;
+namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -12,7 +12,7 @@ use Illuminate\Filesystem\Filesystem;
  * @author JeroenG
  * 
  **/
-class PackagerTestsCommand extends Command
+class MoveTests extends Command
 {
     /**
      * The name and signature of the console command.

@@ -1,11 +1,10 @@
 <?php
 
-namespace JeroenG\Packager;
-
-use SensioLabs\Security\SecurityChecker;
-use SensioLabs\Security\Formatters\SimpleFormatter;
+namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
+use SensioLabs\Security\SecurityChecker;
+use SensioLabs\Security\Formatters\SimpleFormatter;
 
 /**
  * List all locally installed packages.
@@ -14,7 +13,7 @@ use Illuminate\Console\Command;
  * @author JeroenG
  *
  **/
-class PackagerCheckCommand extends Command
+class CheckPackage extends Command
 {
     /**
      * The name and signature of the console command.

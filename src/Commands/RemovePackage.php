@@ -1,6 +1,6 @@
 <?php
 
-namespace JeroenG\Packager;
+namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\PackagerHelper;
@@ -12,7 +12,7 @@ use JeroenG\Packager\PackagerHelper;
  * @author JeroenG
  * 
  **/
-class PackagerRemoveCommand extends Command
+class RemovePackage extends Command
 {
     /**
      * The name and signature of the console command.
@@ -84,8 +84,8 @@ class PackagerRemoveCommand extends Command
 
         // Remove it from composer.json and app config
         $this->info('Removing package from composer and app config...');
-            $this->helper->replaceAndSave(getcwd().'/composer.json', $requirement, '');
-            $this->helper->replaceAndSave(getcwd().'/config/app.php', $appConfigLine, '');
+            $this->helper->replaceAndSave(base_path('composer.json'), $requirement, '');
+            $this->helper->replaceAndSave(config_path('app.php'), $appConfigLine, '');
         $bar->advance();
 
         // Finished removing the package, end of the progress bar

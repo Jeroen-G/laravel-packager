@@ -1,6 +1,6 @@
 <?php
 
-namespace JeroenG\Packager;
+namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 
@@ -11,7 +11,7 @@ use Illuminate\Console\Command;
  * @author JeroenG
  *
  **/
-class PackagerListCommand extends Command
+class ListPackages extends Command
 {
     /**
      * The name and signature of the console command.
@@ -34,7 +34,7 @@ class PackagerListCommand extends Command
      */
     public function handle()
     {
-        $composer = json_decode(file_get_contents('composer.json'), true);
+        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
         $packages = [];
 
         foreach ($composer['autoload']['psr-4'] as $package => $path) {
