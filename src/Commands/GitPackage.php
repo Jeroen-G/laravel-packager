@@ -88,7 +88,7 @@ class GitPackage extends Command
 
         // Clone the repository
         $this->info('Cloning repository...');
-        exec("git clone $source $fullPath");
+        exec("git clone $source $this->conveyor->packagePath()");
         $this->makeProgress();
 
         // Composer dump-autoload to identify new service provider

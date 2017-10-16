@@ -62,13 +62,14 @@ trait FileHandler
      *
      * @param  string $path Path of the directory to make
      *
-     * @return void
+     * @return boolean
      */
     public function makeDir($path)
     {
         if (! is_dir($path)) {
             return mkdir($path, 0777, true);
         }
+        return false;
     }
 
     /**
@@ -76,7 +77,7 @@ trait FileHandler
      *
      * @param  string $path Path of the directory to remove.
      *
-     * @return void
+     * @return boolean
      */
     public function removeDir($path)
     {

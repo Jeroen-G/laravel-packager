@@ -17,15 +17,6 @@ class Wrapping
     public $replacements = [];
 
     /**
-     * Instantiate a new Wrapping class.
-     */
-    public function __construct()
-    {
-        // $this->placeholders = collect();
-        // $this->replacements = collect();
-    }
-
-    /**
      * Open haystack, find and replace needles, save haystack.
      *
      * @param  string|array  $placeholder  String or array to look for (the needles)
@@ -73,7 +64,7 @@ class Wrapping
      */
     public function fillInFile($template, $destination = null)
     {
-        $destination = ($destination == null) ? $template : $destination;
+        $destination = ($destination === null) ? $template : $destination;
 
         $filledFile = str_replace($this->placeholders, $this->replacements, file_get_contents($template));
         file_put_contents($destination, $filledFile);
