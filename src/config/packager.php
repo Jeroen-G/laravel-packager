@@ -1,7 +1,7 @@
 <?php
 
 return [
-    /**
+    /*
      * You can set defaults for the following placeholders.
      */
     'author_name' => 'author name',

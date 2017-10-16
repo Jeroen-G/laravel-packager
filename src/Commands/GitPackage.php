@@ -71,7 +71,7 @@ class GitPackage extends Command
             $this->conveyor->package($this->argument('name'));
         }
 
-         // Start creating the package
+        // Start creating the package
         $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
         $this->conveyor->checkIfPackageExists();
         $this->makeProgress();
