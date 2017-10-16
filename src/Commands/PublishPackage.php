@@ -2,8 +2,9 @@
 
 namespace JeroenG\Packager\Commands;
 
+use JeroenG\Packager\Conveyor;
 use Illuminate\Console\Command;
-use JeroenG\Packager\PackagerHelper;
+use JeroenG\Packager\ProgressBar;
 
 /**
  * Get an existing package from a remote Github repository with its git repository.
@@ -12,12 +13,16 @@ use JeroenG\Packager\PackagerHelper;
  **/
 class PublishPackage extends Command
 {
+    use ProgressBar;
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
     protected $signature = 'packager:publish
+                            {vendor : The vendor part of the namespace}
+                            {name : The name of package for the namespace}
                             {url : The url of the Github repository}';
 
     /**
@@ -28,20 +33,20 @@ class PublishPackage extends Command
     protected $description = 'Publish your package to Github with git.';
 
     /**
-     * Packager helper class.
-     * @var object
+     * Packages roll off of the conveyor.
+     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $helper;
+    protected $conveyor;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(PackagerHelper $helper)
+    public function __construct(Conveyor $conveyor)
     {
         parent::__construct();
-        $this->helper = $helper;
+        $this->conveyor = $conveyor;
     }
 
     /**
@@ -52,28 +57,28 @@ class PublishPackage extends Command
     public function handle()
     {
         // Start the progress bar
-        $bar = $this->helper->barSetup($this->output->createProgressBar(5));
-        $bar->start();
+        $this->startProgressBar(5);
+
+        // Defining vendor/package
+        $this->conveyor->vendor($this->argument('vendor'));
+        $this->conveyor->package($this->argument('name'));
 
         $this->info('Initialising Git if not already done so...');
-        if (! file_exists('.git/')) {
-            exec('git init && git add --all && git commit -m "Initial commit"');
+        if (! file_exists($this->conveyor->packageDir().'/.git/')) {
+            exec('cd '.$this->conveyor->packageDir().' git init && git add --all && git commit -m "Initial commit"');
         }
-        $bar->advance();
+        $this->makeProgress();
 
         $this->info('Git is set up, adding the remote repository...');
-        exec('git remote add origin '.$this->argument('url'));
-        $bar->advance();
+        exec('cd '.$this->conveyor->packageDir().' git remote add origin '.$this->argument('url'));
+        $this->makeProgress();
 
         $this->info('Pushing to Github...');
-        exec('git push origin master');
-        $bar->advance();
+        exec('cd '.$this->conveyor->packageDir().' git push origin master');
+        $this->makeProgress();
 
-        // Finished creating the package, end of the progress bar
-        $bar->finish();
-        $this->info('Package published successfully!');
+        // Finished publishing the package, end of the progress bar
+        $this->finishProgress('Package created successfully!');
         $this->info('Go ahead and submit it to Packagist: https://packagist.org/packages/submit');
-        $this->output->newLine(2);
-        $bar = null;
     }
 }

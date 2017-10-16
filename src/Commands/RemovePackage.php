@@ -2,8 +2,9 @@
 
 namespace JeroenG\Packager\Commands;
 
+use JeroenG\Packager\Conveyor;
 use Illuminate\Console\Command;
-use JeroenG\Packager\PackagerHelper;
+use JeroenG\Packager\ProgressBar;
 
 /**
  * remove an existing package.
@@ -12,6 +13,8 @@ use JeroenG\Packager\PackagerHelper;
  **/
 class RemovePackage extends Command
 {
+    use ProgressBar;
+
     /**
      * The name and signature of the console command.
      *
@@ -27,20 +30,20 @@ class RemovePackage extends Command
     protected $description = 'Remove an existing package.';
 
     /**
-     * Packager helper class.
-     * @var object
+     * Packages roll off of the conveyor.
+     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $helper;
+    protected $conveyor;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(PackagerHelper $helper)
+    public function __construct(Conveyor $conveyor)
     {
         parent::__construct();
-        $this->helper = $helper;
+        $this->conveyor = $conveyor;
     }
 
     /**
@@ -51,48 +54,37 @@ class RemovePackage extends Command
     public function handle()
     {
         // Start the progress bar
-        $bar = $this->helper->barSetup($this->output->createProgressBar(4));
-        $bar->start();
+        $this->startProgressBar(4);
 
-        // Common variables
-        $vendor = $this->argument('vendor');
-        $name = $this->argument('name');
-        $path = getcwd().'/packages/';
-        $fullPath = $path.$vendor.'/'.$name;
-        $requirement = '"'.$vendor.'\\\\'.$name.'\\\\": "packages/'.$vendor.'/'.$name.'/src",';
-        $appConfigLine = $vendor.'\\'.$name.'\\'.$name.'ServiceProvider::class,';
+        // Defining vendor/package
+        $this->conveyor->vendor($this->argument('vendor'));
+        $this->conveyor->package($this->argument('name'));
 
         // Start removing the package
-        $this->info('Removing package '.$vendor.'\\'.$name.'...');
-        $bar->advance();
+        $this->info('Removing package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
+        $this->makeProgress();
 
         // remove the package directory
         $this->info('Removing packages directory...');
-        $this->helper->removeDir($fullPath);
-        $bar->advance();
+        $this->conveyor->removeDir($this->conveyor->packagePath());
+        $this->makeProgress();
 
         // Remove the vendor directory, if agreed to
         if ($this->confirm('Do you want to remove the vendor directory? [y|N]')) {
             $this->info('removing vendor directory...');
-            $this->helper->removeDir($path.$vendor);
+            $this->conveyor->removeDir($this->conveyor->vendorPath());
         } else {
             $this->info('Continuing...');
         }
-        $bar->advance();
+        $this->makeProgress();
 
-        // Remove it from composer.json and app config
-        $this->info('Removing package from composer and app config...');
-        $this->helper->replaceAndSave(base_path('composer.json'), $requirement, '');
-        $this->helper->replaceAndSave(config_path('app.php'), $appConfigLine, '');
-        $bar->advance();
+        // Composer dump-autoload to remove service provider
+        $this->info('Dumping autoloads and undiscovering package...');
+        $this->conveyor->dumpAutoloads();
+        $this->conveyor->discoverPackage();
+        $this->makeProgress();
 
         // Finished removing the package, end of the progress bar
-        $bar->finish();
-        $this->info('Package removed successfully!');
-        $this->output->newLine(2);
-        $bar = null;
-
-        // Composer dump-autoload to identify new MyPackageServiceProvider
-        $this->helper->dumpAutoloads();
+        $this->finishProgress('Package removed successfully!');
     }
 }

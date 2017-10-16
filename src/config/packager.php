@@ -1,10 +1,11 @@
 <?php
 
 return [
-    // Use the relative path to stub file.
-//    'service_provider_stub' => '',
-    'author' => '',
-    'author_email' => '',
-    'author_site' => '',
-    'license' => '',
+    /**
+     * You can set defaults for the following placeholders.
+     */
+    'author_name' => 'author name',
+    'author_email' => 'author email',
+    'author_homepage' => 'author homepage',
+    'license' => 'license',
 ];
