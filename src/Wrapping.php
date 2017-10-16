@@ -5,13 +5,13 @@ namespace JeroenG\Packager;
 class Wrapping
 {
     /**
-     * Placeholders
+     * Placeholders.
      * @var array
      */
     public $placeholders = [];
 
     /**
-     * Replacements
+     * Replacements.
      * @var array
      */
     public $replacements = [];
@@ -45,6 +45,7 @@ class Wrapping
         } else {
             $this->replacements[] = $replacement;
         }
+
         return $this;
     }
 

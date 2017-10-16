@@ -33,7 +33,7 @@ class IntegratedTest extends TestCase
         Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);
         $this->seeInConsoleOutput('MyVendor');
 
-        Artisan::call('packager:remove', ['vendor' => 'MyVendor', 'name' => 'MyPackage', '--no-interaction' => true ]);
+        Artisan::call('packager:remove', ['vendor' => 'MyVendor', 'name' => 'MyPackage', '--no-interaction' => true]);
         $this->seeInConsoleOutput('Package removed successfully!');
     }
 }
