@@ -2,8 +2,11 @@
 
 namespace JeroenG\Packager\Commands;
 
+use Config;
+use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\Wrapping;
 use Illuminate\Console\Command;
-use JeroenG\Packager\PackagerHelper;
+use JeroenG\Packager\ProgressBar;
 
 /**
  * Create a brand new package.
@@ -12,6 +15,8 @@ use JeroenG\Packager\PackagerHelper;
  **/
 class NewPackage extends Command
 {
+    use ProgressBar;
+
     /**
      * The name and signature of the console command.
      *
@@ -27,20 +32,27 @@ class NewPackage extends Command
     protected $description = 'Create a new package.';
 
     /**
-     * Packager helper class.
-     * @var object
+     * Packages roll off of the conveyor.
+     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $helper;
+    protected $conveyor;
+
+    /**
+     * Packages are packed in wrappings to personalise them.
+     * @var object \JeroenG\Packager\Wrapping
+     */
+    protected $wrappings;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(PackagerHelper $helper)
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
     {
         parent::__construct();
-        $this->helper = $helper;
+        $this->conveyor = $conveyor;
+        $this->wrapping = $wrapping;
     }
 
     /**
@@ -51,135 +63,101 @@ class NewPackage extends Command
     public function handle()
     {
         // Start the progress bar
-        $bar = $this->helper->barSetup($this->output->createProgressBar(7));
-        $bar->start();
+        $this->startProgressBar(6);
 
-        // Common variables
-        // Starting with vendor/package, optionally defined interactively
+        // Defining vendor/package, optionally defined interactively
         if ($this->option('i')) {
-            $vendor = $this->ask('What will be the vendor name?', $this->argument('vendor'));
-            $name = $this->ask('What will be the package name?', $this->argument('name'));
+            $this->conveyor->vendor($this->ask('What will be the vendor name?', $this->argument('vendor')));
+            $this->conveyor->package($this->ask('What will be the package name?', $this->argument('name')));
         } else {
-            $vendor = $this->argument('vendor');
-            $name = $this->argument('name');
+            $this->conveyor->vendor($this->argument('vendor'));
+            $this->conveyor->package($this->argument('name'));
         }
-        $path = getcwd().'/packages/';
-        $fullPath = $path.$vendor.'/'.$name;
-        $requireSupport = '"illuminate/support": "~5.1",
-        "php"';
-        $requirement = '"psr-4": {
-            "'.$vendor.'\\\\'.$name.'\\\\": "packages/'.$vendor.'/'.$name.'/src",';
-        $appConfigLine = 'App\Providers\RouteServiceProvider::class,
-
-        '.$vendor.'\\'.$name.'\\'.$name.'ServiceProvider::class,';
 
         // Start creating the package
-        $this->info('Creating package '.$vendor.'\\'.$name.'...');
-        $this->helper->checkExistingPackage($path, $vendor, $name);
-        $bar->advance();
+        $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
+        $this->conveyor->checkIfPackageExists();
+        $this->makeProgress();
 
         // Create the package directory
         $this->info('Creating packages directory...');
-        $this->helper->makeDir($path);
-        $bar->advance();
+        $this->conveyor->makeDir($this->conveyor->packagesPath());
+        $this->makeProgress();
 
         // Create the vendor directory
         $this->info('Creating vendor...');
-        $this->helper->makeDir($path.$vendor);
-        $bar->advance();
+        $this->conveyor->makeDir($this->conveyor->vendorPath());
+        $this->makeProgress();
 
-        // Get the skeleton repo from the PHP League
+        // Get the packager package skeleton
         $this->info('Downloading skeleton...');
-        $this->helper->download($zipFile = $this->helper->makeFilename(), 'http://github.com/thephpleague/skeleton/archive/master.zip')
-                 ->extract($zipFile, $path.$vendor)
-                 ->cleanUp($zipFile);
-        rename($path.$vendor.'/skeleton-master', $fullPath);
-        $bar->advance();
-
-        // Creating a Laravel Service Provider in the src directory
-        $this->info('Creating service provider...');
-        $newProvider = $fullPath.'/src/'.$name.'ServiceProvider.php';
-        $this->helper->replaceAndSave(
-                \Config::get('packager.service_provider_stub', __DIR__.'/ServiceProvider.stub'),
-                ['{{vendor}}', '{{name}}'],
-                [$vendor, $name],
-                $newProvider
-            );
-        $bar->advance();
+        $this->conveyor->downloadSkeleton();
+        $this->makeProgress();
 
         // Replacing skeleton placeholders
         $this->info('Replacing skeleton placeholders...');
-        $this->helper->replaceAndSave($fullPath.'/src/SkeletonClass.php', 'namespace League\Skeleton;', 'namespace '.$vendor.'\\'.$name.';');
-        $search = [
-                ':vendor',
-                ':package_name',
-                ':vendor\\\\:package_name\\\\',
-                ':vendor/:package_name',
-                'thephpleague/:package_name',
-                'league/:package_name',
-                '"php"',
-                'League\\\\Skeleton\\\\',
-                'League\\\\Skeleton\\\\Test\\\\',
-            ];
-        $replace = [
-                $vendor,
-                $name,
-                $vendor.'\\\\'.$name.'\\\\',
-                $vendor.'/'.$name,
-                $vendor.'/'.$name,
-                $vendor.'/'.$name,
-                $requireSupport,
-                $vendor.'\\\\'.$name.'\\\\',
-                $vendor.'\\\\'.$name.'\\\\Test\\\\',
-            ];
-        $this->helper->replaceAndSave($fullPath.'/composer.json', $search, $replace);
+        $this->wrapping->replace([
+            ':uc:vendor',
+            ':uc:package_name',
+            ':lc:vendor',
+            ':lc:package_name',
+        ], [
+            $this->conveyor->vendor(),
+            $this->conveyor->package(),
+            strtolower($this->conveyor->vendor()),
+            strtolower($this->conveyor->package()),
+        ]);
+
         if ($this->option('i')) {
-            $this->interactiveReplace($vendor, $name, $fullPath);
-        }
-        $bar->advance();
-
-        // Add it to composer.json
-        $this->info('Adding package to composer and app...');
-        $this->helper->replaceAndSave(base_path('composer.json'), '"psr-4": {', $requirement);
-        // And add it to the providers array in config/app.php
-        $this->helper->replaceAndSave(config_path('app.php'), 'App\Providers\RouteServiceProvider::class,', $appConfigLine);
-        $bar->advance();
-
-        // Finished creating the package, end of the progress bar
-        $bar->finish();
-        $this->info('Package created successfully!');
-        $this->output->newLine(2);
-        $bar = null;
-
-        // Composer dump-autoload to identify new MyPackageServiceProvider
-        $this->helper->dumpAutoloads();
-    }
-
-    protected function interactiveReplace($vendor, $name, $fullPath)
-    {
-        $author = $this->ask('Who is the author?', \Config::get('packager.author'));
-        $authorEmail = $this->ask('What is the author\'s e-mail?', \Config::get('packager.author_email'));
-        $authorSite = $this->ask('What is the author\'s website?', \Config::get('packager.author_site'));
-        $description = $this->ask('How would you describe the package?');
-        $license = $this->ask('Under which license will it be released?', \Config::get('packager.license'));
-        $homepage = $this->ask('What is going to be the package website?', 'https://github.com/'.$vendor.'/'.$name);
-
-        $search = [
+            $this->interactiveReplace();
+        } else {
+            $this->wrapping->replace([
                 ':author_name',
                 ':author_email',
-                ':author_website',
-                ':package_description',
-                'MIT',
-                'https://github.com/'.$vendor.'/'.$name,
-            ];
-        $replace = [
-                $author,
-                $authorEmail,
-                $authorSite,
-                $description,
-                $license,
-                $homepage,
-            ];
-        $this->helper->replaceAndSave($fullPath.'/composer.json', $search, $replace);
+                ':author_homepage',
+                ':license',
+            ], [
+                Config::get('packager.author_name'),
+                Config::get('packager.author_email'),
+                Config::get('packager.author_homepage'),
+                Config::get('packager.license'),
+            ]);
+        }
+
+        // Fill all placeholders in all files with the replacements.
+        $this->wrapping->fill($this->conveyor->packagePath());
+        $this->makeProgress();
+
+        // Composer dump-autoload to identify new service provider
+        $this->info('Dumping autoloads and discovering package...');
+        $this->conveyor->dumpAutoloads();
+        $this->conveyor->discoverPackage();
+        $this->makeProgress();
+
+        // Finished creating the package, end of the progress bar
+        $this->finishProgress('Package created successfully!');
+    }
+
+    protected function interactiveReplace()
+    {
+        $author = $this->ask('Who is the author?', Config::get('packager.author_name'));
+        $authorEmail = $this->ask('What is the author\'s e-mail?', Config::get('packager.author_email'));
+        $authorHomepage = $this->ask('What is the author\'s website?', Config::get('packager.author_homepage'));
+        $description = $this->ask('How would you describe the package?');
+        $license = $this->ask('Under which license will it be released?', Config::get('packager.license'));
+
+        $this->wrapping->replace([
+            ':author_name',
+            ':author_email',
+            ':author_homepage',
+            ':package_description',
+            ':license',
+        ], [
+            $author,
+            $authorEmail,
+            $authorHomepage,
+            $description,
+            $license,
+        ]);
     }
 }
