@@ -23,14 +23,14 @@ class Conveyor
     /**
      * Set or get the package vendor namespace.
      * @param  string $vendor
-     * @return $vendor|RuntimeException
+     * @return string|RuntimeException
      */
     public function vendor($vendor = null)
     {
-        if ($vendor != null) {
+        if ($vendor !== null) {
             return $this->vendor = $vendor;
         }
-        if ($this->vendor == null) {
+        if ($this->vendor === null) {
             throw new RuntimeException('Please provide a vendor');
         }
 
@@ -40,14 +40,14 @@ class Conveyor
     /**
      * Set or get the package name.
      * @param  string $package
-     * @return $package|RuntimeException
+     * @return string|RuntimeException
      */
     public function package($package = null)
     {
-        if ($package != null) {
+        if ($package !== null) {
             return $this->package = $package;
         }
-        if ($this->package == null) {
+        if ($this->package === null) {
             throw new RuntimeException('Please provide a package name');
         }
 

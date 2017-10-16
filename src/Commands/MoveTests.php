@@ -37,7 +37,7 @@ class MoveTests extends Command
 
     /**
      * Create a new instance.
-     * @param Illuminate\Filesystem\Filesystem $files
+     * @param \Illuminate\Filesystem\Filesystem $files
      */
     public function __construct(Filesystem $files)
     {

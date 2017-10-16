@@ -41,7 +41,7 @@ class NewPackage extends Command
      * Packages are packed in wrappings to personalise them.
      * @var object \JeroenG\Packager\Wrapping
      */
-    protected $wrappings;
+    protected $wrapping;
 
     /**
      * Create a new command instance.
