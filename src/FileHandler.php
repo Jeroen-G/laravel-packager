@@ -93,6 +93,7 @@ trait FileHandler
                 @unlink("$path/$file");
             }
         }
+
         return rmdir($path);
     }
 

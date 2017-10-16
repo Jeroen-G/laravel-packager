@@ -5,7 +5,7 @@ namespace JeroenG\Packager;
 trait ProgressBar
 {
     /**
-     * Symfony ProgressBar instance
+     * Symfony ProgressBar instance.
      * @var object \Symfony\Component\Console\Helper\ProgressBar
      */
     protected $bar;
@@ -13,7 +13,7 @@ trait ProgressBar
     /**
      * Setting custom formatting for the progress bar.
      *
-     * @param  integer $steps   The number of steps the progress bar has.
+     * @param  int $steps   The number of steps the progress bar has.
      *
      * @return void
      */

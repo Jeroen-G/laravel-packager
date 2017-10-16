@@ -2,7 +2,6 @@
 
 namespace JeroenG\Packager\Tests;
 
-use JeroenG\Packager\Tests\TestHelper;
 use Orchestra\Testbench\TestCase as TestBench;
 
 abstract class TestCase extends TestBench
