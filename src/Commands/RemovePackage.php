@@ -18,14 +18,12 @@ class RemovePackage extends Command
 
     /**
      * The name and signature of the console command.
-     *
      * @var string
      */
     protected $signature = 'packager:remove {vendor} {name}';
 
     /**
      * The console command description.
-     *
      * @var string
      */
     protected $description = 'Remove an existing package.';

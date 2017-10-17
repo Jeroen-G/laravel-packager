@@ -19,14 +19,12 @@ class NewPackage extends Command
 
     /**
      * The name and signature of the console command.
-     *
      * @var string
      */
     protected $signature = 'packager:new {vendor} {name} {--i}';
 
     /**
      * The console command description.
-     *
      * @var string
      */
     protected $description = 'Create a new package.';
@@ -92,7 +90,8 @@ class NewPackage extends Command
         // Get the packager package skeleton
         $this->info('Downloading skeleton...');
         $this->conveyor->downloadSkeleton();
-        $this->conveyor->renameFiles();
+        $manifest = (file_exists($this->conveyor->packagePath().'/rewriteRules.php')) ? $this->conveyor->packagePath().'/rewriteRules.php' : null;
+        $this->conveyor->renameFiles($manifest);
         $this->makeProgress();
 
         // Replacing skeleton placeholders
@@ -140,6 +139,11 @@ class NewPackage extends Command
         $this->finishProgress('Package created successfully!');
     }
 
+    /**
+     * Use the interactive CLI to replace certain placeholders.
+     * 
+     * @return void
+     */
     protected function interactiveReplace()
     {
         $author = $this->ask('Who is the author?', Config::get('packager.author_name'));

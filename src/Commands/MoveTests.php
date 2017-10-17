@@ -14,7 +14,6 @@ class MoveTests extends Command
 {
     /**
      * The name and signature of the console command.
-     *
      * @var string
      */
     protected $signature = 'packager:tests
@@ -23,20 +22,19 @@ class MoveTests extends Command
 
     /**
      * The console command description.
-     *
      * @var string
      */
     protected $description = 'Move test files to the Laravel app tests folder';
 
     /**
      * The filesystem handler.
-     *
      * @var object
      */
     protected $files;
 
     /**
      * Create a new instance.
+     * 
      * @param \Illuminate\Filesystem\Filesystem $files
      */
     public function __construct(Filesystem $files)
