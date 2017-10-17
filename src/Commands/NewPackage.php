@@ -141,7 +141,7 @@ class NewPackage extends Command
 
     /**
      * Use the interactive CLI to replace certain placeholders.
-     * 
+     *
      * @return void
      */
     protected function interactiveReplace()

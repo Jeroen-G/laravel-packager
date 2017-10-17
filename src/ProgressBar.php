@@ -39,7 +39,7 @@ trait ProgressBar
 
     /**
      * Advance the progress bar with a step.
-     * 
+     *
      * @return void
      */
     public function makeProgress()
@@ -49,7 +49,7 @@ trait ProgressBar
 
     /**
      * Finalise the progress, output the (last) message.
-     * 
+     *
      * @param  string $message
      * @return void
      */

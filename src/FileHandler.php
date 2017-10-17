@@ -10,7 +10,7 @@ trait FileHandler
 {
     /**
      * Get the path to the packages directory.
-     * 
+     *
      * @return string $path
      */
     public function packagesPath()
@@ -20,7 +20,7 @@ trait FileHandler
 
     /**
      * Get the vendor path.
-     * 
+     *
      * @return string $path
      */
     public function vendorPath()
@@ -30,7 +30,7 @@ trait FileHandler
 
     /**
      * Get the full package path.
-     * 
+     *
      * @return string $path
      */
     public function packagePath()
@@ -71,6 +71,7 @@ trait FileHandler
         if (! is_dir($path)) {
             return mkdir($path, 0777, true);
         }
+
         return false;
     }
 
@@ -156,7 +157,7 @@ trait FileHandler
     {
         $bindings = [
             [':uc:vendor', ':uc:package', ':lc:vendor', ':lc:package'],
-            [$this->vendor(), $this->package(), strtolower($this->vendor()), strtolower($this->package())]
+            [$this->vendor(), $this->package(), strtolower($this->vendor()), strtolower($this->package())],
         ];
 
         $rewrites = require ($manifest === null) ? [
