@@ -89,14 +89,4 @@ class Conveyor
     {
         shell_exec('composer dump-autoload');
     }
-
-    /**
-     * Run Laravel's package:discover command.
-     *
-     * @return void
-     **/
-    public function discoverPackage()
-    {
-        shell_exec('php artisan package:discover');
-    }
 }
