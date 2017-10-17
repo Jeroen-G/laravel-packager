@@ -159,7 +159,7 @@ trait FileHandler
             [$this->vendor(), $this->package(), strtolower($this->vendor()), strtolower($this->package())]
         ];
 
-        $rewrites = ($manifest === null) ? [
+        $rewrites = require ($manifest === null) ? [
             'src/MyPackage.php' => 'src/:uc:package.php',
             'config/mypackage.php' => 'config/:lc:package.php',
             'src/Facades/MyPackage.php' => 'src/Facades/:uc:package.php',
