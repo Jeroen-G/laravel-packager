@@ -36,11 +36,10 @@ abstract class TestCase extends TestBench
      */
     public function tearDown()
     {
+        $this->removeDir(base_path('packages'));
+        $this->undoConfigFile();
 
-       $this->removeDir(base_path('packages'));
-       $this->undoConfigFile();
-       
-       parent::tearDown();
+        parent::tearDown();
     }
 
     public function undoConfigFile()

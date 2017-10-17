@@ -22,7 +22,7 @@ class Conveyor
 
     /**
      * Set or get the package vendor namespace.
-     * 
+     *
      * @param  string $vendor
      * @return string|RuntimeException
      */
@@ -40,7 +40,7 @@ class Conveyor
 
     /**
      * Set or get the package name.
-     * 
+     *
      * @param  string $package
      * @return string|RuntimeException
      */
@@ -58,7 +58,7 @@ class Conveyor
 
     /**
      * Download the skeleton package.
-     * 
+     *
      * @return void
      */
     public function downloadSkeleton()
@@ -71,7 +71,7 @@ class Conveyor
 
     /**
      * Download the package from Github.
-     * 
+     *
      * @param  string $origin The Github URL
      * @param  string $branch The branch to download
      * @return void

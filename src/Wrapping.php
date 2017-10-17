@@ -41,7 +41,7 @@ class Wrapping
 
     /**
      * Fill all placeholders with their replacements.
-     * 
+     *
      * @param  string $path The directory of the files containing placeholders
      * @return void
      */
@@ -62,7 +62,7 @@ class Wrapping
 
     /**
      * Fill placeholders in a single file.
-     * 
+     *
      * @param  string $template     The file with the generic placeholders in it
      * @param  string|null $destiniation    Where to save, defaults to $template
      * @return $this
@@ -79,7 +79,7 @@ class Wrapping
 
     /**
      * Add the package to composer.json.
-     * 
+     *
      * @param  string $vendor
      * @param  string $package
      * @return $this
@@ -93,7 +93,7 @@ class Wrapping
 
     /**
      * Remove the package from composer.json.
-     * 
+     *
      * @param  string $vendor
      * @param  string $package
      * @return $this
@@ -106,7 +106,7 @@ class Wrapping
 
     /**
      * Add the package to the providers in config/app.php.
-     * 
+     *
      * @param  string $vendor
      * @param  string $package
      * @return $this
@@ -124,7 +124,7 @@ class Wrapping
 
     /**
      * Remove the package from the providers in config/app.php.
-     * 
+     *
      * @param  string $vendor
      * @param  string $package
      * @return $this
