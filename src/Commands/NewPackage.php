@@ -131,7 +131,8 @@ class NewPackage extends Command
         // Composer dump-autoload to identify new service provider
         $this->info('Dumping autoloads and discovering package...');
         $this->conveyor->dumpAutoloads();
-        $this->conveyor->discoverPackage();
+        $this->wrapping->addToComposer($this->conveyor->vendor(), $this->conveyor->package());
+        $this->wrapping->addToProviders($this->conveyor->vendor(), $this->conveyor->package());
         $this->makeProgress();
 
         // Finished creating the package, end of the progress bar

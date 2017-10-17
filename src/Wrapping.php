@@ -71,4 +71,36 @@ class Wrapping
 
         return $this;
     }
+
+    public function addToComposer($vendor, $package)
+    {
+        return $this->replace('"psr-4": {', '"psr-4": {
+        "'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",')
+                    ->fillInFile(base_path('composer.json'));
+    }
+
+    public function removeFromComposer($vendor, $package)
+    {
+        return $this->replace('"'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",', '')
+                    ->fillInFile(base_path('composer.json'));
+    }
+
+    public function addToProviders($vendor, $package)
+    {
+        return $this->replace('
+        /*
+         * Package Service Providers...
+         */', '
+        /*
+         * Package Service Providers...
+         */
+        '.$vendor.'\\'.$package.'\\'.$package.'ServiceProvider::class,')
+                    ->fillInFile(config_path('app.php'));
+    }
+
+    public function removeFromProviders($vendor, $package)
+    {
+        return $this->replace($vendor.'\\'.$package.'\\'.$package.'ServiceProvider::class,', '')
+                    ->fillInFile(config_path('app.php'));
+    }
 }

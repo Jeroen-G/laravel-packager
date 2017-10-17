@@ -3,6 +3,7 @@
 namespace JeroenG\Packager\Commands;
 
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\Wrapping;
 use Illuminate\Console\Command;
 use JeroenG\Packager\ProgressBar;
 
@@ -36,14 +37,21 @@ class RemovePackage extends Command
     protected $conveyor;
 
     /**
+     * Packages are packed in wrappings to personalise them.
+     * @var object \JeroenG\Packager\Wrapping
+     */
+    protected $wrapping;
+
+    /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(Conveyor $conveyor)
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
+        $this->wrapping = $wrapping;
     }
 
     /**
@@ -81,7 +89,8 @@ class RemovePackage extends Command
         // Composer dump-autoload to remove service provider
         $this->info('Dumping autoloads and undiscovering package...');
         $this->conveyor->dumpAutoloads();
-        $this->conveyor->discoverPackage();
+        $this->wrapping->removeFromComposer($this->conveyor->vendor(), $this->conveyor->package());
+        $this->wrapping->removeFromProviders($this->conveyor->vendor(), $this->conveyor->package());
         $this->makeProgress();
 
         // Finished removing the package, end of the progress bar
