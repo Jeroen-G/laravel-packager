@@ -4,6 +4,10 @@ php:
   - 7.0
   - 7.1
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 env:
   - TESTBENCH_VERSION=3.5.*
 
