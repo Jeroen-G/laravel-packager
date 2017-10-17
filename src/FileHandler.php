@@ -147,4 +147,23 @@ trait FileHandler
 
         return $this;
     }
+
+    /**
+     * Rename generic files to package-specific ones.
+     *
+     * @return void
+     **/
+    public function renameFiles()
+    {
+        $bindings = [
+            [':uc:vendor', ':uc:package', ':lc:vendor', ':lc:package'],
+            [$this->vendor(), $this->package(), strtolower($this->vendor()), strtolower($this->package())]
+        ];
+
+        $rewrites = ['MyPackageServiceProvider.php' => ':uc:packageServiceProvider.php'];
+        foreach ($rewrites as $file => $name) {
+            $filename = str_replace($bindings[0], $bindings[1], $name);
+            rename($this->packagePath().'/'.$file, $this->packagePath().'/'.$filename);
+        }
+    }
 }
