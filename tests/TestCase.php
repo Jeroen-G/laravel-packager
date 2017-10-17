@@ -48,10 +48,10 @@ abstract class TestCase extends TestBench
         $filledFile = str_replace('
         /*
          * Package Service Providers...
-         */','', file_get_contents(config_path('app.php')));
+         */', '', file_get_contents(config_path('app.php')));
         file_put_contents(config_path('app.php'), $filledFile);
 
-        $filledFile = str_replace('MyVendor\MyPackage\MyPackageServiceProvider::class,','', file_get_contents(config_path('app.php')));
+        $filledFile = str_replace('MyVendor\MyPackage\MyPackageServiceProvider::class,', '', file_get_contents(config_path('app.php')));
         file_put_contents(config_path('app.php'), $filledFile);
     }
 

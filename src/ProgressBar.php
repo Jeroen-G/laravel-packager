@@ -14,7 +14,6 @@ trait ProgressBar
      * Setting custom formatting for the progress bar.
      *
      * @param  int $steps   The number of steps the progress bar has.
-     *
      * @return void
      */
     public function startProgressBar($steps)
@@ -40,6 +39,7 @@ trait ProgressBar
 
     /**
      * Advance the progress bar with a step.
+     * 
      * @return void
      */
     public function makeProgress()
@@ -49,6 +49,7 @@ trait ProgressBar
 
     /**
      * Finalise the progress, output the (last) message.
+     * 
      * @param  string $message
      * @return void
      */

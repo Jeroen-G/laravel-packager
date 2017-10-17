@@ -13,14 +13,12 @@ class ListPackages extends Command
 {
     /**
      * The name and signature of the console command.
-     *
      * @var string
      */
     protected $signature = 'packager:list';
 
     /**
      * The console command description.
-     *
      * @var string
      */
     protected $description = 'List all locally installed packages.';
