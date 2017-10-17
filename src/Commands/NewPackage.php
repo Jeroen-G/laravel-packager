@@ -92,15 +92,16 @@ class NewPackage extends Command
         // Get the packager package skeleton
         $this->info('Downloading skeleton...');
         $this->conveyor->downloadSkeleton();
+        $this->conveyor->renameFiles();
         $this->makeProgress();
 
         // Replacing skeleton placeholders
         $this->info('Replacing skeleton placeholders...');
         $this->wrapping->replace([
             ':uc:vendor',
-            ':uc:package_name',
+            ':uc:package',
             ':lc:vendor',
-            ':lc:package_name',
+            ':lc:package',
         ], [
             $this->conveyor->vendor(),
             $this->conveyor->package(),

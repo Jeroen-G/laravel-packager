@@ -49,7 +49,8 @@ class Wrapping
     {
         $templates = array_merge(
             glob($path.'/composer.json'),
-            glob($path.'/*.md')
+            glob($path.'/*.md'),
+            glob($path.'/*.php')
         );
         foreach ($templates as $file) {
             $this->fillInFile($file);
@@ -72,32 +73,54 @@ class Wrapping
         return $this;
     }
 
+    /**
+     * Add the package to composer.json.
+     * @param  string $vendor
+     * @param  string $package
+     * @return $this
+     */
     public function addToComposer($vendor, $package)
     {
         return $this->replace('"psr-4": {', '"psr-4": {
-        "'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",')
+            "'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",')
                     ->fillInFile(base_path('composer.json'));
     }
 
+    /**
+     * Remove the package from composer.json.
+     * @param  string $vendor
+     * @param  string $package
+     * @return $this
+     */
     public function removeFromComposer($vendor, $package)
     {
         return $this->replace('"'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",', '')
                     ->fillInFile(base_path('composer.json'));
     }
 
+    /**
+     * Add the package to the providers in config/app.php.
+     * @param  string $vendor
+     * @param  string $package
+     * @return $this
+     */
     public function addToProviders($vendor, $package)
     {
         return $this->replace('
-        /*
          * Package Service Providers...
          */', '
-        /*
          * Package Service Providers...
          */
         '.$vendor.'\\'.$package.'\\'.$package.'ServiceProvider::class,')
                     ->fillInFile(config_path('app.php'));
     }
 
+    /**
+     * Remove the package from the providers in config/app.php.
+     * @param  string $vendor
+     * @param  string $package
+     * @return $this
+     */
     public function removeFromProviders($vendor, $package)
     {
         return $this->replace($vendor.'\\'.$package.'\\'.$package.'ServiceProvider::class,', '')
