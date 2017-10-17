@@ -2,7 +2,6 @@
 
 namespace JeroenG\Packager\Commands;
 
-use Config;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\Wrapping;
 use Illuminate\Console\Command;
@@ -117,10 +116,10 @@ class NewPackage extends Command
                 ':author_homepage',
                 ':license',
             ], [
-                Config::get('packager.author_name'),
-                Config::get('packager.author_email'),
-                Config::get('packager.author_homepage'),
-                Config::get('packager.license'),
+                config('packager.author_name'),
+                config('packager.author_email'),
+                config('packager.author_homepage'),
+                config('packager.license'),
             ]);
         }
 
@@ -146,11 +145,11 @@ class NewPackage extends Command
      */
     protected function interactiveReplace()
     {
-        $author = $this->ask('Who is the author?', Config::get('packager.author_name'));
-        $authorEmail = $this->ask('What is the author\'s e-mail?', Config::get('packager.author_email'));
-        $authorHomepage = $this->ask('What is the author\'s website?', Config::get('packager.author_homepage'));
+        $author = $this->ask('Who is the author?', config('packager.author_name'));
+        $authorEmail = $this->ask('What is the author\'s e-mail?', config('packager.author_email'));
+        $authorHomepage = $this->ask('What is the author\'s website?', config('packager.author_homepage'));
         $description = $this->ask('How would you describe the package?');
-        $license = $this->ask('Under which license will it be released?', Config::get('packager.license'));
+        $license = $this->ask('Under which license will it be released?', config('packager.license'));
 
         $this->wrapping->replace([
             ':author_name',
