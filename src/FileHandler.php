@@ -10,6 +10,7 @@ trait FileHandler
 {
     /**
      * Get the path to the packages directory.
+     * 
      * @return string $path
      */
     public function packagesPath()
@@ -19,6 +20,7 @@ trait FileHandler
 
     /**
      * Get the vendor path.
+     * 
      * @return string $path
      */
     public function vendorPath()
@@ -28,6 +30,7 @@ trait FileHandler
 
     /**
      * Get the full package path.
+     * 
      * @return string $path
      */
     public function packagePath()
@@ -48,7 +51,7 @@ trait FileHandler
     /**
      * Check if the package already exists.
      *
-     * @return void          Throws error if package exists, aborts process
+     * @return void    Throws error if package exists, aborts process
      */
     public function checkIfPackageExists()
     {
@@ -61,8 +64,7 @@ trait FileHandler
      * Create a directory if it doesn't exist.
      *
      * @param  string $path Path of the directory to make
-     *
-     * @return boolean
+     * @return bool
      */
     public function makeDir($path)
     {
@@ -76,8 +78,7 @@ trait FileHandler
      * Remove a directory if it exists.
      *
      * @param  string $path Path of the directory to remove.
-     *
-     * @return boolean
+     * @return bool
      */
     public function removeDir($path)
     {
@@ -103,7 +104,6 @@ trait FileHandler
      *
      * @param  string  $zipFile
      * @param  string  $source
-     *
      * @return $this
      */
     public function download($zipFile, $source)
@@ -120,7 +120,6 @@ trait FileHandler
      *
      * @param  string  $zipFile
      * @param  string  $directory
-     *
      * @return $this
      */
     public function extract($zipFile, $directory)
@@ -137,7 +136,6 @@ trait FileHandler
      * Clean-up the Zip file.
      *
      * @param  string  $zipFile
-     *
      * @return $this
      */
     public function cleanUp($zipFile)
@@ -151,16 +149,23 @@ trait FileHandler
     /**
      * Rename generic files to package-specific ones.
      *
+     * @param array|null $manifest
      * @return void
      **/
-    public function renameFiles()
+    public function renameFiles($manifest = null)
     {
         $bindings = [
             [':uc:vendor', ':uc:package', ':lc:vendor', ':lc:package'],
             [$this->vendor(), $this->package(), strtolower($this->vendor()), strtolower($this->package())]
         ];
 
-        $rewrites = ['MyPackageServiceProvider.php' => ':uc:packageServiceProvider.php'];
+        $rewrites = ($manifest === null) ? [
+            'src/MyPackage.php' => 'src/:uc:package.php',
+            'config/mypackage.php' => 'config/:lc:package.php',
+            'src/Facades/MyPackage.php' => 'src/Facades/:uc:package.php',
+            'src/MyPackageServiceProvider.php' => 'src/:uc:packageServiceProvider.php',
+        ] : $manifest;
+
         foreach ($rewrites as $file => $name) {
             $filename = str_replace($bindings[0], $bindings[1], $name);
             rename($this->packagePath().'/'.$file, $this->packagePath().'/'.$filename);
