@@ -63,7 +63,7 @@ class Conveyor
      */
     public function downloadSkeleton()
     {
-        $this->download($zipFile = $this->makeFilename(), 'http://github.com/Jeroen-G/packager-skeleton/archive/master.zip')
+        $this->download($zipFile = $this->makeFilename(), config('packager.skeleton'))
              ->extract($zipFile, $this->vendorPath())
              ->cleanUp($zipFile);
         rename($this->vendorPath().'/packager-skeleton-master', $this->packagePath());

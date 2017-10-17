@@ -56,6 +56,8 @@ class PackagerServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__.'/config/packager.php', 'packager');
+
         $this->commands($this->commands);
     }
 
