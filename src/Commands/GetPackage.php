@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use JeroenG\Packager\ProgressBar;
 
 /**
- * Get an existing package from a remote Github repository.
+ * Get an existing package from a remote git repository.
  *
  * @author JeroenG
  **/
@@ -21,16 +21,17 @@ class GetPackage extends Command
      * @var string
      */
     protected $signature = 'packager:get
-                            {url : The url of the Github repository}
+                            {url : The url of the repository}
                             {vendor? : The vendor part of the namespace}
                             {name? : The name of package for the namespace}
+                            {--host=github : Download from github or bitbucket?}
                             {--branch=master : The branch to download}';
 
     /**
      * The console command description.
      * @var string
      */
-    protected $description = 'Retrieve an existing package from Github.';
+    protected $description = 'Retrieve an existing package from Github or Bitbucket.';
 
     /**
      * Packages roll off of the conveyor.
@@ -67,7 +68,11 @@ class GetPackage extends Command
         $this->startProgressBar(4);
 
         // Common variables
-        $origin = rtrim(strtolower($this->argument('url')), '/').'/archive/'.$this->option('branch').'.zip';
+        if($this->option('host') == 'bitbucket') {
+            $origin = rtrim(strtolower($this->argument('url')), '/').'/branch/'.$this->option('branch').'.zip';
+        } else {
+            $origin = rtrim(strtolower($this->argument('url')), '/').'/archive/'.$this->option('branch').'.zip';
+        }
         $pieces = explode('/', $origin);
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->conveyor->vendor($pieces[3]);
@@ -92,9 +97,14 @@ class GetPackage extends Command
         $this->conveyor->makeDir($this->conveyor->vendorPath());
         $this->makeProgress();
 
-        // Get the skeleton repo from the PHP League
-        $this->info('Downloading from Github...');
-        $this->conveyor->downloadFromGithub($origin, $pieces[4], $this->option('branch'));
+        // Get the repo from Github or Bitbucket
+        if($this->option('host') == ' bitbucket') {
+            $this->info('Downloading from Bitbucket...');
+            $this->conveyor->downloadFromBitbucket($origin, $pieces[4], $this->option('branch'));
+        } else {
+            $this->info('Downloading from Github...');
+            $this->conveyor->downloadFromGithub($origin, $pieces[4], $this->option('branch'));
+        }
         $this->makeProgress();
 
         // Composer dump-autoload to identify new service provider

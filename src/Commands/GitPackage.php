@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use JeroenG\Packager\ProgressBar;
 
 /**
- * Get an existing package from a remote Github repository with its git repository.
+ * Get an existing package from a remote git repository with its VCS.
  *
  * @author JeroenG
  **/
@@ -21,7 +21,7 @@ class GitPackage extends Command
      * @var string
      */
     protected $signature = 'packager:git
-                            {url : The url of the Github repository}
+                            {url : The url of the git repository}
                             {vendor? : The vendor part of the namespace}
                             {name? : The name of package for the namespace}';
 
@@ -29,7 +29,7 @@ class GitPackage extends Command
      * The console command description.
      * @var string
      */
-    protected $description = 'Retrieve an existing package from Github with git.';
+    protected $description = 'Retrieve an existing package with git.';
 
     /**
      * Packages roll off of the conveyor.
