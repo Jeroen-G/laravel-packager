@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "illuminate/support": "^5.5",
+        "illuminate/support": "~5",
         "guzzlehttp/guzzle": "~6"
     },
     "require-dev": {
