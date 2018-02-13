@@ -86,9 +86,9 @@ class RemovePackage extends Command
 
         // Composer dump-autoload to remove service provider
         $this->info('Dumping autoloads and undiscovering package...');
-        $this->conveyor->dumpAutoloads();
         $this->wrapping->removeFromComposer($this->conveyor->vendor(), $this->conveyor->package());
         $this->wrapping->removeFromProviders($this->conveyor->vendor(), $this->conveyor->package());
+        $this->conveyor->dumpAutoloads();
         $this->makeProgress();
 
         // Finished removing the package, end of the progress bar
