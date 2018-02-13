@@ -52,6 +52,7 @@ class Wrapping
             glob($path.'/*.md'),
             glob($path.'/*.php'),
             glob($path.'/src/*.php'),
+            glob($path.'/src/Facades/*.php'),
             glob($path.'/tests/*.php'),
             glob($path.'/config/*.php')
         );
