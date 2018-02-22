@@ -8,6 +8,7 @@
         "skeleton",
         "Github"
     ],
+    "type": "laravel-package",
     "homepage": "https://github.com/Jeroen-G/laravel-packager",
     "license": "EUPL-1.1",
     "authors": [
