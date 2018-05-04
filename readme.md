@@ -2,7 +2,12 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
-[![Software License][ico-license]](license.md)
+[![Build Status][ico-travis]][link-travis]
+[![StyleCI][ico-styleci]][link-styleci]
+
+<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/u9146g1vyywKAGc24ys1Hez8/Jeroen-G/laravel-packager'>
+  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/u9146g1vyywKAGc24ys1Hez8/Jeroen-G/laravel-packager.svg' />
+</a>
 
 This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate.
 
@@ -21,8 +26,15 @@ JeroenG\Packager\PackagerServiceProvider::class,
 ```
 
 If you do run the package on Laravel 5.5+, [package auto-discovery](https://medium.com/@taylorotwell/package-auto-discovery-in-laravel-5-5-ea9e3ab20518) takes care of the magic of adding the service provider.
+Be aware that the auto-discovery also means that this package is loaded in your production environment. Therefore you may [disable auto-discovery](https://laravel.com/docs/5.5/packages#package-discovery) and instead put in your `AppServiceProvider` something like this:
 
-Optional you can publish the configuration to provide an own service provider stub.
+```php
+if ($this->app->environment('local')) {
+    $this->app->register('JeroenG\Packager\PackagerServiceProvider');
+}
+```
+
+Optional you can publish the configuration to provide a different service provider stub. The default is [here](https://github.com/jeroen-g/packager-skeleton).
 
 ```bash
 $ php artisan vendor:publish --provider="JeroenG\Packager\PackagerServiceProvider"
@@ -58,7 +70,7 @@ $ php artisan packager:git https://github.com/author/repository
 
 **Result:**
 This will register the package in `config/app.php` and in the app's `composer.json` file.
-If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository.
+If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository. This also works with Bitbucket repositories, but you have to provide the flag `--host=bitbucket` for the `packager:get` command.
 
 **Options:**
 ```bash
@@ -109,11 +121,38 @@ $ php artisan packager:remove MyVendor MyPackage
 **Result:**
 The `MyVendor\MyPackage` package is deleted, including its references in `composer.json` and `config/app.php`.
 
+### Publish
+**Command:**
+```bash
+$ php artisan packager:publish MyVendor MyPackage https://github.com/myvendor/mypackage
+```
+
+**Result:**
+The `MyVendor\MyPackage` package will be published to Github using the provided url.
+
+### Check
+**Command:**
+```bash
+$ php artisan packager:check MyVendor MyPackage
+```
+
+**Result:**
+The `MyVendor\MyPackage` package will be checked for security vulnerabilities using SensioLabs security checker.
+
+**Remarks**
+You first need to run
+
+```bash
+$ composer require sensiolabs/security-checker
+```
+
+
 ## Issues with cURL SSL certificate
-It turns out that, especially on windows, there might arise some problems with the downloading of the skeleton, due to a file regarding SSL certificates missing on the OS. This can be solved by opening up your .env file and putting this in it:
+It turns out that, especially on Windows, there might arise some problems with the downloading of the skeleton, due to a file regarding SSL certificates missing on the OS. This can be solved by opening up your .env file and putting this in it:
 ```
 CURL_VERIFY=false
 ```
+Of course this means it will be less secure, but then again you are not supposed to run this package anywhere near a production environment.
 
 ## Changelog
 
@@ -121,7 +160,7 @@ Please see [changelog.md](changelog.md) for what has changed recently.
 
 ## Contributing
 
-Please see [contributing.md](contributing.md) for details.
+Please see [contributing.md](contributing.md) for details and a todolist.
 
 ## Credits
 
@@ -134,10 +173,13 @@ The EU Public License. Please see [license.md](license.md) for more information.
 
 
 [ico-version]: https://img.shields.io/packagist/v/jeroen-g/laravel-packager.svg?style=flat-square
-[ico-license]: https://img.shields.io/badge/license-EUPL-yellow.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/jeroen-g/laravel-packager.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/jeroen-g/laravel-packager/master.svg?style=flat-square
+[ico-styleci]: https://styleci.io/repos/37218114/shield
 
 [link-packagist]: https://packagist.org/packages/jeroen-g/laravel-packager
 [link-downloads]: https://packagist.org/packages/jeroen-g/laravel-packager
+[link-travis]: https://travis-ci.org/jeroen-g/laravel-packager
+[link-styleci]: https://styleci.io/repos/37218114
 [link-author]: https://github.com/Jeroen-G
 [link-contributors]: ../../contributors]
