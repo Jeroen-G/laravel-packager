@@ -15,13 +15,6 @@ use Illuminate\Support\ServiceProvider;
 class PackagerServiceProvider extends ServiceProvider
 {
     /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = false;
-
-    /**
      * The console commands.
      *
      * @var bool
@@ -59,15 +52,5 @@ class PackagerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/packager.php', 'packager');
 
         $this->commands($this->commands);
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return ['packager'];
     }
 }
