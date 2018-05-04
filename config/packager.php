@@ -2,7 +2,7 @@
 
 return [
 
-    /**
+    /*
      * The following skeleton will be downloaded for each new package.
      * Default: http://github.com/Jeroen-G/packager-skeleton/archive/master.zip
      */
