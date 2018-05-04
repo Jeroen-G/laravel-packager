@@ -2,6 +2,20 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.0
+
+### Added
+- Tests, TravisCI, StyleCI.
+- The command `packager:publish` to bring your package to Github.
+- Default Laravel-style skeleton, but with option to use your own.
+- Support for get/git of bitbucket repositories.
+
+### Updated
+- Moved `sensiolabs/security-checker` to suggested requirements.
+- Config folder moved up one level.
+- Refactored core code.
+- More comprehensive readme, added todo's in the contributing file.
+
 ## Version 1.6.x
 
 ### Added
