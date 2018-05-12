@@ -5,10 +5,6 @@
 [![Build Status][ico-travis]][link-travis]
 [![StyleCI][ico-styleci]][link-styleci]
 
-<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/u9146g1vyywKAGc24ys1Hez8/Jeroen-G/laravel-packager'>
-  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/u9146g1vyywKAGc24ys1Hez8/Jeroen-G/laravel-packager.svg' />
-</a>
-
 This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate.
 
 ## Installation
@@ -174,12 +170,12 @@ The EU Public License. Please see [license.md](license.md) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/jeroen-g/laravel-packager.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/jeroen-g/laravel-packager.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/jeroen-g/laravel-packager/master.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/Jeroen-G/laravel-packager/master.svg?style=flat-square
 [ico-styleci]: https://styleci.io/repos/37218114/shield
 
 [link-packagist]: https://packagist.org/packages/jeroen-g/laravel-packager
 [link-downloads]: https://packagist.org/packages/jeroen-g/laravel-packager
-[link-travis]: https://travis-ci.org/jeroen-g/laravel-packager
+[link-travis]: https://travis-ci.org/Jeroen-G/laravel-packager
 [link-styleci]: https://styleci.io/repos/37218114
 [link-author]: https://github.com/Jeroen-G
 [link-contributors]: ../../contributors]
