@@ -4,13 +4,25 @@ php:
   - 7.0
   - 7.1
   - 7.2
+  - nightly
 
 cache:
   directories:
     - $HOME/.composer/cache
 
 env:
+  - TESTBENCH_VERSION=3.5.*
   - TESTBENCH_VERSION=3.6.*
+  - TESTBENCH_VERSION=dev-master
+
+matrix:
+  exclude:
+    - php: 7.0
+      env: TESTBENCH_VERSION=3.6.*
+  allow_failures:
+    - env: TESTBENCH_VERSION=dev-master
+    - php: nightly
+  fast_finish: true
 
 before_script:
   - travis_retry composer self-update
