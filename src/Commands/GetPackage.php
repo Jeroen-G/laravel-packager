@@ -68,7 +68,7 @@ class GetPackage extends Command
         $this->startProgressBar(4);
 
         // Common variables
-        if($this->option('host') == 'bitbucket') {
+        if ($this->option('host') == 'bitbucket') {
             $origin = rtrim(strtolower($this->argument('url')), '/').'/branch/'.$this->option('branch').'.zip';
         } else {
             $origin = rtrim(strtolower($this->argument('url')), '/').'/archive/'.$this->option('branch').'.zip';
@@ -98,7 +98,7 @@ class GetPackage extends Command
         $this->makeProgress();
 
         // Get the repo from Github or Bitbucket
-        if($this->option('host') == ' bitbucket') {
+        if ($this->option('host') == ' bitbucket') {
             $this->info('Downloading from Bitbucket...');
             $this->conveyor->downloadFromBitbucket($origin, $pieces[4], $this->option('branch'));
         } else {

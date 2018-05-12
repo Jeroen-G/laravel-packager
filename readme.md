@@ -59,7 +59,7 @@ $ php artisan packager:new --i
 The package will be created interactively, allowing to configure everything in the package's `composer.json`, such as the license and package description.
 
 **Remarks:**
-The new package will be based on [league/skeleton](https://github.com/thephpleague/skeleton), plus a Laravel service provider.
+The new package will be based on [this custom skeleton](https://github.com/jeroen-g/packager-skeleton).
 
 ### Get & Git
 **Command:**
