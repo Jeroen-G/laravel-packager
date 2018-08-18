@@ -12,7 +12,7 @@ This package provides you with a simple tool to set up a new package and it will
 Via Composer
 
 ```bash
-$ composer require jeroen-g/laravel-packager
+$ composer require jeroen-g/laravel-packager --dev
 ```
 
 If you do not run Laravel 5.5 (or higher), then add the service provider in `config/app.php`:
