@@ -71,7 +71,6 @@ class Wrapping
     public function fillInFile($template, $destination = null)
     {
         $destination = ($destination === null) ? $template : $destination;
-
         $filledFile = str_replace($this->placeholders, $this->replacements, file_get_contents($template));
         file_put_contents($destination, $filledFile);
 
@@ -88,7 +87,7 @@ class Wrapping
     public function addToComposer($vendor, $package)
     {
         return $this->replace('"psr-4": {', '"psr-4": {
-            "'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",')
+            "'.studly_case($vendor).'\\\\'.studly_case($package).'\\\\": "packages/'.$vendor.'/'.$package.'/src",')
                     ->fillInFile(base_path('composer.json'));
     }
 
@@ -101,7 +100,7 @@ class Wrapping
      */
     public function removeFromComposer($vendor, $package)
     {
-        return $this->replace('"'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",', '')
+        return $this->replace('"'.studly_case($vendor).'\\\\'.studly_case($package).'\\\\": "packages/'.$vendor.'/'.$package.'/src",', '')
                     ->fillInFile(base_path('composer.json'));
     }
 
@@ -115,12 +114,15 @@ class Wrapping
     public function addToProviders($vendor, $package)
     {
         return $this->replace('
-         * Package Service Providers...
+         * Application Service Providers...
          */', '
-         * Package Service Providers...
+         * Application Service Providers...
          */
-        '.$vendor.'\\'.$package.'\\'.$package.'ServiceProvider::class,')
-                    ->fillInFile(config_path('app.php'));
+        '.studly_case($vendor).'\\'.studly_case($package).'\\'.studly_case($package).'ServiceProvider::class,')
+        ->replace("'aliases' => [", 
+        "'aliases' => [
+        ".'\''.studly_case($package).'\' => '.studly_case($vendor).'\\'.studly_case($package).'\\Facades\\'.studly_case($package).'::class,')
+        ->fillInFile(config_path('app.php'));
     }
 
     /**
@@ -132,7 +134,7 @@ class Wrapping
      */
     public function removeFromProviders($vendor, $package)
     {
-        return $this->replace($vendor.'\\'.$package.'\\'.$package.'ServiceProvider::class,', '')
+        return $this->replace(studly_case($vendor).'\\'.studly_case($package).'\\'.studly_case($package).'ServiceProvider::class,', '')
                     ->fillInFile(config_path('app.php'));
     }
 }

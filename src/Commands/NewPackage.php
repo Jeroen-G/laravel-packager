@@ -90,6 +90,7 @@ class NewPackage extends Command
         $this->info('Downloading skeleton...');
         $this->conveyor->downloadSkeleton();
         $manifest = (file_exists($this->conveyor->packagePath().'/rewriteRules.php')) ? $this->conveyor->packagePath().'/rewriteRules.php' : null;
+    
         $this->conveyor->renameFiles($manifest);
         $this->makeProgress();
 
@@ -101,8 +102,8 @@ class NewPackage extends Command
             ':lc:vendor',
             ':lc:package',
         ], [
-            $this->conveyor->vendor(),
-            $this->conveyor->package(),
+            studly_case($this->conveyor->vendor()),
+            studly_case($this->conveyor->package()),
             strtolower($this->conveyor->vendor()),
             strtolower($this->conveyor->package()),
         ]);

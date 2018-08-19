@@ -168,7 +168,7 @@ Please see [contributing.md](contributing.md) for details and a todolist.
 The EU Public License. Please see [license.md](license.md) for more information.
 
 
-[ico-version]: https://poser.pugx.org/jeroen-g/laravel-packager/v/stable?format=flat-square
+[ico-version]: https://img.shields.io/packagist/v/jeroen-g/laravel-packager.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/jeroen-g/laravel-packager.svg?style=flat-square
 [ico-travis]: https://img.shields.io/travis/Jeroen-G/laravel-packager/master.svg?style=flat-square
 [ico-styleci]: https://styleci.io/repos/37218114/shield
