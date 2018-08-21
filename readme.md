@@ -12,7 +12,7 @@ This package provides you with a simple tool to set up a new package and it will
 Via Composer
 
 ```bash
-$ composer require jeroen-g/laravel-packager
+$ composer require mpandar/laravel-packager
 ```
 
 If you do not run Laravel 5.5 (or higher), then add the service provider in `config/app.php`:
@@ -41,7 +41,7 @@ $ php artisan vendor:publish --provider="JeroenG\Packager\PackagerServiceProvide
 ### New
 **Command:**
 ```bash
-$ php artisan packager:new MyVendor MyPackage
+$ php artisan packager:new myvendor my-package
 ```
 
 **Result:**
@@ -49,7 +49,7 @@ The command will handle practically everything for you. It will create a package
 
 **Options:**
 ```bash
-$ php artisan packager:new MyVendor MyPackage --i
+$ php artisan packager:new myvendor my-package --i
 $ php artisan packager:new --i
 ```
 The package will be created interactively, allowing to configure everything in the package's `composer.json`, such as the license and package description.
@@ -71,8 +71,8 @@ If the `packager:git` command is used, the entire Git repository is cloned. If `
 **Options:**
 ```bash
 $ php artisan packager:get https://github.com/author/repository --branch=develop
-$ php artisan packager:get https://github.com/author/repository MyVendor MyPackage
-$ php artisan packager:git https://github.com/author/repository MyVendor MyPackage
+$ php artisan packager:get https://github.com/author/repository myvendor my-package
+$ php artisan packager:git https://github.com/author/repository myvendor my-package
 ```
 It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url.
 
@@ -93,7 +93,7 @@ Add the following to phpunit.xml (under the other testsuites) in order to run th
 
 **Options:**
 ```bash
-$ php artisan packager:tests MyVendor MyPackage
+$ php artisan packager:tests myvendor my-package
 ```
 
 **Remarks:**
@@ -111,7 +111,7 @@ An overview of all packages in the `/packages` directory.
 ### Remove
 **Command:**
 ```bash
-$ php artisan packager:remove MyVendor MyPackage
+$ php artisan packager:remove myvendor my-package
 ```
 
 **Result:**
@@ -120,7 +120,7 @@ The `MyVendor\MyPackage` package is deleted, including its references in `compos
 ### Publish
 **Command:**
 ```bash
-$ php artisan packager:publish MyVendor MyPackage https://github.com/myvendor/mypackage
+$ php artisan packager:publish myvendor my-package https://github.com/myvendor/mypackage
 ```
 
 **Result:**
@@ -129,7 +129,7 @@ The `MyVendor\MyPackage` package will be published to Github using the provided 
 ### Check
 **Command:**
 ```bash
-$ php artisan packager:check MyVendor MyPackage
+$ php artisan packager:check myvendor my-package
 ```
 
 **Result:**
