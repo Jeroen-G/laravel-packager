@@ -63,7 +63,7 @@ class PublishPackage extends Command
 
         $this->info('Initialising Git if not already done so...');
         if (! file_exists($this->conveyor->packagePath().'/.git/')) {
-            exec('cd '.$this->conveyor->packagePath().'; git init && git add --all && git commit -m "Initial commit"');
+            exec('cd '.$this->conveyor->packagePath().' && git init && git add --all && git commit -m "Initial commit"');
         }
         $this->makeProgress();
 
