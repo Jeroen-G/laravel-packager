@@ -28,12 +28,12 @@ class PackagerServiceProvider extends ServiceProvider
         'JeroenG\Packager\Commands\MoveTests',
         'JeroenG\Packager\Commands\CheckPackage',
         'JeroenG\Packager\Commands\PublishPackage',
+        'JeroenG\Packager\Commands\EnablePackage',
+        'JeroenG\Packager\Commands\DisablePackage',
     ];
 
     /**
      * Bootstrap the application events.
-     *
-     * @return void
      */
     public function boot()
     {
@@ -44,8 +44,6 @@ class PackagerServiceProvider extends ServiceProvider
 
     /**
      * Register the command.
-     *
-     * @return void
      */
     public function register()
     {
