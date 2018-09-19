@@ -2,6 +2,11 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.1
+
+### Added
+- package:enable and package:disable commands.
+
 ## Version 2.0
 
 ### Added
