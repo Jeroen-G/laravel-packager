@@ -75,7 +75,6 @@ class PublishPackage extends Command
         exec('cd '.$this->conveyor->packagePath().' && git push -u origin master');
         $this->makeProgress();
 
-
         // Finished publishing the package, end of the progress bar
         $this->finishProgress('Package created successfully!');
         $this->info('Go ahead and submit it to Packagist: https://packagist.org/packages/submit');
