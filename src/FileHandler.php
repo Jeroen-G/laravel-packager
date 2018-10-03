@@ -178,10 +178,8 @@ trait FileHandler
     {
         $ruleFiles = ['rules.php', 'rewriteRules.php'];
 
-        foreach($ruleFiles as $file)
-        {
-            if(file_exists($this->packagePath(). '/' .$filename))
-            {
+        foreach($ruleFiles as $file) {
+            if(file_exists($this->packagePath(). '/' .$filename)) {
                 unlink($this->packagePath(). '/' .$filename);
             }
         }
