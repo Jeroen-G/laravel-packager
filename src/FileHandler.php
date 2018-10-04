@@ -172,4 +172,16 @@ trait FileHandler
             rename($this->packagePath().'/'.$file, $this->packagePath().'/'.$filename);
         }
     }
+
+
+    public function cleanUpRules()
+    {
+        $ruleFiles = ['rules.php', 'rewriteRules.php'];
+
+        foreach($ruleFiles as $file) {
+            if(file_exists($this->packagePath(). '/' .$file)) {
+                unlink($this->packagePath(). '/' .$file);
+            }
+        }
+    }
 }

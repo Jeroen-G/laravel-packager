@@ -125,6 +125,12 @@ class NewPackage extends Command
 
         // Fill all placeholders in all files with the replacements.
         $this->wrapping->fill($this->conveyor->packagePath());
+
+        // Make sure to remove the rule files to avoid clutter.
+        if($manifest !== null) {
+            $this->conveyor->cleanUpRules();
+        }
+
         $this->makeProgress();
 
         // Composer dump-autoload to identify new service provider
