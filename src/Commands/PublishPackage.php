@@ -61,18 +61,18 @@ class PublishPackage extends Command
         $this->conveyor->vendor($this->argument('vendor'));
         $this->conveyor->package($this->argument('name'));
 
-        $this->info('Initialising Git if not already done so...');
+	$this->info('Initialising Git if not already done so...');	
         if (! file_exists($this->conveyor->packagePath().'/.git/')) {
             exec('cd '.$this->conveyor->packagePath().' && git init && git add --all && git commit -m "Initial commit"');
         }
         $this->makeProgress();
 
         $this->info('Git is set up, adding the remote repository...');
-        exec('cd '.$this->conveyor->packagePath().' git remote add origin '.$this->argument('url'));
+        exec('cd '.$this->conveyor->packagePath().' && git remote add origin '.$this->argument('url'));
         $this->makeProgress();
 
         $this->info('Pushing to Github...');
-        exec('cd '.$this->conveyor->packagePath().' git push origin master');
+        exec('cd '.$this->conveyor->packagePath().' && git push -u origin master');
         $this->makeProgress();
 
         // Finished publishing the package, end of the progress bar
