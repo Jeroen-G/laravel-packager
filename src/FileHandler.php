@@ -173,14 +173,13 @@ trait FileHandler
         }
     }
 
-
     public function cleanUpRules()
     {
         $ruleFiles = ['rules.php', 'rewriteRules.php'];
 
-        foreach($ruleFiles as $file) {
-            if(file_exists($this->packagePath(). '/' .$file)) {
-                unlink($this->packagePath(). '/' .$file);
+        foreach ($ruleFiles as $file) {
+            if (file_exists($this->packagePath().'/'.$file)) {
+                unlink($this->packagePath().'/'.$file);
             }
         }
     }

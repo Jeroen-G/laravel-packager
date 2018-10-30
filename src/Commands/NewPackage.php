@@ -127,7 +127,7 @@ class NewPackage extends Command
         $this->wrapping->fill($this->conveyor->packagePath());
 
         // Make sure to remove the rule files to avoid clutter.
-        if($manifest !== null) {
+        if ($manifest !== null) {
             $this->conveyor->cleanUpRules();
         }
 
