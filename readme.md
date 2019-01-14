@@ -150,6 +150,9 @@ CURL_VERIFY=false
 ```
 Of course this means it will be less secure, but then again you are not supposed to run this package anywhere near a production environment.
 
+## Extensions
+DelveFore started to work on a cool project to use various Artisan `make:` commands for the packages, [check it out](https://github.com/DelveFore/laravel-packager-hermes)!
+
 ## Changelog
 
 Please see [changelog.md](changelog.md) for what has changed recently.
