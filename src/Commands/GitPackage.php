@@ -128,4 +128,3 @@ class GitPackage extends Command
         $this->conveyor->package($package);
     }
 }
-
