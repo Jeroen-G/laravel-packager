@@ -90,6 +90,7 @@ class GitPackage extends Command
         if ($exit_code != 0) {
             $this->error('Unable to clone repository');
             $this->warn('Please check credentials and try again');
+
             return;
         }
 
