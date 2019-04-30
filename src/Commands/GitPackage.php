@@ -85,7 +85,7 @@ class GitPackage extends Command
         // Clone the repository
         $this->info('Cloning repository...');
 
-        exec("git clone $source " . $this->conveyor->packagePath(), $output, $exit_code);
+        exec("git clone $source ".$this->conveyor->packagePath(), $output, $exit_code);
 
         if ($exit_code != 0) {
             $this->error('Unable to clone repository');
