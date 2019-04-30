@@ -116,10 +116,10 @@ class GitPackage extends Command
         $pieces = explode('/', $origin);
 
         if (Str::contains($origin, 'https')) {
-            $vendor  = $pieces[3];
+            $vendor = $pieces[3];
             $package = $pieces[4];
         } else {
-            $vendor  = explode(':', $pieces[0])[1];
+            $vendor = explode(':', $pieces[0])[1];
             $package = rtrim($pieces[1], '.git');
         }
 
