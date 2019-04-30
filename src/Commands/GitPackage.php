@@ -82,9 +82,12 @@ class GitPackage extends Command
         $this->conveyor->checkIfPackageExists();
         $this->makeProgress();
 
+        // Create the package directory
+        $this->info('Creating packages directory...');
+        $this->conveyor->makeDir($this->conveyor->packagesPath());
+
         // Clone the repository
         $this->info('Cloning repository...');
-
         exec("git clone $source ".$this->conveyor->packagePath(), $output, $exit_code);
 
         if ($exit_code != 0) {
