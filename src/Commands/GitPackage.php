@@ -2,6 +2,7 @@
 
 namespace JeroenG\Packager\Commands;
 
+use Illuminate\Support\Str;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\Wrapping;
 use Illuminate\Console\Command;
@@ -68,10 +69,9 @@ class GitPackage extends Command
         // Common variables
         $source = $this->argument('url');
         $origin = rtrim(strtolower($source), '/');
-        $pieces = explode('/', $origin);
+
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
-            $this->conveyor->vendor($pieces[3]);
-            $this->conveyor->package($pieces[4]);
+            $this->setGitVendorAndPackage($origin);
         } else {
             $this->conveyor->vendor($this->argument('vendor'));
             $this->conveyor->package($this->argument('name'));
@@ -85,16 +85,23 @@ class GitPackage extends Command
         // Create the package directory
         $this->info('Creating packages directory...');
         $this->conveyor->makeDir($this->conveyor->packagesPath());
+
+        // Clone the repository
+        $this->info('Cloning repository...');
+        exec("git clone $source ".$this->conveyor->packagePath(), $output, $exit_code);
+
+        if ($exit_code != 0) {
+            $this->error('Unable to clone repository');
+            $this->warn('Please check credentials and try again');
+
+            return;
+        }
+
         $this->makeProgress();
 
         // Create the vendor directory
         $this->info('Creating vendor...');
         $this->conveyor->makeDir($this->conveyor->vendorPath());
-        $this->makeProgress();
-
-        // Clone the repository
-        $this->info('Cloning repository...');
-        exec("git clone $source ".$this->conveyor->packagePath());
         $this->makeProgress();
 
         // Composer dump-autoload to identify new service provider
@@ -106,5 +113,21 @@ class GitPackage extends Command
 
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package cloned successfully!');
+    }
+
+    protected function setGitVendorAndPackage($origin)
+    {
+        $pieces = explode('/', $origin);
+
+        if (Str::contains($origin, 'https')) {
+            $vendor = $pieces[3];
+            $package = $pieces[4];
+        } else {
+            $vendor = explode(':', $pieces[0])[1];
+            $package = rtrim($pieces[1], '.git');
+        }
+
+        $this->conveyor->vendor($vendor);
+        $this->conveyor->package($package);
     }
 }
