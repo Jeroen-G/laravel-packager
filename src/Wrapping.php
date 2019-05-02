@@ -141,7 +141,7 @@ class Wrapping
     }
 
     /**
-     * Format vendor and package strings.
+     * Format vendor and package strings to camel case.
      *
      * @param  string $vendor
      * @param  string $package
