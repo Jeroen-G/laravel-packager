@@ -150,11 +150,9 @@ class Wrapping
     protected function formatVars($vendor, $package)
     {
         foreach (['vendor', 'package'] as $var) {
-            if (strpos(${$var}, '-') !== false) {
-                ${$var} = collect(explode('-', ${$var}))->map(function ($segment, $key) {
-                    return ucfirst($segment);
-                })->implode('');
-            }
+            ${$var} = collect(explode('-', ${$var}))->map(function ($segment, $key) {
+                return ucfirst($segment);
+            })->implode('');
         }
 
         return [$vendor, $package];
