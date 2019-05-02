@@ -87,6 +87,8 @@ class Wrapping
      */
     public function addToComposer($vendor, $package)
     {
+        list($vendor, $package) = $this->formatVars($vendor, $package);
+
         return $this->replace('"psr-4": {', '"psr-4": {
             "'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",')
                     ->fillInFile(base_path('composer.json'));
@@ -114,6 +116,8 @@ class Wrapping
      */
     public function addToProviders($vendor, $package)
     {
+        list($vendor, $package) = $this->formatVars($vendor, $package);
+
         return $this->replace('
          * Package Service Providers...
          */', '
@@ -134,5 +138,18 @@ class Wrapping
     {
         return $this->replace($vendor.'\\'.$package.'\\'.$package.'ServiceProvider::class,', '')
                     ->fillInFile(config_path('app.php'));
+    }
+
+    protected function formatVars($vendor, $package)
+    {
+        foreach (['vendor', 'package'] as $var) {
+            if (strpos(${$var}, '-') !== false) {
+                ${$var} = collect(explode('-', ${$var}))->map(function ($segment, $key) {
+                    return ucfirst($segment);
+                })->implode('');
+            }
+        }
+
+        return [$vendor, $package];
     }
 }
