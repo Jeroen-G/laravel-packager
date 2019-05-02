@@ -140,6 +140,13 @@ class Wrapping
                     ->fillInFile(config_path('app.php'));
     }
 
+    /**
+     * Format vendor and package strings.
+     *
+     * @param  string $vendor
+     * @param  string $package
+     * @return array
+     */
     protected function formatVars($vendor, $package)
     {
         foreach (['vendor', 'package'] as $var) {
