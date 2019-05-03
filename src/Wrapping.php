@@ -87,6 +87,8 @@ class Wrapping
      */
     public function addToComposer($vendor, $package)
     {
+        list($vendor, $package) = $this->formatVars($vendor, $package);
+
         return $this->replace('"psr-4": {', '"psr-4": {
             "'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",')
                     ->fillInFile(base_path('composer.json'));
@@ -114,6 +116,8 @@ class Wrapping
      */
     public function addToProviders($vendor, $package)
     {
+        list($vendor, $package) = $this->formatVars($vendor, $package);
+
         return $this->replace('
          * Package Service Providers...
          */', '
@@ -134,5 +138,23 @@ class Wrapping
     {
         return $this->replace($vendor.'\\'.$package.'\\'.$package.'ServiceProvider::class,', '')
                     ->fillInFile(config_path('app.php'));
+    }
+
+    /**
+     * Format vendor and package strings to camel case.
+     *
+     * @param  string $vendor
+     * @param  string $package
+     * @return array
+     */
+    protected function formatVars($vendor, $package)
+    {
+        foreach (['vendor', 'package'] as $var) {
+            ${$var} = collect(explode('-', ${$var}))->map(function ($segment, $key) {
+                return ucfirst($segment);
+            })->implode('');
+        }
+
+        return [$vendor, $package];
     }
 }
