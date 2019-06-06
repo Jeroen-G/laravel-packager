@@ -45,7 +45,7 @@ $ php artisan packager:new MyVendor MyPackage
 ```
 
 **Result:**
-The command will handle practically everything for you. It will create a packages directory, creates the vendor and package directory in it, pulls in a skeleton package, sets up composer.json, creates a service provider, registers the package in config/app.php and the app's composer.json.
+The command will handle practically everything for you. It will create a packages directory, creates the vendor and package directory in it, pulls in a skeleton package, sets up composer.json and creates a service provider.
 
 **Options:**
 ```bash
@@ -65,7 +65,7 @@ $ php artisan packager:git https://github.com/author/repository
 ```
 
 **Result:**
-This will register the package in `config/app.php` and in the app's `composer.json` file.
+This will register the package in the app's `composer.json` file.
 If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository. This also works with Bitbucket repositories, but you have to provide the flag `--host=bitbucket` for the `packager:get` command.
 
 **Options:**

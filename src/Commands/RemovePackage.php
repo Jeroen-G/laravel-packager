@@ -70,6 +70,11 @@ class RemovePackage extends Command
         $this->info('Removing package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
         $this->makeProgress();
 
+        // Uninstall the package
+        $this->info('Uninstalling package...');
+        $this->conveyor->uninstallPackage();
+        $this->makeProgress();
+
         // remove the package directory
         $this->info('Removing packages directory...');
         $this->conveyor->removeDir($this->conveyor->packagePath());
@@ -82,13 +87,6 @@ class RemovePackage extends Command
         } else {
             $this->info('Continuing...');
         }
-        $this->makeProgress();
-
-        // Composer dump-autoload to remove service provider
-        $this->info('Dumping autoloads and undiscovering package...');
-        $this->wrapping->removeFromComposer($this->conveyor->vendor(), $this->conveyor->package());
-        $this->wrapping->removeFromProviders($this->conveyor->vendor(), $this->conveyor->package());
-        $this->conveyor->dumpAutoloads();
         $this->makeProgress();
 
         // Finished removing the package, end of the progress bar
