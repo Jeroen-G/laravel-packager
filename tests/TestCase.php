@@ -8,50 +8,42 @@ abstract class TestCase extends TestBench
 {
     use TestHelper;
 
+    protected const TEST_APP_TEMPLATE = __DIR__.'/../testbench/template';
+    protected const TEST_APP = __DIR__.'/../testbench/laravel';
+
+    public static function setUpBeforeClass():void
+    {
+        if (!file_exists(self::TEST_APP_TEMPLATE)) {
+            self::setUpLocalTestbench();
+        }
+        parent::setUpBeforeClass();
+    }
+
+
+    protected function getBasePath()
+    {
+        return self::TEST_APP;
+    }
+
     /**
      * Setup before each test.
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
+        $this->installTestApp();
         parent::setUp();
-
-        $this->updateConfigFile();
-    }
-
-    public function updateConfigFile()
-    {
-        $filledFile = str_replace('Illuminate\View\ViewServiceProvider::class,',
-        'Illuminate\View\ViewServiceProvider::class,
-        /*
-         * Package Service Providers...
-         */', file_get_contents(config_path('app.php')));
-        file_put_contents(config_path('app.php'), $filledFile);
     }
 
     /**
      * Tear down after each test.
      * @return  void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
-        $this->removeDir(base_path('packages'));
-        $this->undoConfigFile();
-
+        $this->uninstallTestApp();
         parent::tearDown();
-    }
-
-    public function undoConfigFile()
-    {
-        $filledFile = str_replace('
-        /*
-         * Package Service Providers...
-         */', '', file_get_contents(config_path('app.php')));
-        file_put_contents(config_path('app.php'), $filledFile);
-
-        $filledFile = str_replace('MyVendor\MyPackage\MyPackageServiceProvider::class,', '', file_get_contents(config_path('app.php')));
-        file_put_contents(config_path('app.php'), $filledFile);
     }
 
     /**
@@ -63,4 +55,5 @@ abstract class TestCase extends TestBench
     {
         return ['JeroenG\Packager\PackagerServiceProvider'];
     }
+
 }
