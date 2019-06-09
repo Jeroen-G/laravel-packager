@@ -92,7 +92,7 @@ class Conveyor
     public function installPackageFromPath()
     {
         $this->addComposerRepository();
-        $this->requirePackage();
+        $this->requirePackage(null, false);
     }
 
     public function installPackageFromVcs($url, $version)
@@ -149,7 +149,7 @@ class Conveyor
         ]);
     }
 
-    protected function requirePackage(string $version = null)
+    protected function requirePackage(string $version = null, bool $prefer_source = true)
     {
         $package = $this->getPackageName();
         if ($version !== null) {
@@ -159,7 +159,7 @@ class Conveyor
             'composer',
             'require',
             $package,
-            '--prefer-source'
+            '--prefer-' . ($prefer_source ? 'source' : 'dist'),
         ]);
         if (!$result['success']){
             if (preg_match('/Could not find a matching version of package/', $result['output'])){

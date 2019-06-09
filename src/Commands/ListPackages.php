@@ -3,6 +3,7 @@
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Process\Process;
 
 /**
  * List all locally installed packages.
@@ -35,29 +36,48 @@ class ListPackages extends Command
         $repositories = $composer['repositories'] ?? [];
         $packages = [];
         foreach ($repositories as $name => $info) {
-            if ($info['type'] === 'path'){
+            if ($info['type'] === 'path') {
                 $path = $info['url'];
                 $pattern = '{'.addslashes($packages_path).'(.*)$}';
                 if (preg_match($pattern, $path, $match)) {
-                    $packages[] = [$name, 'packages/'.$match[1]];
+                    $status = $this->getGitStatus($path);
+                    $packages[] = [$name, 'packages/'.$match[1], $status];
                 }
-            }
-            else if ($info['type'] === 'vcs'){
-                $path = $packages_path . $name;
-                if (file_exists($path)){
+            } elseif ($info['type'] === 'vcs') {
+                $path = $packages_path.$name;
+                if (file_exists($path)) {
                     $pattern = '{'.addslashes($packages_path).'(.*)$}';
                     if (preg_match($pattern, $path, $match)) {
-                        $packages[] = [$name, 'packages/'.$match[1]];
+                        $status = $this->getGitStatus($path);
+                        $packages[] = [$name, 'packages/'.$match[1], $status];
                     }
                 }
             }
         }
-        $headers = ['Package', 'Path'];
+        $headers = ['Package', 'Path', 'Git status'];
         $this->table($headers, $packages);
     }
 
     protected function getGitStatus($path)
     {
-        $command = sprintf('git --work-tree=%s status', realpath($path));
+        $status = '';
+        (new Process(['git', 'fetch', '--all'], $path))->run();
+        $cmd = implode(' ', ['git', '--git-dir='.$path.'/.git', '--work-tree='.$path, 'status', '-sb']);
+        (new Process(['git', '--git-dir='.$path.'/.git', '--work-tree='.$path, 'status', '-sb'], $path))->run(function (
+            $type,
+            $buffer
+        ) use (&$status) {
+            if (preg_match('/not a git repository/', $buffer)) {
+                $status = 'Not initialized';
+            }
+            if (preg_match('/^##/', $buffer)) {
+                if (preg_match('/\[(.*)\]$/', $buffer, $match)) {
+                    $status = '<comment>'.ucfirst($match[1]).'</comment>';
+                } else {
+                    $status = '<info>Up to date</info>';
+                }
+            }
+        });
+        return $status;
     }
 }
