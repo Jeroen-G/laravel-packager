@@ -109,7 +109,7 @@ class GetPackage extends Command
 
         // Install the package
         $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        $this->conveyor->installPackageFromPath();
         $this->makeProgress();
 
         // Finished creating the package, end of the progress bar

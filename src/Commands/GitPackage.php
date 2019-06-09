@@ -24,7 +24,8 @@ class GitPackage extends Command
     protected $signature = 'packager:git
                             {url : The url of the git repository}
                             {vendor? : The vendor part of the namespace}
-                            {name? : The name of package for the namespace}';
+                            {name? : The name of package for the namespace}
+                            {branch? : The branch to install}';
 
     /**
      * The console command description.
@@ -69,6 +70,10 @@ class GitPackage extends Command
         // Common variables
         $source = $this->argument('url');
         $origin = rtrim(strtolower($source), '/');
+        $version = 'dev-master';
+        if ($branch = $this->argument('branch')){
+            $version = 'dev-'.$branch;
+        }
 
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->setGitVendorAndPackage($origin);
@@ -82,30 +87,18 @@ class GitPackage extends Command
         $this->conveyor->checkIfPackageExists();
         $this->makeProgress();
 
+        // Install package from VCS
+        $this->info('Installing package from VCS...');
+        $this->conveyor->installPackageFromVcs($origin, $version);
+        $this->makeProgress();
         // Create the package directory
         $this->info('Creating packages directory...');
         $this->conveyor->makeDir($this->conveyor->packagesPath());
-
-        // Clone the repository
-        $this->info('Cloning repository...');
-        exec("git clone $source ".$this->conveyor->packagePath(), $output, $exit_code);
-
-        if ($exit_code != 0) {
-            $this->error('Unable to clone repository');
-            $this->warn('Please check credentials and try again');
-
-            return;
-        }
-
-        $this->makeProgress();
-
-        // Create the vendor directory
-        $this->info('Creating vendor...');
         $this->conveyor->makeDir($this->conveyor->vendorPath());
         $this->makeProgress();
 
-        $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        $this->info('Symlinking package to ' . $this->conveyor->packagePath());
+        $this->conveyor->createSymlinks();
         $this->makeProgress();
 
         // Finished creating the package, end of the progress bar

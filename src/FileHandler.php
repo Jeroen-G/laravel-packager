@@ -83,6 +83,10 @@ trait FileHandler
      */
     public function removeDir($path)
     {
+        if (is_link($path)){
+            unlink($path);
+            return true;
+        }
         if ($path == 'packages' || $path == '/') {
             return false;
         }

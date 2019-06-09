@@ -35,14 +35,29 @@ class ListPackages extends Command
         $repositories = $composer['repositories'] ?? [];
         $packages = [];
         foreach ($repositories as $name => $info) {
-            $path = $info['url'];
-            $pattern = '{'.addslashes($packages_path).'(.*)$}';
-            if (preg_match($pattern, $path, $match)) {
-                $packages[] = explode(DIRECTORY_SEPARATOR, $match[1]);
+            if ($info['type'] === 'path'){
+                $path = $info['url'];
+                $pattern = '{'.addslashes($packages_path).'(.*)$}';
+                if (preg_match($pattern, $path, $match)) {
+                    $packages[] = [$name, 'packages/'.$match[1]];
+                }
+            }
+            else if ($info['type'] === 'vcs'){
+                $path = $packages_path . $name;
+                if (file_exists($path)){
+                    $pattern = '{'.addslashes($packages_path).'(.*)$}';
+                    if (preg_match($pattern, $path, $match)) {
+                        $packages[] = [$name, 'packages/'.$match[1]];
+                    }
+                }
             }
         }
-
         $headers = ['Package', 'Path'];
         $this->table($headers, $packages);
+    }
+
+    protected function getGitStatus($path)
+    {
+        $command = sprintf('git --work-tree=%s status', realpath($path));
     }
 }

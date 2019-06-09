@@ -2,7 +2,6 @@
 
 namespace JeroenG\Packager;
 
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class Conveyor
@@ -85,38 +84,54 @@ class Conveyor
         rename($this->vendorPath().'/'.$piece.'-'.$branch, $this->packagePath());
     }
 
-    /**
-     * Dump Composer's autoloads.
-     *
-     * @return void
-     */
-    public function dumpAutoloads()
+    public function getPackageName()
     {
-        shell_exec('composer dump-autoload');
+        return $this->vendor . '/' . $this->package;
     }
 
-    public function installPackage()
+    public function installPackageFromPath()
     {
-        $this->addPathRepository();
+        $this->addComposerRepository();
         $this->requirePackage();
+    }
+
+    public function installPackageFromVcs($url, $version)
+    {
+        $this->addComposerRepository('vcs', $url);
+        $success = $this->requirePackage($version);
+        if (!$success){
+            $this->removeComposerRepository();
+            $message = 'No package named ' . $this->getPackageName() . ' with version ' . $version . ' was found in ' .$url;
+            throw new RuntimeException($message);
+        }
+    }
+
+    public function createSymlinks()
+    {
+        // Find installed path
+        $result = $this->runProcess(['composer', 'info', $this->getPackageName(), '--path']);
+        if (preg_match('{' . $this->getPackageName() . ' (.*)$}m', $result['output'], $match)){
+            $path = $match[1];
+            symlink($path, $this->packagePath());
+        }
     }
 
     public function uninstallPackage()
     {
         $this->removePackage();
-        $this->removePathRepository();
+        $this->removeComposerRepository();
     }
 
-    public function addPathRepository()
+    protected function addComposerRepository(string $type = 'path', string $url = null)
     {
         $params = json_encode([
-            'type' => 'path',
-            'url'  => $this->packagePath()
+            'type' => $type,
+            'url'  => $url ?: $this->packagePath()
         ]);
         $command = [
             'composer',
             'config',
-            'repositories.'.Str::slug($this->vendor.'-'.$this->package),
+            'repositories.'.$this->getPackageName(),
             $params,
             '--file',
             'composer.json'
@@ -124,42 +139,57 @@ class Conveyor
         return $this->runProcess($command);
     }
 
-    public function removePathRepository()
+    protected function removeComposerRepository()
     {
         return $this->runProcess([
             'composer',
             'config',
             '--unset',
-            'repositories.'.Str::slug($this->vendor.'-', $this->package)
+            'repositories.'.$this->getPackageName()
         ]);
     }
 
-    public function requirePackage()
+    protected function requirePackage(string $version = null)
     {
-        return $this->runProcess([
+        $package = $this->getPackageName();
+        if ($version !== null) {
+            $package .= ':'.$version;
+        }
+        $result = $this->runProcess([
             'composer',
             'require',
-            $this->vendor.'/'.$this->package
+            $package,
+            '--prefer-source'
         ]);
+        if (!$result['success']){
+            if (preg_match('/Could not find a matching version of package/', $result['output'])){
+                return false;
+            }
+        }
+        return true;
     }
 
-    public function removePackage()
+    protected function removePackage()
     {
         return $this->runProcess([
             'composer',
             'remove',
-            $this->vendor.'/'.$this->package
+            $this->getPackageName()
         ]);
     }
 
     /**
      * @param  array  $command
-     * @return bool
+     * @return array
      */
     protected function runProcess(array $command)
     {
         $process = new \Symfony\Component\Process\Process($command, base_path());
-        $process->run();
-        return $process->getExitCode() === 0;
+        $output = '';
+        $process->run(function ($type, $buffer) use (&$output) {
+            $output .= $buffer;
+        });
+        $success = $process->getExitCode() === 0;
+        return compact('success', 'output');
     }
 }
