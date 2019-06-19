@@ -17,6 +17,7 @@
         }
     ],
     "require": {
+        "ext-zip": "*",
         "illuminate/support": "~5",
         "guzzlehttp/guzzle": "~6"
     },
