@@ -10,10 +10,8 @@ abstract class TestCase extends TestBench
 
     /**
      * Setup before each test.
-     *
-     * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -32,9 +30,8 @@ abstract class TestCase extends TestBench
 
     /**
      * Tear down after each test.
-     * @return  void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->removeDir(base_path('packages'));
         $this->undoConfigFile();
@@ -56,7 +53,9 @@ abstract class TestCase extends TestBench
 
     /**
      * Tell Testbench to use this package.
+     *
      * @param $app
+     *
      * @return array
      */
     protected function getPackageProviders($app)

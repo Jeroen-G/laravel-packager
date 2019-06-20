@@ -24,7 +24,7 @@ trait TestHelper
     protected function seeInConsoleOutput($expectedText)
     {
         $consoleOutput = $this->app[Kernel::class]->output();
-        $this->assertContains($expectedText, $consoleOutput, "Did not see `{$expectedText}` in console output: `$consoleOutput`");
+        $this->assertStringContainsString($expectedText, $consoleOutput, "Did not see `{$expectedText}` in console output: `$consoleOutput`");
     }
 
     protected function doNotSeeInConsoleOutput($unExpectedText)
