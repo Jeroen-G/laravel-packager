@@ -72,11 +72,9 @@ class DisablePackage extends Command
         $this->info('Disabling package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
         $this->makeProgress();
 
-        // Composer dump-autoload to remove service provider
-        $this->info('Dumping autoloads and undiscovering package...');
-        $this->wrapping->removeFromComposer($this->conveyor->vendor(), $this->conveyor->package());
-        $this->wrapping->removeFromProviders($this->conveyor->vendor(), $this->conveyor->package());
-        $this->conveyor->dumpAutoloads();
+        // Uninstall the package
+        $this->info('Uninstalling package...');
+        $this->conveyor->uninstallPackage();
         $this->makeProgress();
 
         // Finished removing the package, end of the progress bar

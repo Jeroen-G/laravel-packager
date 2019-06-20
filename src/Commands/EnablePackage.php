@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 use JeroenG\Packager\ProgressBar;
 
 /**
- * remove an existing package.
+ * Enable an existing package.
  *
  * @author JeroenG
  **/
@@ -72,11 +72,9 @@ class EnablePackage extends Command
         $this->info('Enabling package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
         $this->makeProgress();
 
-        // Composer dump-autoload to remove service provider
-        $this->info('Dumping autoloads and undiscovering package...');
-        $this->wrapping->addToComposer($this->conveyor->vendor(), $this->conveyor->package());
-        $this->wrapping->addToProviders($this->conveyor->vendor(), $this->conveyor->package());
-        $this->conveyor->dumpAutoloads();
+        // Install the package
+        $this->info('Installing package...');
+        $this->conveyor->installPackage();
         $this->makeProgress();
 
         // Finished removing the package, end of the progress bar

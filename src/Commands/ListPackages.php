@@ -31,11 +31,14 @@ class ListPackages extends Command
     public function handle()
     {
         $composer = json_decode(file_get_contents(base_path('composer.json')), true);
+        $packages_path = base_path('packages/');
+        $repositories = $composer['repositories'] ?? [];
         $packages = [];
-
-        foreach ($composer['autoload']['psr-4'] as $package => $path) {
-            if ($package !== 'App\\') {
-                $packages[] = [rtrim($package, '\\'), $path];
+        foreach ($repositories as $name => $info) {
+            $path = $info['url'];
+            $pattern = '{'.addslashes($packages_path).'(.*)$}';
+            if (preg_match($pattern, $path, $match)) {
+                $packages[] = explode(DIRECTORY_SEPARATOR, $match[1]);
             }
         }
 

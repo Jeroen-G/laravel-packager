@@ -2,7 +2,7 @@
 
 namespace JeroenG\Packager\Tests;
 
-use Artisan;
+use Illuminate\Support\Facades\Artisan;
 
 class IntegratedTest extends TestCase
 {
@@ -15,7 +15,8 @@ class IntegratedTest extends TestCase
 
     public function test_get_existing_package()
     {
-        Artisan::call('packager:get', ['url' => 'https://github.com/Jeroen-G/packager-skeleton', 'vendor' => 'MyVendor', 'name' => 'MyPackage']);
+        Artisan::call('packager:get',
+            ['url' => 'https://github.com/Jeroen-G/packager-skeleton', 'vendor' => 'MyVendor', 'name' => 'MyPackage']);
 
         $this->seeInConsoleOutput('Package downloaded successfully!');
     }

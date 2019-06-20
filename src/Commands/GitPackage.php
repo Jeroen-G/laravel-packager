@@ -104,11 +104,8 @@ class GitPackage extends Command
         $this->conveyor->makeDir($this->conveyor->vendorPath());
         $this->makeProgress();
 
-        // Composer dump-autoload to identify new service provider
-        $this->info('Dumping autoloads and discovering package...');
-        $this->wrapping->addToComposer($this->conveyor->vendor(), $this->conveyor->package());
-        $this->wrapping->addToProviders($this->conveyor->vendor(), $this->conveyor->package());
-        $this->conveyor->dumpAutoloads();
+        $this->info('Installing package...');
+        $this->conveyor->installPackage();
         $this->makeProgress();
 
         // Finished creating the package, end of the progress bar
