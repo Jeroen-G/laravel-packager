@@ -13,12 +13,11 @@ abstract class TestCase extends TestBench
 
     public static function setUpBeforeClass():void
     {
-        if (!file_exists(self::TEST_APP_TEMPLATE)) {
+        if (! file_exists(self::TEST_APP_TEMPLATE)) {
             self::setUpLocalTestbench();
         }
         parent::setUpBeforeClass();
     }
-
 
     protected function getBasePath()
     {
@@ -54,5 +53,4 @@ abstract class TestCase extends TestBench
     {
         return ['JeroenG\Packager\PackagerServiceProvider'];
     }
-
 }

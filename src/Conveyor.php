@@ -2,8 +2,8 @@
 
 namespace JeroenG\Packager;
 
-use Illuminate\Support\Str;
 use RuntimeException;
+use Illuminate\Support\Str;
 
 class Conveyor
 {
@@ -111,7 +111,7 @@ class Conveyor
     {
         $params = json_encode([
             'type' => 'path',
-            'url'  => $this->packagePath()
+            'url'  => $this->packagePath(),
         ]);
         $command = [
             'composer',
@@ -119,8 +119,9 @@ class Conveyor
             'repositories.'.Str::slug($this->vendor.'-'.$this->package),
             $params,
             '--file',
-            'composer.json'
+            'composer.json',
         ];
+
         return $this->runProcess($command);
     }
 
@@ -130,7 +131,7 @@ class Conveyor
             'composer',
             'config',
             '--unset',
-            'repositories.'.Str::slug($this->vendor.'-', $this->package)
+            'repositories.'.Str::slug($this->vendor.'-', $this->package),
         ]);
     }
 
@@ -139,7 +140,7 @@ class Conveyor
         return $this->runProcess([
             'composer',
             'require',
-            $this->vendor.'/'.$this->package
+            $this->vendor.'/'.$this->package,
         ]);
     }
 
@@ -148,7 +149,7 @@ class Conveyor
         return $this->runProcess([
             'composer',
             'remove',
-            $this->vendor.'/'.$this->package
+            $this->vendor.'/'.$this->package,
         ]);
     }
 
@@ -160,6 +161,7 @@ class Conveyor
     {
         $process = new \Symfony\Component\Process\Process($command, base_path());
         $process->run();
+
         return $process->getExitCode() === 0;
     }
 }

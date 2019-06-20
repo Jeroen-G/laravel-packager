@@ -2,13 +2,12 @@
 
 namespace JeroenG\Packager\Tests;
 
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use Illuminate\Contracts\Console\Kernel;
 
 trait TestHelper
 {
-
     protected function seeInConsoleOutput($expectedText)
     {
         $consoleOutput = $this->app[Kernel::class]->output();
@@ -25,7 +24,7 @@ trait TestHelper
 
     /**
      * Create a modified copy of testbench to be used as a template.
-     * Before each test, a fresh copy of the template is created
+     * Before each test, a fresh copy of the template is created.
      */
     private static function setUpLocalTestbench()
     {
