@@ -3,6 +3,7 @@
 namespace JeroenG\Packager\Tests;
 
 use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Process\Process;
 
 class IntegratedTest extends TestCase
 {
@@ -26,7 +27,7 @@ class IntegratedTest extends TestCase
         Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);
         Artisan::call('packager:list');
 
-        $this->seeInConsoleOutput('MyVendor');
+        $this->seeInConsoleOutput(['MyVendor', 'Not initialized']);
     }
 
     public function test_removing_package()
@@ -36,5 +37,26 @@ class IntegratedTest extends TestCase
 
         Artisan::call('packager:remove', ['vendor' => 'MyVendor', 'name' => 'MyPackage', '--no-interaction' => true]);
         $this->seeInConsoleOutput('Package removed successfully!');
+    }
+
+    public function test_adding_git_package()
+    {
+        Artisan::call('packager:git',
+            ['url' => 'Jeroen-G/testassist']);
+        $this->seeInConsoleOutput('Package cloned successfully!');
+    }
+
+    public function test_git_package_tracking()
+    {
+        Artisan::call('packager:git',
+            ['url' => 'jeroen-g/testassist']);
+        Artisan::call('packager:list');
+        $this->seeInConsoleOutput('Up to date');
+        $package_path = base_path('packages/jeroen-g/testassist');
+        (new Process(['touch', 'new-file.txt'], $package_path))->run();
+        (new Process(['git', 'add', '.'], $package_path))->run();
+        (new Process(['git', 'commit', '-m', 'New commit'], $package_path))->run();
+        Artisan::call('packager:list');
+        $this->seeInConsoleOutput('Ahead 1');
     }
 }

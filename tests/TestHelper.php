@@ -11,9 +11,14 @@ trait TestHelper
 
     protected function seeInConsoleOutput($expectedText)
     {
+        if (!is_array($expectedText)){
+            $expectedText = [$expectedText];
+        }
         $consoleOutput = $this->app[Kernel::class]->output();
-        $this->assertStringContainsString($expectedText, $consoleOutput,
-            "Did not see `{$expectedText}` in console output: `$consoleOutput`");
+        foreach ($expectedText as $string) {
+            $this->assertStringContainsString($string, $consoleOutput,
+                "Did not see `{$string}` in console output: `$consoleOutput`");
+        }
     }
 
     protected function doNotSeeInConsoleOutput($unExpectedText)
