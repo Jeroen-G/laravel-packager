@@ -126,7 +126,7 @@ class Conveyor
     {
         $params = json_encode([
             'type' => $type,
-            'url'  => $url ?: $this->packagePath()
+            'url'  => $url ?: $this->packagePath(),
         ]);
         $command = [
             'composer',
@@ -134,8 +134,9 @@ class Conveyor
             'repositories.'.$this->getPackageName(),
             $params,
             '--file',
-            'composer.json'
+            'composer.json',
         ];
+
         return $this->runProcess($command);
     }
 
@@ -145,7 +146,7 @@ class Conveyor
             'composer',
             'config',
             '--unset',
-            'repositories.'.$this->getPackageName()
+            'repositories.'.$this->getPackageName(),
         ]);
     }
 
@@ -174,7 +175,7 @@ class Conveyor
         return $this->runProcess([
             'composer',
             'remove',
-            $this->getPackageName()
+            $this->getPackageName(),
         ]);
     }
 
