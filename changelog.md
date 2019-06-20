@@ -2,6 +2,17 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.2
+
+### Added
+- package:enable and package:disable commands.
+- ext-zip as a requirement.
+- Check if git clone was successful before continuing installation of a package.
+
+### Updated
+- PHPUnit requirement from 7 to 8.
+- Convert vendor and package to camel case when installing package from git.
+
 ## Version 2.1
 
 ### Added
