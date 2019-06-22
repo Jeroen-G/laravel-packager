@@ -52,9 +52,7 @@ trait TestHelper
         Conveyor::fetchSkeleton($skeleton_url, Conveyor::getSkeletonCachePath());
         // Install dependencies
         fwrite(STDOUT, "Installing test environment dependencies\n");
-        (new Process(['composer', 'install', '--prefer-dist'], self::TEST_APP_TEMPLATE))->run(function ($t, $b) {
-            fwrite(STDOUT, $b);
-        });
+        (new Process(['composer', 'install', '--prefer-dist'], self::TEST_APP_TEMPLATE))->run();
         fwrite(STDOUT, "Test environment installed\n");
     }
 

@@ -8,3 +8,4 @@ report
 *.sublime-project
 *.sublime-workspace
 testbench/
+skeleton-cache/

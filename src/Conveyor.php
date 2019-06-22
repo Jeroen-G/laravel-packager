@@ -235,11 +235,6 @@ class Conveyor
 
     public static function getSkeletonCachePath(): string
     {
-        if (defined('PHPUNIT_COMPOSER_INSTALL')) {
-            // Running PhpUnit
-            return __DIR__.'/../testbench/skeleton-cache';
-        }
-
-        return storage_path('app/laravel-packager/cache');
+        return __DIR__.'/../skeleton-cache';
     }
 }
