@@ -3,6 +3,7 @@
 namespace JeroenG\Packager;
 
 use RuntimeException;
+use Illuminate\Support\Facades\File;
 
 class Conveyor
 {
@@ -56,6 +57,14 @@ class Conveyor
         return $this->package;
     }
 
+    public static function fetchSkeleton(string $source, string $destination)
+    {
+        $zipFilePath = tempnam(getcwd(), 'package');
+        (new self())->download($zipFilePath, $source)
+            ->extract($zipFilePath, $destination)
+            ->cleanUp($zipFilePath);
+    }
+
     /**
      * Download the skeleton package.
      *
@@ -63,10 +72,19 @@ class Conveyor
      */
     public function downloadSkeleton()
     {
-        $this->download($zipFile = $this->makeFilename(), config('packager.skeleton'))
-            ->extract($zipFile, $this->vendorPath())
-            ->cleanUp($zipFile);
-        rename($this->vendorPath().'/packager-skeleton-master', $this->packagePath());
+        $useCached = config('packager.cache_skeleton');
+        $cachePath = self::getSkeletonCachePath();
+        $cacheExists = File::exists($cachePath);
+        if ($useCached && $cacheExists) {
+            File::copyDirectory($cachePath, $this->vendorPath());
+        } else {
+            self::fetchSkeleton(config('packager.skeleton'), $this->vendorPath());
+        }
+        $temporaryPath = $this->vendorPath().'/packager-skeleton-master';
+        if ($useCached && ! $cacheExists) {
+            File::copyDirectory($temporaryPath, $cachePath);
+        }
+        rename($temporaryPath, $this->packagePath());
     }
 
     /**
@@ -86,22 +104,26 @@ class Conveyor
 
     public function getPackageName()
     {
-        return $this->vendor . '/' . $this->package;
+        return $this->vendor.'/'.$this->package;
     }
 
     public function installPackageFromPath()
     {
+        $this->disablePackagistRepo();
         $this->addComposerRepository();
         $this->requirePackage(null, false);
+        $this->enablePackagistRepo();
     }
 
     public function installPackageFromVcs($url, $version)
     {
+        $this->disablePackagistRepo();
         $this->addComposerRepository('vcs', $url);
         $success = $this->requirePackage($version);
-        if (!$success){
+        $this->enablePackagistRepo();
+        if (! $success) {
             $this->removeComposerRepository();
-            $message = 'No package named ' . $this->getPackageName() . ' with version ' . $version . ' was found in ' .$url;
+            $message = 'No package named '.$this->getPackageName().' with version '.$version.' was found in '.$url;
             throw new RuntimeException($message);
         }
     }
@@ -110,7 +132,7 @@ class Conveyor
     {
         // Find installed path
         $result = $this->runProcess(['composer', 'info', $this->getPackageName(), '--path']);
-        if (preg_match('{' . $this->getPackageName() . ' (.*)$}m', $result['output'], $match)){
+        if (preg_match('{'.$this->getPackageName().' (.*)$}m', $result['output'], $match)) {
             $path = $match[1];
             symlink($path, $this->packagePath());
         }
@@ -124,17 +146,12 @@ class Conveyor
 
     protected function addComposerRepository(string $type = 'path', string $url = null)
     {
-        $params = json_encode([
-            'type' => $type,
-            'url'  => $url ?: $this->packagePath(),
-        ]);
         $command = [
             'composer',
             'config',
             'repositories.'.$this->getPackageName(),
-            $params,
-            '--file',
-            'composer.json',
+            $type,
+            $url ?: $this->packagePath(),
         ];
 
         return $this->runProcess($command);
@@ -152,21 +169,19 @@ class Conveyor
 
     protected function requirePackage(string $version = null, bool $prefer_source = true)
     {
-        $package = $this->getPackageName();
-        if ($version !== null) {
-            $package .= ':'.$version;
-        }
+        $package = sprintf('%s:%s', strtolower($this->getPackageName()), $version ?? '@dev');
         $result = $this->runProcess([
             'composer',
             'require',
             $package,
-            '--prefer-' . ($prefer_source ? 'source' : 'dist'),
+            '--prefer-'.($prefer_source ? 'source' : 'dist'),
         ]);
-        if (!$result['success']){
-            if (preg_match('/Could not find a matching version of package/', $result['output'])){
+        if (! $result['success']) {
+            if (preg_match('/Could not find a matching version of package/', $result['output'])) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -175,7 +190,7 @@ class Conveyor
         return $this->runProcess([
             'composer',
             'remove',
-            $this->getPackageName(),
+            strtolower($this->getPackageName()),
         ]);
     }
 
@@ -192,5 +207,39 @@ class Conveyor
         });
         $success = $process->getExitCode() === 0;
         return compact('success', 'output');
+    }
+
+    protected function disablePackagistRepo()
+    {
+        $result = $this->runProcess([
+            'composer',
+            'config',
+            'repo.packagist',
+            'false',
+        ]);
+
+        return $result['success'];
+    }
+
+    private function enablePackagistRepo()
+    {
+        $result = $this->runProcess([
+            'composer',
+            'config',
+            'repo.packagist',
+            'true',
+        ]);
+
+        return $result['success'];
+    }
+
+    public static function getSkeletonCachePath(): string
+    {
+        if (defined('PHPUNIT_COMPOSER_INSTALL')) {
+            // Running PhpUnit
+            return __DIR__.'/../testbench/skeleton-cache';
+        }
+
+        return storage_path('app/laravel-packager/cache');
     }
 }

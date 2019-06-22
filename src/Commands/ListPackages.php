@@ -3,6 +3,7 @@
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use Symfony\Component\Process\Process;
 
 /**
@@ -60,21 +61,18 @@ class ListPackages extends Command
 
     protected function getGitStatus($path)
     {
-        $status = '';
+        if (! File::exists($path.'/.git')) {
+            return 'Not initialized';
+        }
+        $status = '<info>Up to date</info>';
         (new Process(['git', 'fetch', '--all'], $path))->run();
-        $cmd = implode(' ', ['git', '--git-dir='.$path.'/.git', '--work-tree='.$path, 'status', '-sb']);
         (new Process(['git', '--git-dir='.$path.'/.git', '--work-tree='.$path, 'status', '-sb'], $path))->run(function (
             $type,
             $buffer
         ) use (&$status) {
-            if (preg_match('/not a git repository/', $buffer)) {
-                $status = 'Not initialized';
-            }
             if (preg_match('/^##/', $buffer)) {
                 if (preg_match('/\[(.*)\]$/', $buffer, $match)) {
                     $status = '<comment>'.ucfirst($match[1]).'</comment>';
-                } else {
-                    $status = '<info>Up to date</info>';
                 }
             }
         });

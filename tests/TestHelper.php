@@ -2,6 +2,7 @@
 
 namespace JeroenG\Packager\Tests;
 
+use JeroenG\Packager\Conveyor;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Illuminate\Contracts\Console\Kernel;
@@ -44,14 +45,17 @@ trait TestHelper
         unset($composer['autoload']['classmap'][1]);
         // Pre-install illuminate/support
         $composer['require'] = ['illuminate/support' => '~5'];
-        // Install stable version
-        $composer['minimum-stability'] = 'stable';
-        $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT));
+        $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        // Pre-download the skeleton package
+        fwrite(STDOUT, "Downloading local copy of packager-skeleton\n");
+        $skeleton_url = 'http://github.com/Jeroen-G/packager-skeleton/archive/master.zip';
+        Conveyor::fetchSkeleton($skeleton_url, Conveyor::getSkeletonCachePath());
         // Install dependencies
         fwrite(STDOUT, "Installing test environment dependencies\n");
-        (new Process(['composer', 'install', '--no-dev'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
-            fwrite(STDOUT, $buffer);
+        (new Process(['composer', 'install', '--prefer-dist'], self::TEST_APP_TEMPLATE))->run(function ($t, $b) {
+            fwrite(STDOUT, $b);
         });
+        fwrite(STDOUT, "Test environment installed\n");
     }
 
     protected function installTestApp()

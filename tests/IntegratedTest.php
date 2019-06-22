@@ -9,6 +9,8 @@ class IntegratedTest extends TestCase
 {
     public function test_new_package_is_created()
     {
+        // Also test downloading package-skeleton (the other test will use a cached copy)
+        config()->set('packager.cache_skeleton', false);
         Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);
 
         $this->seeInConsoleOutput('Package created successfully!');
@@ -42,14 +44,8 @@ class IntegratedTest extends TestCase
     public function test_adding_git_package()
     {
         Artisan::call('packager:git',
-            ['url' => 'Jeroen-G/testassist']);
-        $this->seeInConsoleOutput('Package cloned successfully!');
-    }
-
-    public function test_git_package_tracking()
-    {
-        Artisan::call('packager:git',
             ['url' => 'jeroen-g/testassist']);
+        $this->seeInConsoleOutput('Package cloned successfully!');
         Artisan::call('packager:list');
         $this->seeInConsoleOutput('Up to date');
         $package_path = base_path('packages/jeroen-g/testassist');
