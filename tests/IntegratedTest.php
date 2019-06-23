@@ -20,6 +20,7 @@ class IntegratedTest extends TestCase
 
     public function test_get_existing_package()
     {
+        $this->assertComposerPackageNotInstalled('MyVendor/MyPackage');
         Artisan::call('packager:get', [
             'url' => 'https://github.com/Jeroen-G/packager-skeleton',
             'vendor' => 'MyVendor',
@@ -53,7 +54,7 @@ class IntegratedTest extends TestCase
     public function test_adding_git_package()
     {
         Artisan::call('packager:git', [
-            'url' => 'mortenscheel/mypackage',
+            'url' => 'https://github.com/Jeroen-G/packager-skeleton',
             'vendor' => 'MyVendor',
             'name' => 'MyPackage'
         ]);
