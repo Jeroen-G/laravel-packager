@@ -3,11 +3,10 @@
 namespace JeroenG\Packager;
 
 use RuntimeException;
-use Illuminate\Support\Facades\File;
 
 class Conveyor
 {
-    use FileHandler;
+    use FileHandler, ComposerHandler;
 
     /**
      * Package vendor namespace.
@@ -57,7 +56,7 @@ class Conveyor
         return $this->package;
     }
 
-    public static function fetchSkeleton(string $source, string $destination)
+    public static function fetchSkeleton(string $source, string $destination): void
     {
         $zipFilePath = tempnam(getcwd(), 'package');
         (new self())->download($zipFilePath, $source)
@@ -70,167 +69,71 @@ class Conveyor
      *
      * @return void
      */
-    public function downloadSkeleton()
+    public function downloadSkeleton(): void
     {
         $useCached = config('packager.cache_skeleton');
         $cachePath = self::getSkeletonCachePath();
-        $cacheExists = File::exists($cachePath);
+        $cacheExists = $this->pathExists($cachePath);
         if ($useCached && $cacheExists) {
-            File::copyDirectory($cachePath, $this->vendorPath());
+            $this->copyDir($cachePath, $this->vendorPath());
         } else {
             self::fetchSkeleton(config('packager.skeleton'), $this->vendorPath());
         }
         $temporaryPath = $this->vendorPath().'/packager-skeleton-master';
         if ($useCached && ! $cacheExists) {
-            File::copyDirectory($temporaryPath, $cachePath);
+            $this->copyDir($temporaryPath, $cachePath);
         }
-        rename($temporaryPath, $this->packagePath());
+        $this->rename($temporaryPath, $this->packagePath());
     }
 
     /**
      * Download the package from Github.
      *
      * @param  string  $origin  The Github URL
+     * @param $piece
      * @param  string  $branch  The branch to download
      * @return void
      */
-    public function downloadFromGithub($origin, $piece, $branch)
+    public function downloadFromGithub($origin, $piece, $branch): void
     {
         $this->download($zipFile = $this->makeFilename(), $origin)
             ->extract($zipFile, $this->vendorPath())
             ->cleanUp($zipFile);
-        rename($this->vendorPath().'/'.$piece.'-'.$branch, $this->packagePath());
+        $this->rename($this->vendorPath().'/'.$piece.'-'.$branch, $this->packagePath());
     }
 
-    public function getPackageName()
+    public function getPackageName(): string
     {
         return $this->vendor.'/'.$this->package;
     }
 
-    public function installPackageFromPath()
+    public function installPackageFromPath(): void
     {
-        $this->disablePackagistRepo();
-        $this->addComposerRepository();
-        $this->requirePackage(null, false);
-        $this->enablePackagistRepo();
+        $this->addComposerRepository($this->getPackageName(), 'path', $this->packagePath());
+        $this->requirePackage($this->getPackageName(), null, false);
     }
 
-    public function installPackageFromVcs($url, $version)
+    public function installPackageFromVcs($url, $version): void
     {
-        $this->disablePackagistRepo();
-        $this->addComposerRepository('vcs', $url);
-        $success = $this->requirePackage($version);
-        $this->enablePackagistRepo();
-        if (! $success) {
-            $this->removeComposerRepository();
+        $this->addComposerRepository($this->getPackageName(), 'vcs', $url);
+        $success = $this->requirePackage($this->getPackageName(), $version);
+        if (!$success) {
+            $this->removeComposerRepository($this->getPackageName());
             $message = 'No package named '.$this->getPackageName().' with version '.$version.' was found in '.$url;
             throw new RuntimeException($message);
         }
     }
 
-    public function createSymlinks()
+    public function symlinkInstalledPackage(): bool
     {
-        // Find installed path
-        $result = $this->runProcess(['composer', 'info', $this->getPackageName(), '--path']);
-        if (preg_match('{'.$this->getPackageName().' (.*)$}m', $result['output'], $match)) {
-            $path = $match[1];
-            symlink($path, $this->packagePath());
-        }
+        $sourcePath = $this->findInstalledPath($this->getPackageName());
+        return $this->createSymlink($sourcePath, $this->packagePath());
     }
 
-    public function uninstallPackage()
+    public function uninstallPackage(): void
     {
-        $this->removePackage();
-        $this->removeComposerRepository();
-    }
-
-    protected function addComposerRepository(string $type = 'path', string $url = null)
-    {
-        $command = [
-            'composer',
-            'config',
-            'repositories.'.$this->getPackageName(),
-            $type,
-            $url ?: $this->packagePath(),
-        ];
-
-        return $this->runProcess($command);
-    }
-
-    protected function removeComposerRepository()
-    {
-        return $this->runProcess([
-            'composer',
-            'config',
-            '--unset',
-            'repositories.'.$this->getPackageName(),
-        ]);
-    }
-
-    protected function requirePackage(string $version = null, bool $prefer_source = true)
-    {
-        $package = sprintf('%s:%s', strtolower($this->getPackageName()), $version ?? '@dev');
-        $result = $this->runProcess([
-            'composer',
-            'require',
-            $package,
-            '--prefer-'.($prefer_source ? 'source' : 'dist'),
-        ]);
-        if (! $result['success']) {
-            if (preg_match('/Could not find a matching version of package/', $result['output'])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    protected function removePackage()
-    {
-        return $this->runProcess([
-            'composer',
-            'remove',
-            strtolower($this->getPackageName()),
-        ]);
-    }
-
-    /**
-     * @param  array  $command
-     * @return array
-     */
-    protected function runProcess(array $command)
-    {
-        $process = new \Symfony\Component\Process\Process($command, base_path());
-        $output = '';
-        $process->run(function ($type, $buffer) use (&$output) {
-            $output .= $buffer;
-        });
-        $success = $process->getExitCode() === 0;
-        return compact('success', 'output');
-    }
-
-    protected function disablePackagistRepo()
-    {
-        $result = $this->runProcess([
-            'composer',
-            'config',
-            'repo.packagist',
-            'false',
-        ]);
-
-        return $result['success'];
-    }
-
-    private function enablePackagistRepo()
-    {
-        $result = $this->runProcess([
-            'composer',
-            'config',
-            'repo.packagist',
-            'true',
-        ]);
-
-        return $result['success'];
+        $this->removePackage($this->getPackageName());
+        $this->removeComposerRepository($this->getPackageName());
     }
 
     public static function getSkeletonCachePath(): string

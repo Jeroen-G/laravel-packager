@@ -2,6 +2,7 @@
 
 namespace JeroenG\Packager;
 
+use Illuminate\Filesystem\Filesystem;
 use ZipArchive;
 use RuntimeException;
 use GuzzleHttp\Client;
@@ -73,6 +74,11 @@ trait FileHandler
         }
 
         return false;
+    }
+
+    public function copyDir($source, $destination)
+    {
+        return (new Filesystem())->copyDirectory($source, $destination);
     }
 
     /**
@@ -186,5 +192,29 @@ trait FileHandler
                 unlink($this->packagePath().'/'.$file);
             }
         }
+    }
+
+    protected function createSymlink(string $from, string $to)
+    {
+        return symlink($from, $to);
+    }
+
+    /**
+     * @param $path
+     * @return bool
+     */
+    protected function pathExists($path): bool
+    {
+        return (new Filesystem())->exists($path);
+    }
+
+    /**
+     * @param $path
+     * @param $to
+     * @return bool
+     */
+    protected function rename($path, $to): bool
+    {
+        return (new Filesystem())->move($path, $to);
     }
 }

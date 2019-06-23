@@ -25,7 +25,7 @@ class GitPackage extends Command
                             {url : The url of the git repository}
                             {vendor? : The vendor part of the namespace}
                             {name? : The name of package for the namespace}
-                            {--branch=dev-master : The version to install}';
+                            {--constraint=dev-master : The version to install}';
 
     /**
      * The console command description.
@@ -85,7 +85,7 @@ class GitPackage extends Command
         $this->makeProgress();
         // Install package from VCS
         $this->info('Installing package from VCS...');
-        $this->conveyor->installPackageFromVcs($origin, $this->option('branch'));
+        $this->conveyor->installPackageFromVcs($origin, $this->option('constraint'));
         $this->makeProgress();
         // Create the package directory
         $this->info('Creating packages directory...');
@@ -93,7 +93,7 @@ class GitPackage extends Command
         $this->conveyor->makeDir($this->conveyor->vendorPath());
         $this->makeProgress();
         $this->info('Symlinking package to '.$this->conveyor->packagePath());
-        $this->conveyor->createSymlinks();
+        $this->conveyor->symlinkInstalledPackage();
         $this->makeProgress();
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package cloned successfully!');

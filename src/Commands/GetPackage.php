@@ -65,7 +65,7 @@ class GetPackage extends Command
     public function handle()
     {
         // Start the progress bar
-        $this->startProgressBar(4);
+        $this->startProgressBar(5);
 
         // Common variables
         if ($this->option('host') == 'bitbucket') {

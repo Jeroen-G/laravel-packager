@@ -61,7 +61,7 @@ class ListPackages extends Command
 
     protected function getGitStatus($path)
     {
-        if (! File::exists($path.'/.git')) {
+        if (!File::exists($path.'/.git')) {
             return 'Not initialized';
         }
         $status = '<info>Up to date</info>';
