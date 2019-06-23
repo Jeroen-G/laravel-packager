@@ -12,7 +12,7 @@ trait ComposerHandler
 
     protected function removeComposerRepository($name)
     {
-        return self::modifyComposerJson(function (array $composer) use ($name){
+        return $this->modifyComposerJson(function (array $composer) use ($name){
             unset($composer['repositories'][$name]);
             return $composer;
         }, base_path());
@@ -20,17 +20,16 @@ trait ComposerHandler
 
     /**
      * Determines the path to Composer executable
-     * @todo Might not work on Windows
      * @return string
      */
-    protected static function getComposerExecutable(): string
+    public function getComposerExecutable(): string
     {
         return trim(shell_exec('which composer')) ?: 'composer';
     }
 
     protected function removePackage(string $packageName): array
     {
-        return self::runComposerCommand([
+        return $this->runComposerCommand([
             'remove',
             strtolower($packageName),
             '--no-progress',
@@ -43,7 +42,7 @@ trait ComposerHandler
         if ($version) {
             $package .= ':'.$version;
         }
-        $result = self::runComposerCommand([
+        $result = $this->runComposerCommand([
             'require',
             $package,
             '--prefer-'.($prefer_source ? 'source' : 'dist'),
@@ -63,7 +62,7 @@ trait ComposerHandler
             'type' => $type,
             'url'  => $url
         ];
-        return self::modifyComposerJson(function (array $composer) use ($params, $name){
+        return $this->modifyComposerJson(function (array $composer) use ($params, $name){
             $composer['repositories'][$name] = $params;
             return $composer;
         }, base_path());
@@ -75,10 +74,10 @@ trait ComposerHandler
      * @return string
      * @throws RuntimeException
      */
-    protected function findInstalledPath(string $packageName): string
+    public function findInstalledPath(string $packageName): string
     {
         $packageName = strtolower($packageName);
-        $result = self::runComposerCommand([
+        $result = $this->runComposerCommand([
             'info',
             $packageName,
             '--path']);
@@ -92,18 +91,18 @@ trait ComposerHandler
      * @param  string  $path
      * @return array
      */
-    protected static function getComposerJsonArray(string $path): array
+    public function getComposerJsonArray(string $path): array
     {
         return json_decode(file_get_contents($path), true);
     }
 
-    protected static function modifyComposerJson(Closure $callback, string $composer_path)
+    public function modifyComposerJson(Closure $callback, string $composer_path)
     {
         $composer_path = rtrim($composer_path, '/');
         if (!preg_match('/composer\.json$/', $composer_path)){
             $composer_path .= '/composer.json';
         }
-        $original = self::getComposerJsonArray($composer_path);
+        $original = $this->getComposerJsonArray($composer_path);
         $modified = $callback($original);
         return file_put_contents($composer_path, json_encode($modified, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
     }
@@ -113,9 +112,9 @@ trait ComposerHandler
      * @param  string|null  $cwd
      * @return array
      */
-    protected static function runComposerCommand(array $command, string $cwd = null): array
+    public function runComposerCommand(array $command, string $cwd = null): array
     {
-        array_unshift($command, 'php', '-n', self::getComposerExecutable());
-        return self::runProcess($command, $cwd);
+        array_unshift($command, 'php', '-n', $this->getComposerExecutable());
+        return $this->runProcess($command, $cwd);
     }
 }

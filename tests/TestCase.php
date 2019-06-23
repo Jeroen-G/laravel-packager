@@ -10,7 +10,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 
-class TestCase extends TestBench
+abstract class TestCase extends TestBench
 {
     use RefreshTestbench;
 
@@ -59,7 +59,7 @@ class TestCase extends TestBench
      */
     protected function assertComposerPackageInstalled(string $package): void
     {
-        $composer = self::getComposerJsonArray(base_path('composer.json'));
+        $composer = $this->getComposerJsonArray(base_path('composer.json'));
         $this->assertArrayHasKey(strtolower($package), $composer['require']);
         $path =  $this->findInstalledPath($package);
         $this->assertDirectoryIsReadable($path);
@@ -79,7 +79,7 @@ class TestCase extends TestBench
      */
     protected function assertComposerPackageNotInstalled(string $package): void
     {
-        $composer = self::getComposerJsonArray(base_path('composer.json'));
+        $composer = $this->getComposerJsonArray(base_path('composer.json'));
         $this->assertArrayNotHasKey(strtolower($package), $composer['require']);
         $this->expectException(DirectoryNotFoundException::class);
         $this->findInstalledPath($package);
@@ -113,7 +113,7 @@ class TestCase extends TestBench
         $packagePath = base_path('packages/MyVendor/MyPackage');
         $this->makeDir(base_path('vendor/myvendor'));
         $this->createSymlink($packagePath, base_path('vendor/myvendor/mypackage'));
-        self::modifyComposerJson(function (array $composer) use ($packagePath){
+        $this->modifyComposerJson(function (array $composer) use ($packagePath){
             $composer['repositories']['MyVendor/MyPackage'] = [
                 'type' => 'path',
                 'url' => $packagePath
@@ -122,10 +122,5 @@ class TestCase extends TestBench
             return $composer;
         }, base_path());
         $this->assertComposerPackageInstalled('MyVendor/MyPackage');
-    }
-
-    public function testLocalTestbenchInstalled()
-    {
-        $this->assertDirectoryIsReadable(self::getLocalTestbenchPath());
     }
 }

@@ -34,15 +34,15 @@ trait RefreshTestbench
     {
         try {
             fwrite(STDOUT, "Setting up test environment for first use.\n");
-            Conveyor::fetchSkeleton(
+            $instance = new Conveyor;
+            $instance->fetchSkeleton(
                 'http://github.com/Jeroen-G/packager-skeleton/archive/master.zip',
-                Conveyor::getSkeletonCachePath()
+                $instance->getSkeletonCachePath()
             );
-            $instance = new self;
             $instance->makeDir(self::getTestbenchTemplatePath());
             $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel/';
             $instance->copyDir($original, self::getTestbenchTemplatePath());
-            self::modifyComposerJson(function (array $composer) {
+            $instance->modifyComposerJson(function (array $composer) {
                 // Remove "tests/TestCase.php" from autoload (it doesn't exist)
                 unset($composer['autoload']['classmap'][1]);
                 // Pre-install dependencies
@@ -56,7 +56,7 @@ trait RefreshTestbench
                 return $composer;
             }, self::getTestbenchTemplatePath());
             fwrite(STDOUT, "Installing test environment dependencies\n");
-            self::runComposerCommand([
+            $instance->runComposerCommand([
                 'install',
                 '--prefer-dist',
                 '--no-progress'

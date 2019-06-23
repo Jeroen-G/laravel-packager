@@ -72,12 +72,12 @@ class Conveyor
     public function downloadSkeleton(): void
     {
         $useCached = config('packager.cache_skeleton');
-        $cachePath = self::getSkeletonCachePath();
+        $cachePath = $this->getSkeletonCachePath();
         $cacheExists = $this->pathExists($cachePath);
         if ($useCached && $cacheExists) {
             $this->copyDir($cachePath, $this->vendorPath());
         } else {
-            self::fetchSkeleton(config('packager.skeleton'), $this->vendorPath());
+            $this->fetchSkeleton(config('packager.skeleton'), $this->vendorPath());
         }
         $temporaryPath = $this->vendorPath().'/packager-skeleton-master';
         if ($useCached && ! $cacheExists) {
