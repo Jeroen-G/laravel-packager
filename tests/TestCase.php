@@ -26,8 +26,6 @@ class TestCase extends TestBench
         return ['JeroenG\Packager\PackagerServiceProvider'];
     }
 
-    use ComposerHandler, FileHandler;
-
     /**
      * @param $expectedText
      * @throws ExpectationFailedException
