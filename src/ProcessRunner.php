@@ -16,6 +16,7 @@ trait ProcessRunner
             $cwd = base_path();
         }
         $process = new \Symfony\Component\Process\Process($command, $cwd);
+        $process->setTimeout(null);
         $output = '';
         $process->run(static function ($type, $buffer) use (&$output) {
             $output .= $buffer;
