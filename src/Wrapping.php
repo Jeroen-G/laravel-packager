@@ -2,8 +2,8 @@
 
 namespace JeroenG\Packager;
 
-use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 
 class Wrapping
 {
@@ -51,9 +51,9 @@ class Wrapping
     public function fill($path)
     {
         $files = new RecursiveDirectoryIterator($path);
-        foreach(new RecursiveIteratorIterator($files) as $file) {
-            if (!$file->isFile()) {
-                continue;                
+        foreach (new RecursiveIteratorIterator($files) as $file) {
+            if (! $file->isFile()) {
+                continue;
             }
 
             $this->fillInFile($file->getPath().'/'.$file->getFilename());

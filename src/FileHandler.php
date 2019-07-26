@@ -3,10 +3,10 @@
 namespace JeroenG\Packager;
 
 use ZipArchive;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use RuntimeException;
 use GuzzleHttp\Client;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 
 trait FileHandler
 {
@@ -163,9 +163,9 @@ trait FileHandler
         ];
 
         $files = new RecursiveDirectoryIterator($this->packagePath());
-        foreach(new RecursiveIteratorIterator($files) as $file) {
-            if (!$file->isFile()) {
-                continue;                
+        foreach (new RecursiveIteratorIterator($files) as $file) {
+            if (! $file->isFile()) {
+                continue;
             }
             $replaced = str_replace($bindings[0], $bindings[1], $file->getFilename());
             if ($replaced === $file->getFilename()) {
