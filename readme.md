@@ -66,13 +66,14 @@ $ php artisan packager:git https://github.com/author/repository
 
 **Result:**
 This will register the package in the app's `composer.json` file.
-If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository. This also works with Bitbucket repositories, but you have to provide the flag `--host=bitbucket` for the `packager:get` command.
+If the `packager:git` command is used, the entire Git repository is cloned (you can optionally specify the branch/version to clone using the `--branch` option). If `packager:get` is used, the package will be downloaded, without a repository. This also works with Bitbucket repositories, but you have to provide the flag `--host=bitbucket` for the `packager:get` command.
 
 **Options:**
 ```bash
 $ php artisan packager:get https://github.com/author/repository --branch=develop
 $ php artisan packager:get https://github.com/author/repository MyVendor MyPackage
 $ php artisan packager:git https://github.com/author/repository MyVendor MyPackage
+$ php artisan packager:git github-user/github-repo --branch=dev-mybranch
 ```
 It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url.
 
@@ -142,6 +143,14 @@ You first need to run
 $ composer require sensiolabs/security-checker
 ```
 
+## Managing dependencies
+When you install a new package using `packager:new`, `packager:get` or `packager:git`, the package dependencies will automatically be installed into the parent project's `vendor/` folder.
+
+Installing or updating package dependencies should *not* be done directly from the `packages/` folder.
+
+When you've edited the `composer.json` file in your package folder, you should run `composer update` from the root folder of the parent project. 
+
+If your package was installed using the `packager:git` command, any changes you make to the package's `composer.json` file will not be detected by the parent project until the changes have been committed.
 
 ## Issues with cURL SSL certificate
 It turns out that, especially on Windows, there might arise some problems with the downloading of the skeleton, due to a file regarding SSL certificates missing on the OS. This can be solved by opening up your .env file and putting this in it:

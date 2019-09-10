@@ -7,6 +7,7 @@ return [
      * Default: http://github.com/Jeroen-G/packager-skeleton/archive/master.zip
      */
     'skeleton' => 'http://github.com/Jeroen-G/packager-skeleton/archive/master.zip',
+    'cache_skeleton' => false,
 
     /*
      * You can set defaults for the following placeholders.

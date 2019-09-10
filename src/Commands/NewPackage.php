@@ -135,7 +135,7 @@ class NewPackage extends Command
 
         // Add path repository to composer.json and install package
         $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        $this->conveyor->installPackageFromPath();
 
         $this->makeProgress();
 

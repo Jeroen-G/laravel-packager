@@ -3,8 +3,10 @@
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
+use JeroenG\Packager\ComposerHandler;
 use SensioLabs\Security\SecurityChecker;
 use SensioLabs\Security\Formatters\SimpleFormatter;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 
 /**
  * List all locally installed packages.
@@ -13,6 +15,7 @@ use SensioLabs\Security\Formatters\SimpleFormatter;
  **/
 class CheckPackage extends Command
 {
+    use ComposerHandler;
     /**
      * The name and signature of the console command.
      * @var string
@@ -34,7 +37,14 @@ class CheckPackage extends Command
     {
         $this->info('Using the SensioLabs Security Checker the composer.lock of the package is scanned for known security vulnerabilities in the dependencies.');
         $this->info('Make sure you have a composer.lock file first (for example by running "composer install" in the folder');
-
+        try {
+            $this->findInstalledPath('sensiolabs/security-checker');
+        } catch (DirectoryNotFoundException $e) {
+            $this->warn('SensioLabs Security Checker is not installed.');
+            $this->info('Run the following command and try again:');
+            $this->getOutput()->writeln('composer require sensiolabs/security-checker');
+            return 1;
+        }
         $checker = new SecurityChecker();
         $formatter = new SimpleFormatter($this->getHelperSet()->get('formatter'));
         $vendor = $this->argument('vendor');

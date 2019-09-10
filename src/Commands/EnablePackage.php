@@ -74,7 +74,7 @@ class EnablePackage extends Command
 
         // Install the package
         $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        $this->conveyor->installPackageFromPath();
         $this->makeProgress();
 
         // Finished removing the package, end of the progress bar

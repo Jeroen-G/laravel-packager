@@ -65,7 +65,7 @@ class GetPackage extends Command
     public function handle()
     {
         // Start the progress bar
-        $this->startProgressBar(4);
+        $this->startProgressBar(5);
 
         // Common variables
         if ($this->option('host') == 'bitbucket') {
@@ -109,7 +109,7 @@ class GetPackage extends Command
 
         // Install the package
         $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        $this->conveyor->installPackageFromPath();
         $this->makeProgress();
 
         // Finished creating the package, end of the progress bar

@@ -2,11 +2,11 @@
 
 namespace JeroenG\Packager\Commands;
 
+use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use JeroenG\Packager\Conveyor;
-use JeroenG\Packager\Wrapping;
-use Illuminate\Console\Command;
 use JeroenG\Packager\ProgressBar;
+use JeroenG\Packager\Wrapping;
 
 /**
  * Get an existing package from a remote git repository with its VCS.
@@ -24,7 +24,8 @@ class GitPackage extends Command
     protected $signature = 'packager:git
                             {url : The url of the git repository}
                             {vendor? : The vendor part of the namespace}
-                            {name? : The name of package for the namespace}';
+                            {name? : The name of package for the namespace}
+                            {--constraint=dev-master : The version to install}';
 
     /**
      * The console command description.
@@ -65,49 +66,35 @@ class GitPackage extends Command
     {
         // Start the progress bar
         $this->startProgressBar(4);
-
         // Common variables
         $source = $this->argument('url');
-        $origin = rtrim(strtolower($source), '/');
-
-        if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
+        $origin = strtolower(rtrim($source, '/'));
+        // If only "user/repository" is provided as origin, assume a https Github repository
+        if (preg_match('/^[\w-]+\/[\w-]+$/', $origin)) {
+            $origin = 'https://github.com/'.$origin;
+        }
+        if ($this->argument('vendor') === null || $this->argument('name') === null) {
             $this->setGitVendorAndPackage($origin);
         } else {
             $this->conveyor->vendor($this->argument('vendor'));
             $this->conveyor->package($this->argument('name'));
         }
-
         // Start creating the package
         $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
         $this->conveyor->checkIfPackageExists();
         $this->makeProgress();
-
+        // Install package from VCS
+        $this->info('Installing package from VCS...');
+        $this->conveyor->installPackageFromVcs($origin, $this->option('constraint'));
+        $this->makeProgress();
         // Create the package directory
         $this->info('Creating packages directory...');
         $this->conveyor->makeDir($this->conveyor->packagesPath());
-
-        // Clone the repository
-        $this->info('Cloning repository...');
-        exec("git clone $source ".$this->conveyor->packagePath(), $output, $exit_code);
-
-        if ($exit_code != 0) {
-            $this->error('Unable to clone repository');
-            $this->warn('Please check credentials and try again');
-
-            return;
-        }
-
-        $this->makeProgress();
-
-        // Create the vendor directory
-        $this->info('Creating vendor...');
         $this->conveyor->makeDir($this->conveyor->vendorPath());
         $this->makeProgress();
-
-        $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        $this->info('Symlinking package to '.$this->conveyor->packagePath());
+        $this->conveyor->symlinkInstalledPackage();
         $this->makeProgress();
-
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package cloned successfully!');
     }
@@ -115,7 +102,6 @@ class GitPackage extends Command
     protected function setGitVendorAndPackage($origin)
     {
         $pieces = explode('/', $origin);
-
         if (Str::contains($origin, 'https')) {
             $vendor = $pieces[3];
             $package = $pieces[4];
@@ -123,7 +109,6 @@ class GitPackage extends Command
             $vendor = explode(':', $pieces[0])[1];
             $package = rtrim($pieces[1], '.git');
         }
-
         $this->conveyor->vendor($vendor);
         $this->conveyor->package($package);
     }
