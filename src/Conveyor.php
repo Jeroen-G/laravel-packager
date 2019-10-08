@@ -98,7 +98,7 @@ class Conveyor
     public function installPackage()
     {
         $this->addPathRepository(
-            config('packager.composer_json_filename')
+            config('packager.composer_json_filename', 'composer.json')
         );
 
         $this->requirePackage();
