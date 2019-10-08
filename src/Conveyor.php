@@ -97,7 +97,10 @@ class Conveyor
 
     public function installPackage()
     {
-        $this->addPathRepository();
+        $this->addPathRepository(
+            config('packager.composer_json_filename')
+        );
+
         $this->requirePackage();
     }
 
@@ -107,19 +110,25 @@ class Conveyor
         $this->removePathRepository();
     }
 
-    public function addPathRepository()
+    /**
+     * @param string $composer_json_filename
+     *
+     * @return bool
+     */
+    public function addPathRepository($composer_json_filename)
     {
         $params = json_encode([
             'type' => 'path',
             'url'  => $this->packagePath(),
         ]);
+
         $command = [
             'composer',
             'config',
             'repositories.'.Str::slug($this->vendor.'-'.$this->package),
             $params,
             '--file',
-            'composer.json',
+            $composer_json_filename,
         ];
 
         return $this->runProcess($command);

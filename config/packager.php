@@ -9,6 +9,12 @@ return [
     'skeleton' => 'http://github.com/Jeroen-G/packager-skeleton/archive/master.zip',
 
     /*
+     * You can change composer.json file name.
+     * It can be useful for projects with composer merge-plugin usage
+     */
+    'composer_json_filename' => 'composer.json',
+
+    /*
      * You can set defaults for the following placeholders.
      */
     'author_name' => 'author name',
