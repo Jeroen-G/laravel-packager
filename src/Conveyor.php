@@ -116,7 +116,7 @@ class Conveyor
         $command = [
             'composer',
             'config',
-            'repositories.'.Str::slug($this->vendor.'-'.$this->package),
+            'repositories.'.Str::slug($this->vendor.'/'.$this->package),
             $params,
             '--file',
             'composer.json',
