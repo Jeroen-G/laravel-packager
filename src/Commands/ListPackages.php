@@ -38,7 +38,7 @@ class ListPackages extends Command
         $packages = [];
         foreach ($repositories as $name => $info) {
             $path = $info['url'];
-            $pattern = '{' . addslashes($packages_path) . '(.*)$}';
+            $pattern = '{'.addslashes($packages_path).'(.*)$}';
             if (preg_match($pattern, $path, $match)) {
                 $packages[] = explode(DIRECTORY_SEPARATOR, $match[1]);
             }
@@ -65,7 +65,7 @@ class ListPackages extends Command
                 ];
             })
             ->filter(function ($package) {
-                return file_exists($package['path'] . DIRECTORY_SEPARATOR . '.git');
+                return file_exists($package['path'].DIRECTORY_SEPARATOR.'.git');
             })
             ->map(function ($package) {
                 // Always run fetch first
