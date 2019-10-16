@@ -85,7 +85,6 @@ class ListPackages extends Command
                         if (Str::startsWith($buffer, '*')) {
                             $branch = str_replace(["\n", "\r", ' ', '*'], '', $buffer);
                         }
-
                     });
 
                 return [
@@ -95,7 +94,6 @@ class ListPackages extends Command
                     $branch,
                 ];
             });
-
 
         $headers = ['Package', 'Path', 'Commits behind', 'Branch'];
 
