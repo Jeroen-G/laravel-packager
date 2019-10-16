@@ -2,8 +2,8 @@
 
 namespace JeroenG\Packager\Commands;
 
-use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Illuminate\Console\Command;
 use Symfony\Component\Process\Process;
 
 /**
@@ -61,7 +61,7 @@ class ListPackages extends Command
                 return [
                     'vendor' => $package[0],
                     'name'   => $package[1],
-                    'path'   => $packages_path . implode(DIRECTORY_SEPARATOR, [$package[0], $package[1]]),
+                    'path'   => $packages_path.implode(DIRECTORY_SEPARATOR, [$package[0], $package[1]]),
                 ];
             })
             ->filter(function ($package) {
