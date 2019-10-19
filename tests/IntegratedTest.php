@@ -17,7 +17,7 @@ class IntegratedTest extends TestCase
     {
         Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);
 
-        $composer =  file_get_contents(base_path('composer.json'));
+        $composer = file_get_contents(base_path('composer.json'));
 
         $this->assertStringContainsString('MyVendor/MyPackage', $composer);
     }
