@@ -45,16 +45,14 @@ class ListPackages extends Command
         }
 
         if ($this->option('git')) {
-            $this->renderGitPackages($packages, $packages_path);
-
-            return;
+            return $this->renderGitPackages($packages, $packages_path);
         }
 
         $headers = ['Package', 'Path'];
         $this->table($headers, $packages);
     }
 
-    protected function renderGitPackages($packages, $packages_path)
+    private function renderGitPackages($packages, $packages_path)
     {
         $gitPackages = collect($packages)
             ->map(function ($package) use ($packages_path) {
@@ -64,28 +62,19 @@ class ListPackages extends Command
                     'path'   => $packages_path.implode(DIRECTORY_SEPARATOR, [$package[0], $package[1]]),
                 ];
             })
+            // Filter out none-git packages
             ->filter(function ($package) {
                 return file_exists($package['path'].DIRECTORY_SEPARATOR.'.git');
             })
             ->map(function ($package) {
-                // Always run fetch first
+                // Always run fetch first to get the latest repo state
                 (new Process('git fetch', $package['path']))->disableOutput()->run();
 
                 // get the amount of commits difference
-                $commitDifference = 0;
-                (new Process('git rev-list HEAD..origin --count', $package['path']))
-                    ->run(function ($type, $buffer) use (&$commitDifference) {
-                        $commitDifference = str_replace(["\n", "\r"], '', $buffer);
-                    });
+                $commitDifference = $this->getCommitDifferenceAmount($package['path']);
 
                 // Get the current branch
-                $branch = null;
-                (new Process('git branch', $package['path']))
-                    ->run(function ($type, $buffer) use (&$branch) {
-                        if (Str::startsWith($buffer, '*')) {
-                            $branch = str_replace(["\n", "\r", ' ', '*'], '', $buffer);
-                        }
-                    });
+                $branch = $this->getBranchForPackage($package['path']);
 
                 return [
                     $package['vendor'],
@@ -98,5 +87,46 @@ class ListPackages extends Command
         $headers = ['Package', 'Path', 'Commits behind', 'Branch'];
 
         $this->table($headers, $gitPackages->toArray());
+    }
+
+    /**
+     * Compares the local package against the repo and returns the difference in commits.
+     * A possitive number means the local package is x commits behind the repo.
+     * 
+     * @param $path
+     *
+     * @return int
+     */
+    private function getCommitDifferenceAmount($path) {
+        $commitDifference = 0;
+        
+        (new Process('git rev-list HEAD..origin --count', $package['path']))
+            ->run(function ($type, $buffer) use (&$commitDifference) {
+                $commitDifference = str_replace(["\n", "\r"], '', $buffer);
+            });
+        
+        return $commitDifference;
+    }
+
+    /**
+     * Gets the branch name for a package.
+     * 
+     * @param $path
+     *
+     * @return string|null
+     */
+    private function getBranchForPackage($path) {
+        $branch = null;
+        
+        // This command lists all branches
+        (new Process('git branch', $package['path']))
+            ->run(function ($type, $buffer) use (&$branch) {
+                // The current branch is prefixed with an asterisk
+                if (Str::startsWith($buffer, '*')) {
+                    $branch = str_replace(["\n", "\r", ' ', '*'], '', $buffer);
+                }
+            });
+        
+        return $branch;
     }
 }
