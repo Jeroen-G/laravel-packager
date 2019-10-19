@@ -92,7 +92,6 @@ class ListPackages extends Command
     /**
      * Compares the local package against the repo and returns the difference in commits.
      * A possitive number means the local package is x commits behind the repo.
-     * 
      * @param $path
      *
      * @return int
@@ -111,7 +110,6 @@ class ListPackages extends Command
 
     /**
      * Gets the branch name for a package.
-     * 
      * @param $path
      *
      * @return string|null
