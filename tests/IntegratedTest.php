@@ -13,6 +13,15 @@ class IntegratedTest extends TestCase
         $this->seeInConsoleOutput('Package created successfully!');
     }
 
+    public function test_new_package_is_installed()
+    {
+        Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);
+
+        $composer =  file_get_contents(base_path('composer.json'));
+
+        $this->assertStringContainsString('MyVendor/MyPackage', $composer);
+    }
+
     public function test_get_existing_package()
     {
         Artisan::call('packager:get',
