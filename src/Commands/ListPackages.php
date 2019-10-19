@@ -97,14 +97,15 @@ class ListPackages extends Command
      *
      * @return int
      */
-    private function getCommitDifferenceAmount($path) {
+    private function getCommitDifferenceAmount($path)
+    {
         $commitDifference = 0;
-        
+
         (new Process('git rev-list HEAD..origin --count', $package['path']))
             ->run(function ($type, $buffer) use (&$commitDifference) {
                 $commitDifference = str_replace(["\n", "\r"], '', $buffer);
             });
-        
+
         return $commitDifference;
     }
 
@@ -115,9 +116,10 @@ class ListPackages extends Command
      *
      * @return string|null
      */
-    private function getBranchForPackage($path) {
+    private function getBranchForPackage($path)
+    {
         $branch = null;
-        
+
         // This command lists all branches
         (new Process('git branch', $package['path']))
             ->run(function ($type, $buffer) use (&$branch) {
@@ -126,7 +128,7 @@ class ListPackages extends Command
                     $branch = str_replace(["\n", "\r", ' ', '*'], '', $buffer);
                 }
             });
-        
+
         return $branch;
     }
 }
