@@ -46,4 +46,14 @@ class IntegratedTest extends TestCase
         Artisan::call('packager:remove', ['vendor' => 'MyVendor', 'name' => 'MyPackage', '--no-interaction' => true]);
         $this->seeInConsoleOutput('Package removed successfully!');
     }
+
+    public function test_new_package_is_uninstalled()
+    {
+        Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);
+        Artisan::call('packager:remove', ['vendor' => 'MyVendor', 'name' => 'MyPackage', '--no-interaction' => true]);
+
+        $composer = file_get_contents(base_path('composer.json'));
+
+        $this->assertStringNotContainsString('MyVendor/MyPackage', $composer);
+    }
 }
