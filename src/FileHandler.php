@@ -109,7 +109,7 @@ trait FileHandler
      */
     public function download($zipFile, $source)
     {
-        $client = new Client(['verify' => config('packager.curl_verify_cert', true)]);
+        $client = new Client(['verify' => config('packager.curl_verify_cert')]);
         $response = $client->get($source);
         file_put_contents($zipFile, $response->getBody());
 
