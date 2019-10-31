@@ -19,7 +19,7 @@ class TestCustomComposerJsonName extends TestCase
         // Check repositories entry in composer.local.json
         $composerJsonContent = json_decode(file_get_contents($composerJsonPath), true);
         $this->assertArrayHasKey('repositories', $composerJsonContent);
-        $this->assertIsArray($composerJsonContent['repositories']['myvendor-mypackage']);
+        $this->assertIsArray($composerJsonContent['repositories']['myvendor/mypackage']);
     }
 
     protected function getEnvironmentSetUp($app)

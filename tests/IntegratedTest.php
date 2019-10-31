@@ -15,7 +15,7 @@ class IntegratedTest extends TestCase
         // Check repositories entry in composer.json
         $composerJsonContent = json_decode(file_get_contents(self::TEST_APP.'/composer.json'), true);
         $this->assertArrayHasKey('repositories', $composerJsonContent);
-        $this->assertIsArray($composerJsonContent['repositories']['myvendor-mypackage']);
+        $this->assertIsArray($composerJsonContent['repositories']['myvendor/mypackage']);
     }
 
     public function test_get_existing_package()
