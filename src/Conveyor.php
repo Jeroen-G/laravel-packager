@@ -66,10 +66,34 @@ class Conveyor
      */
     public function downloadSkeleton()
     {
-        $this->download($zipFile = $this->makeFilename(), config('packager.skeleton'))
-            ->extract($zipFile, $this->vendorPath())
-            ->cleanUp($zipFile);
-        rename($this->vendorPath().'/packager-skeleton-master', $this->packagePath());
+        $archiveUrl = config('packager.skeleton');
+        $extension = $this->getArchiveExtension($archiveUrl);
+
+        $tempDir = $this->tempPath().'/'.uniqid();
+
+        $this->download($archive = $this->makeFilename($extension), $archiveUrl)
+            ->extract($archive, $tempDir)
+            ->cleanUp($archive);
+
+        // Before move files to vendor/package folder, ensure that we have non-wrapped skeleton.
+        // There are two options:
+        // 1. Many files in archive root
+        // 2. Single folder with files in archive root
+        $tempDirFilesList = scandir($tempDir);
+
+        $directoryToMove = $tempDir;
+
+        // 3 because '.', '..', and one file or directory
+        if (count($tempDirFilesList) === 3 && is_dir($realSkeletonDir = $tempDir . '/' . $tempDirFilesList[2])) {
+            $directoryToMove = $realSkeletonDir;
+        }
+
+        rename($directoryToMove, $this->packagePath());
+
+        // Delete temp dir if exists
+        if (is_dir($tempDir)) {
+            rmdir($tempDir);
+        }
     }
 
     /**
@@ -83,6 +107,7 @@ class Conveyor
         $this->download($zipFile = $this->makeFilename(), $origin)
             ->extract($zipFile, $this->vendorPath())
             ->cleanUp($zipFile);
+
         rename($this->vendorPath().'/'.$piece.'-'.$branch, $this->packagePath());
     }
 

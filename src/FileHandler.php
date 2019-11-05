@@ -2,7 +2,10 @@
 
 namespace JeroenG\Packager;
 
-use ZipArchive;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Facades\Log;
+use JeroenG\Packager\ArchiveExtractors\Manager;
+use JeroenG\Packager\ArchiveExtractors\Zip;
 use RuntimeException;
 use GuzzleHttp\Client;
 
@@ -29,6 +32,23 @@ trait FileHandler
     }
 
     /**
+     * Get the local temp dir path.
+     *
+     * @return string $path
+     */
+    public function tempPath()
+    {
+        $path = $this->packagesPath() . '/temp';
+
+        // Ensure that temp dir exists
+        if (!is_dir($path)) {
+            mkdir($path);
+        }
+
+        return $path;
+    }
+
+    /**
      * Get the full package path.
      *
      * @return string $path
@@ -39,13 +59,15 @@ trait FileHandler
     }
 
     /**
-     * Generate a random temporary filename for the package zipfile.
+     * Generate a random temporary filename for the package archive file.
+     *
+     * @param string $extension
      *
      * @return string
      */
-    public function makeFilename()
+    public function makeFilename($extension = 'zip')
     {
-        return getcwd().'/package'.md5(time().uniqid()).'.zip';
+        return getcwd().'/package'.md5(time().uniqid()).'.'.$extension;
     }
 
     /**
@@ -101,17 +123,17 @@ trait FileHandler
     }
 
     /**
-     * Download the temporary Zip to the given file.
+     * Download the archive to the given file by url.
      *
-     * @param  string  $zipFile
-     * @param  string  $source
+     * @param  string  $filePath
+     * @param  string  $sourceFileUrl
      * @return $this
      */
-    public function download($zipFile, $source)
+    public function download($filePath, $sourceFileUrl)
     {
         $client = new Client(['verify' => config('packager.curl_verify_cert')]);
-        $response = $client->get($source);
-        file_put_contents($zipFile, $response->getBody());
+        $response = $client->get($sourceFileUrl);
+        file_put_contents($filePath, $response->getBody());
 
         return $this;
     }
@@ -119,30 +141,39 @@ trait FileHandler
     /**
      * Extract the zip file into the given directory.
      *
-     * @param  string  $zipFile
-     * @param  string  $directory
+     * @param string $archiveFilePath
+     * @param string $directory
      * @return $this
      */
-    public function extract($zipFile, $directory)
+    public function extract($archiveFilePath, $directory)
     {
-        $archive = new ZipArchive;
-        $archive->open($zipFile);
-        $archive->extractTo($directory);
-        $archive->close();
+        $extension = $this->getArchiveExtension($archiveFilePath);
+
+        /** @var Manager $extractorManager */
+        try {
+            $extractorManager = app()->make(Manager::class);
+            $extractor = $extractorManager->getExtractor($extension);
+        } catch (BindingResolutionException $e) {
+            Log::error('Can not get extractor manager. Falling back with using zip extractor');
+
+            $extractor = new Zip();
+        }
+
+        $extractor->extract($archiveFilePath, $directory);
 
         return $this;
     }
 
     /**
-     * Clean-up the Zip file.
+     * Clean-up the archive file.
      *
-     * @param  string  $zipFile
+     * @param  string  $pathToArchiveFile
      * @return $this
      */
-    public function cleanUp($zipFile)
+    public function cleanUp($pathToArchiveFile)
     {
-        @chmod($zipFile, 0777);
-        @unlink($zipFile);
+        @chmod($pathToArchiveFile, 0777);
+        @unlink($pathToArchiveFile);
 
         return $this;
     }
@@ -182,5 +213,29 @@ trait FileHandler
                 unlink($this->packagePath().'/'.$file);
             }
         }
+    }
+
+    /**
+     * @param string $archiveFilePath
+     *
+     * @return string
+     */
+    protected function getArchiveExtension($archiveFilePath)
+    {
+        $pathParts = pathinfo($archiveFilePath);
+        $extension = $pathParts['extension'];
+
+        // Hack for complex file extensions
+        if (in_array($extension, ['gz', 'xz'])) {
+            // Check child extension
+            if ($childExtension = pathinfo($pathParts['filename'], PATHINFO_EXTENSION)) {
+                $extension = implode('.', [
+                    $childExtension,
+                    $extension
+                ]);
+            }
+        }
+
+        return $extension;
     }
 }
