@@ -7,9 +7,9 @@ use ZipArchive;
 class Zip extends Extractor
 {
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    function extract($pathToArchive, $pathToDirectory)
+    public function extract($pathToArchive, $pathToDirectory)
     {
         $archive = new ZipArchive;
         $archive->open($pathToArchive);

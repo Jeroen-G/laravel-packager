@@ -2,12 +2,12 @@
 
 namespace JeroenG\Packager;
 
+use GuzzleHttp\Client;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Log;
 use JeroenG\Packager\ArchiveExtractors\Manager;
 use JeroenG\Packager\ArchiveExtractors\Zip;
 use RuntimeException;
-use GuzzleHttp\Client;
 
 trait FileHandler
 {
@@ -38,10 +38,10 @@ trait FileHandler
      */
     public function tempPath()
     {
-        $path = $this->packagesPath() . '/temp';
+        $path = $this->packagesPath().'/temp';
 
         // Ensure that temp dir exists
-        if (!is_dir($path)) {
+        if (! is_dir($path)) {
             mkdir($path);
         }
 
@@ -149,8 +149,8 @@ trait FileHandler
     {
         $extension = $this->getArchiveExtension($archiveFilePath);
 
-        /** @var Manager $extractorManager */
         try {
+            /** @var Manager $extractorManager */
             $extractorManager = app()->make(Manager::class);
             $extractor = $extractorManager->getExtractor($extension);
         } catch (BindingResolutionException $e) {
@@ -231,7 +231,7 @@ trait FileHandler
             if ($childExtension = pathinfo($pathParts['filename'], PATHINFO_EXTENSION)) {
                 $extension = implode('.', [
                     $childExtension,
-                    $extension
+                    $extension,
                 ]);
             }
         }

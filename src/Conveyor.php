@@ -2,8 +2,8 @@
 
 namespace JeroenG\Packager;
 
-use RuntimeException;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class Conveyor
 {
@@ -84,8 +84,12 @@ class Conveyor
         $directoryToMove = $tempDir;
 
         // 3 because '.', '..', and one file or directory
-        if (count($tempDirFilesList) === 3 && is_dir($realSkeletonDir = $tempDir . '/' . $tempDirFilesList[2])) {
-            $directoryToMove = $realSkeletonDir;
+        if (count($tempDirFilesList) === 3) {
+            $maybeRealSkeletonDir = $tempDir.'/'.$tempDirFilesList[2];
+
+            if (is_dir($maybeRealSkeletonDir)) {
+                $directoryToMove = $maybeRealSkeletonDir;
+            }
         }
 
         rename($directoryToMove, $this->packagePath());

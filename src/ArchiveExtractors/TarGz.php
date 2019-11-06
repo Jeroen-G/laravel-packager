@@ -7,9 +7,9 @@ use PharData;
 class TarGz extends Extractor
 {
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    function extract($pathToArchive, $pathToDirectory)
+    public function extract($pathToArchive, $pathToDirectory)
     {
         $phar = new PharData($pathToArchive);
         $phar->decompress();
