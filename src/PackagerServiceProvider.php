@@ -47,7 +47,7 @@ class PackagerServiceProvider extends ServiceProvider
             __DIR__.'/../config/packager.php' => config_path('packager.php'),
         ]);
 
-        // Define
+        // Register ExtractorManager singleton
         $this->app->singleton(ExtractorManager::class, function () {
             return new ExtractorManager();
         });

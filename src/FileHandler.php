@@ -228,7 +228,9 @@ trait FileHandler
         // Hack for complex file extensions
         if (in_array($extension, ['gz', 'xz'])) {
             // Check child extension
-            if ($childExtension = pathinfo($pathParts['filename'], PATHINFO_EXTENSION)) {
+            $childExtension = pathinfo($pathParts['filename'], PATHINFO_EXTENSION);
+
+            if ($childExtension) {
                 $extension = implode('.', [
                     $childExtension,
                     $extension,
