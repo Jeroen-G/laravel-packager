@@ -2,8 +2,8 @@
 
 namespace JeroenG\Packager;
 
-use RuntimeException;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class Conveyor
 {

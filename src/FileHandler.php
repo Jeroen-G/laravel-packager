@@ -2,9 +2,9 @@
 
 namespace JeroenG\Packager;
 
-use ZipArchive;
-use RuntimeException;
 use GuzzleHttp\Client;
+use RuntimeException;
+use ZipArchive;
 
 trait FileHandler
 {

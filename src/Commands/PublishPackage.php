@@ -2,8 +2,8 @@
 
 namespace JeroenG\Packager\Commands;
 
-use JeroenG\Packager\Conveyor;
 use Illuminate\Console\Command;
+use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\ProgressBar;
 
 /**
