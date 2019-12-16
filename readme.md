@@ -5,7 +5,7 @@
 [![Build Status][ico-travis]][link-travis]
 [![StyleCI][ico-styleci]][link-styleci]
 
-This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate.
+This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate. If you like a visual explanation [check out this video by Jeffrey Way on Laracasts](https://laracasts.com/series/building-laracasts/episodes/3).
 
 ## Installation
 
