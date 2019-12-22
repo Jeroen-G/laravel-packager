@@ -17,7 +17,8 @@ class ListPackages extends Command
      * The name and signature of the console command.
      * @var string
      */
-    protected $signature = 'packager:list {--g|git}';
+    protected $signature = 'packager:list
+                           {--g|git : Show Git branch status}';
 
     /**
      * The console command description.
@@ -28,79 +29,104 @@ class ListPackages extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
-        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
-        $packages_path = base_path('packages/');
-        $repositories = $composer['repositories'] ?? [];
+        $packages = $this->getPackagesList();
+
+        if ($this->option('git')) {
+            $this->renderGitTable($packages);
+        } else {
+            $this->renderBasicTable($packages);
+        }
+    }
+
+    /**
+     * Get all of the packages installed with Packager.
+     *
+     * @return array
+     */
+    private function getPackagesList(): array
+    {
+        $composerFile = json_decode(file_get_contents(base_path('composer.json')), true);
+        $packagesPath = base_path('packages/');
+        $repositories = $composerFile['repositories'] ?? [];
         $packages = [];
         foreach ($repositories as $name => $info) {
             $path = $info['url'];
-            $pattern = '{'.addslashes($packages_path).'(.*)$}';
+            $pattern = '{'.addslashes($packagesPath).'(.*)$}';
             if (preg_match($pattern, $path, $match)) {
                 $packages[] = explode(DIRECTORY_SEPARATOR, $match[1]);
             }
         }
 
-        if ($this->option('git')) {
-            return $this->renderGitPackages($packages, $packages_path);
-        }
+        return $packages;
+    }
 
+    /**
+     * Render the list as a simple table.
+     *
+     * @param array $packages
+     */
+    private function renderBasicTable(array $packages): void
+    {
         $headers = ['Package', 'Path'];
         $this->table($headers, $packages);
     }
 
-    private function renderGitPackages($packages, $packages_path)
+    /**
+     * Render the list, but with git status if the package has git initialised.
+     *
+     * @param $packages
+     */
+    private function renderGitTable($packages): void
     {
-        $gitPackages = collect($packages)
-            ->map(function ($package) use ($packages_path) {
-                return [
-                    'vendor' => $package[0],
-                    'name'   => $package[1],
-                    'path'   => $packages_path.implode(DIRECTORY_SEPARATOR, [$package[0], $package[1]]),
-                ];
-            })
-            // Filter out none-git packages
-            ->filter(function ($package) {
-                return file_exists($package['path'].DIRECTORY_SEPARATOR.'.git');
-            })
-            ->map(function ($package) {
-                // Always run fetch first to get the latest repo state
-                (new Process('git fetch', $package['path']))->disableOutput()->run();
-
-                // get the amount of commits difference
-                $commitDifference = $this->getCommitDifferenceAmount($package['path']);
-
-                // Get the current branch
-                $branch = $this->getBranchForPackage($package['path']);
-
-                return [
-                    $package['vendor'],
-                    $package['name'],
-                    $commitDifference,
-                    $branch,
-                ];
-            });
+        $gitPackages = [];
+        foreach ($packages as $package) {
+            $gitPackages[] = array_merge($package, $this->getGitStatus($package[1]));
+        }
 
         $headers = ['Package', 'Path', 'Commits behind', 'Branch'];
 
-        $this->table($headers, $gitPackages->toArray());
+        $this->table($headers, $gitPackages);
     }
 
     /**
-     * Compares the local package against the repo and returns the difference in commits.
-     * A possitive number means the local package is x commits behind the repo.
-     * @param $path
+     * If a package has a git history, add its status.
+     *
+     * @param string $path
+     *
+     * @return array
+     */
+    private function getGitStatus(string $path): array
+    {
+        if(file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
+            (new Process(['git fetch'], $path))->disableOutput()->run();
+
+            $commitDifference = $this->getCommitDifference($path);
+            $branch = $this->getCurrentBranchForPackage($path);
+
+            return [$commitDifference, $branch];
+        }
+
+        return ['-', '-'];
+    }
+
+    /**
+     * Compare the local git history with the origin remote.
+     * It returns the difference in commits as a positive or negative integer.
+     * A positive number means the local package is behind. Otherwise it is ahead.
+     *
+     * @param string $path
      *
      * @return int
      */
-    private function getCommitDifferenceAmount($path)
+    private function getCommitDifference(string $path): int
     {
         $commitDifference = 0;
 
-        (new Process('git rev-list HEAD..origin --count', $package['path']))
+        (new Process(['git rev-list HEAD..origin --count'], $path))
             ->run(function ($type, $buffer) use (&$commitDifference) {
                 $commitDifference = str_replace(["\n", "\r"], '', $buffer);
             });
@@ -110,16 +136,17 @@ class ListPackages extends Command
 
     /**
      * Gets the branch name for a package.
+     *
      * @param $path
      *
      * @return string|null
      */
-    private function getBranchForPackage($path)
+    private function getCurrentBranchForPackage($path): ?string
     {
         $branch = null;
 
         // This command lists all branches
-        (new Process('git branch', $package['path']))
+        (new Process(['git branch'], $path))
             ->run(function ($type, $buffer) use (&$branch) {
                 // The current branch is prefixed with an asterisk
                 if (Str::startsWith($buffer, '*')) {

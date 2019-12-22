@@ -108,6 +108,12 @@ $ php artisan packager:list
 **Result:**
 An overview of all packages in the `/packages` directory.
 
+**Options:**
+```bash
+$ php artisan packager:list --git
+```
+The packages are displayed with information on the git status (branch, commit difference with origin) if it is a git repository.
+
 ### Remove
 **Command:**
 ```bash
