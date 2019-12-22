@@ -4,10 +4,6 @@ namespace JeroenG\Packager;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\ServiceProvider;
-use JeroenG\Packager\ArchiveExtractors\Manager as ExtractorManager;
-use JeroenG\Packager\ArchiveExtractors\Tar;
-use JeroenG\Packager\ArchiveExtractors\TarGz;
-use JeroenG\Packager\ArchiveExtractors\Zip;
 
 /**
  * This is the service provider.
@@ -46,18 +42,6 @@ class PackagerServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/packager.php' => config_path('packager.php'),
         ]);
-
-        // Register ExtractorManager singleton
-        $this->app->singleton(ExtractorManager::class, function () {
-            return new ExtractorManager();
-        });
-
-        /** @var ExtractorManager $manager */
-        $manager = $this->app->make(ExtractorManager::class);
-
-        $manager->extend('zip', new Zip())
-            ->extend('tar', new Tar())
-            ->extend('tar.gz', new TarGz());
     }
 
     /**

@@ -10,5 +10,5 @@ abstract class Extractor
      *
      * @return void
      */
-    abstract public function extract($pathToArchive, $pathToDirectory);
+    abstract public function extract(string $pathToArchive, string $pathToDirectory): void;
 }

@@ -9,9 +9,9 @@ class Tar extends Extractor
     /**
      * {@inheritdoc}
      */
-    public function extract($pathToArchive, $pathToDirectory)
+    public function extract(string $pathToArchive, string $pathToDirectory): void
     {
-        $phar = new PharData($pathToArchive);
-        $phar->extractTo($pathToDirectory);
+        $archive = new PharData($pathToArchive);
+        $archive->extractTo($pathToDirectory);
     }
 }
