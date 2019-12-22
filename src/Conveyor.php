@@ -66,14 +66,20 @@ class Conveyor
      */
     public function downloadSkeleton()
     {
-        $this->download($zipFile = $this->makeFilename(), config('packager.skeleton'))
-            ->extract($zipFile, $this->vendorPath())
-            ->cleanUp($zipFile);
+        $skeletonArchiveUrl = config('packager.skeleton');
+        $extension = $this->getArchiveExtension($skeletonArchiveUrl);
 
-        $firstInDirectory = scandir($this->vendorPath().'/temp')[2];
-        $extractedSkeletonLocation = $this->vendorPath().'/temp/'.$firstInDirectory;
+        $this->download($archive = $this->makeFilename($extension), $skeletonArchiveUrl)
+            ->extract($archive, $this->tempPath())
+            ->cleanUp($archive);
+
+        $firstInDirectory = scandir($this->tempPath())[2];
+        $extractedSkeletonLocation = $this->tempPath().'/'.$firstInDirectory;
         rename($extractedSkeletonLocation, $this->packagePath());
-        rmdir($this->vendorPath().'/temp');
+
+        if (is_dir($this->tempPath())) {
+            rmdir($this->tempPath());
+        }
     }
 
     /**
@@ -87,6 +93,7 @@ class Conveyor
         $this->download($zipFile = $this->makeFilename(), $origin)
             ->extract($zipFile, $this->vendorPath())
             ->cleanUp($zipFile);
+
         rename($this->vendorPath().'/'.$piece.'-'.$branch, $this->packagePath());
     }
 
