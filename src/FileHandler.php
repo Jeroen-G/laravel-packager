@@ -32,20 +32,13 @@ trait FileHandler
     }
 
     /**
-     * Get the local temp dir path.
+     * Get the path to store a vendor's temporary files.
      *
      * @return string $path
      */
     public function tempPath()
     {
-        $path = $this->packagesPath().'/temp';
-
-        // Ensure that temp dir exists
-        if (! is_dir($path)) {
-            mkdir($path);
-        }
-
-        return $path;
+        return $this->vendorPath().'/temp';
     }
 
     /**
@@ -139,7 +132,7 @@ trait FileHandler
     }
 
     /**
-     * Extract the zip file into the given directory.
+     * Extract the downloaded archive into the given directory.
      *
      * @param string $archiveFilePath
      * @param string $directory
@@ -148,32 +141,23 @@ trait FileHandler
     public function extract($archiveFilePath, $directory)
     {
         $extension = $this->getArchiveExtension($archiveFilePath);
-
-        try {
-            /** @var Manager $extractorManager */
-            $extractorManager = app()->make(Manager::class);
-            $extractor = $extractorManager->getExtractor($extension);
-        } catch (BindingResolutionException $e) {
-            Log::error('Can not get extractor manager. Falling back with using zip extractor');
-
-            $extractor = new Zip();
-        }
-
+        $extractorManager = new Manager();
+        $extractor = $extractorManager->getExtractor($extension);
         $extractor->extract($archiveFilePath, $directory);
 
         return $this;
     }
 
     /**
-     * Clean-up the archive file.
+     * Remove the archive.
      *
-     * @param  string  $pathToArchiveFile
+     * @param  string  $pathToArchive
      * @return $this
      */
-    public function cleanUp($pathToArchiveFile)
+    public function cleanUp($pathToArchive)
     {
-        @chmod($pathToArchiveFile, 0777);
-        @unlink($pathToArchiveFile);
+        @chmod($pathToArchive, 0777);
+        @unlink($pathToArchive);
 
         return $this;
     }
@@ -204,6 +188,9 @@ trait FileHandler
         }
     }
 
+    /**
+     * Remove the rules files if present.
+     */
     public function cleanUpRules()
     {
         $ruleFiles = ['rules.php', 'rewriteRules.php'];
@@ -216,23 +203,24 @@ trait FileHandler
     }
 
     /**
+     * Based on the extension a different archive extractor is used.
+     *
      * @param string $archiveFilePath
      *
      * @return string
      */
-    protected function getArchiveExtension($archiveFilePath)
+    protected function getArchiveExtension($archiveFilePath): string
     {
         $pathParts = pathinfo($archiveFilePath);
         $extension = $pathParts['extension'];
 
-        // Hack for complex file extensions
+        // Here we check if it actually is supposed to be .tar.gz/.tar.xz
         if (in_array($extension, ['gz', 'xz'])) {
-            // Check child extension
-            $childExtension = pathinfo($pathParts['filename'], PATHINFO_EXTENSION);
+            $subExtension = pathinfo($pathParts['filename'], PATHINFO_EXTENSION);
 
-            if ($childExtension) {
+            if ($subExtension) {
                 $extension = implode('.', [
-                    $childExtension,
+                    $subExtension,
                     $extension,
                 ]);
             }

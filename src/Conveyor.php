@@ -66,37 +66,19 @@ class Conveyor
      */
     public function downloadSkeleton()
     {
-        $archiveUrl = config('packager.skeleton');
-        $extension = $this->getArchiveExtension($archiveUrl);
+        $skeletonArchiveUrl = config('packager.skeleton');
+        $extension = $this->getArchiveExtension($skeletonArchiveUrl);
 
-        $tempDir = $this->tempPath().'/'.uniqid();
-
-        $this->download($archive = $this->makeFilename($extension), $archiveUrl)
-            ->extract($archive, $tempDir)
+        $this->download($archive = $this->makeFilename($extension), $skeletonArchiveUrl)
+            ->extract($archive, $this->tempPath())
             ->cleanUp($archive);
 
-        // Before move files to vendor/package folder, ensure that we have non-wrapped skeleton.
-        // There are two options:
-        // 1. Many files in archive root
-        // 2. Single folder with files in archive root
-        $tempDirFilesList = scandir($tempDir);
+        $firstInDirectory = scandir($this->tempPath())[2];
+        $extractedSkeletonLocation = $this->tempPath().'/'.$firstInDirectory;
+        rename($extractedSkeletonLocation, $this->packagePath());
 
-        $directoryToMove = $tempDir;
-
-        // 3 because '.', '..', and one file or directory
-        if (count($tempDirFilesList) === 3) {
-            $maybeRealSkeletonDir = $tempDir.'/'.$tempDirFilesList[2];
-
-            if (is_dir($maybeRealSkeletonDir)) {
-                $directoryToMove = $maybeRealSkeletonDir;
-            }
-        }
-
-        rename($directoryToMove, $this->packagePath());
-
-        // Delete temp dir if exists
-        if (is_dir($tempDir)) {
-            rmdir($tempDir);
+        if (is_dir($this->tempPath())) {
+            rmdir($this->tempPath());
         }
     }
 
