@@ -1,4 +1,4 @@
-<?php /** @noinspection ALL */
+<?php
 
 namespace JeroenG\Packager\ArchiveExtractors;
 
@@ -27,7 +27,7 @@ final class Manager
     {
         $extractor = Arr::get($this->extractorsMap, $archiveExtension);
 
-        if (!$extractor) {
+        if (! $extractor) {
             throw new InvalidArgumentException("There are no extractors for extension '{$archiveExtension}'!");
         }
 

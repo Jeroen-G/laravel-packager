@@ -3,10 +3,7 @@
 namespace JeroenG\Packager;
 
 use GuzzleHttp\Client;
-use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Support\Facades\Log;
 use JeroenG\Packager\ArchiveExtractors\Manager;
-use JeroenG\Packager\ArchiveExtractors\Zip;
 use RuntimeException;
 
 trait FileHandler
