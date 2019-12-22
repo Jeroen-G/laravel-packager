@@ -3,8 +3,8 @@
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
-use SensioLabs\Security\SecurityChecker;
 use SensioLabs\Security\Formatters\SimpleFormatter;
+use SensioLabs\Security\SecurityChecker;
 
 /**
  * List all locally installed packages.

@@ -2,11 +2,11 @@
 
 namespace JeroenG\Packager\Commands;
 
+use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use JeroenG\Packager\Conveyor;
-use JeroenG\Packager\Wrapping;
-use Illuminate\Console\Command;
 use JeroenG\Packager\ProgressBar;
+use JeroenG\Packager\Wrapping;
 
 /**
  * Get an existing package from a remote git repository with its VCS.

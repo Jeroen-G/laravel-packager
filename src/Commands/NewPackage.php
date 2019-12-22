@@ -2,10 +2,10 @@
 
 namespace JeroenG\Packager\Commands;
 
-use JeroenG\Packager\Conveyor;
-use JeroenG\Packager\Wrapping;
 use Illuminate\Console\Command;
+use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\ProgressBar;
+use JeroenG\Packager\Wrapping;
 
 /**
  * Create a brand new package.

@@ -14,6 +14,7 @@ class MoveTests extends Command
 {
     /**
      * The name and signature of the console command.
+     *
      * @var string
      */
     protected $signature = 'packager:tests
@@ -22,20 +23,20 @@ class MoveTests extends Command
 
     /**
      * The console command description.
+     *
      * @var string
      */
     protected $description = 'Move test files to the Laravel app tests folder';
 
     /**
      * The filesystem handler.
+     *
      * @var object
      */
     protected $files;
 
     /**
      * Create a new instance.
-     *
-     * @param \Illuminate\Filesystem\Filesystem $files
      */
     public function __construct(Filesystem $files)
     {
@@ -55,6 +56,7 @@ class MoveTests extends Command
 
             $composer = json_decode(file_get_contents('composer.json'), true);
 
+            $packages = [];
             foreach ($composer['autoload']['psr-4'] as $package => $path) {
                 if ($package !== 'App\\' && $package !== 'Tests\\') {
                     $packages[] = [rtrim($package, '\\'), $path];

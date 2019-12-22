@@ -182,8 +182,6 @@ class Conveyor
     }
 
     /**
-     * @param array $command
-     *
      * @return bool
      */
     protected function runProcess(array $command)
