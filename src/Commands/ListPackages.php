@@ -101,7 +101,7 @@ class ListPackages extends Command
      */
     private function getGitStatus(string $path): array
     {
-        if(file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
+        if (file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
             (new Process(['git fetch'], $path))->disableOutput()->run();
 
             $commitDifference = $this->getCommitDifference($path);
