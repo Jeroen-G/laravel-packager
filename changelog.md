@@ -2,6 +2,25 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.4
+
+### Added
+- A `--git` flag for `packager:list`
+- Skeletons may now be `.tar.gz` or `.tar` next to `.zip`.
+
+### Updated
+- Skeletons may now have different names.
+- Default Skeleton is updated for Laravel 6.
+- The CURL_VERIFY flag is retrieved from the config instead of the `.env`.
+
+## Version 2.3
+
+### Updated
+- Updated requirements for Laravel 6.
+
+### Fixed
+- A bug where packages were not sluggified properly for Composer.
+
 ## Version 2.2
 
 ### Added
