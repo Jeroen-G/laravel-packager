@@ -5,7 +5,7 @@ namespace JeroenG\Packager\Tests;
 use Illuminate\Config\Repository;
 use Illuminate\Support\Facades\Artisan;
 
-class TestTarGzSkeletonArchive extends TestCase
+class SkeletonArchiveExtractorsTest extends TestCase
 {
     public function test_new_package_is_created_with_tar_gz_skeleton()
     {
