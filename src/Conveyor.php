@@ -60,25 +60,25 @@ class Conveyor
 
         return $this->package;
     }
-
+    
     /**
-     * Get the vendor name camelized.
+     * Get the vendor name studly-zed.
      *
      * @return string|RuntimeException
      */
-    public function vendorCamel() {
+    public function vendorStudly() {
 
-        return Str::ucfirst(Str::camel($this->vendor()));
+        return Str::studly($this->vendor());
     }
 
     /**
-     * Get the package name camelized.
+     * Get the package name studly-zed.
      *
      * @return string|RuntimeException
      */
-    public function packageCamel() {
+    public function packageStudly() {
 
-        return Str::ucfirst(Str::camel($this->package()));
+        return Str::studly($this->package());
     }
     
     /**
