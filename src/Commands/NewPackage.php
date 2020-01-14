@@ -101,8 +101,8 @@ class NewPackage extends Command
             ':lc:vendor',
             ':lc:package',
         ], [
-            $this->conveyor->vendor(),
-            $this->conveyor->package(),
+            $this->conveyor->vendorCamel(),
+            $this->conveyor->packageCamel(),
             strtolower($this->conveyor->vendor()),
             strtolower($this->conveyor->package()),
         ]);
