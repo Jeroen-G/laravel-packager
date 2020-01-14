@@ -169,7 +169,7 @@ trait FileHandler
     {
         $bindings = [
             [':uc:vendor', ':uc:package', ':lc:vendor', ':lc:package'],
-            [$this->vendorCamel(), $this->packageCamel(), strtolower($this->vendor()), strtolower($this->package())],
+            [$this->vendorStudly(), $this->packageStudly(), strtolower($this->vendor()), strtolower($this->package())],
         ];
 
         $rewrites = require ($manifest === null) ? [
