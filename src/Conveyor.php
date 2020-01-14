@@ -62,6 +62,26 @@ class Conveyor
     }
 
     /**
+     * Get the vendor name camelized.
+     *
+     * @return string|RuntimeException
+     */
+    public function vendorCamel() {
+
+        return Str::ucfirst(Str::camel($this->vendor()));
+    }
+
+    /**
+     * Get the package name camelized.
+     *
+     * @return string|RuntimeException
+     */
+    public function packageCamel() {
+
+        return Str::ucfirst(Str::camel($this->package()));
+    }
+    
+    /**
      * Download the skeleton package.
      */
     public function downloadSkeleton()
