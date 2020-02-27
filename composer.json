@@ -19,7 +19,7 @@
     "require": {
         "ext-zip": "*",
         "ext-json": "*",
-        "illuminate/support": "~5|~6",
+        "illuminate/support": "~5|~6|dev",
         "guzzlehttp/guzzle": "~6"
     },
     "require-dev": {
