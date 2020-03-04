@@ -11,7 +11,7 @@ abstract class TestCase extends TestBench
     protected const TEST_APP_TEMPLATE = __DIR__.'/../testbench/template';
     protected const TEST_APP = __DIR__.'/../testbench/laravel';
 
-    public static function setUpBeforeClass():void
+    public static function setUpBeforeClass(): void
     {
         if (! file_exists(self::TEST_APP_TEMPLATE)) {
             self::setUpLocalTestbench();
