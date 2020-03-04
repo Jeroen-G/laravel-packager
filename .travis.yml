@@ -3,6 +3,7 @@ language: php
 php:
   - 7.2
   - 7.3
+  - 7.4
   - nightly
 
 cache:
@@ -10,20 +11,20 @@ cache:
     - $HOME/.composer/cache
 
 env:
-  - TESTBENCH_VERSION=3.8.* PHPUNIT_VERSION=~8 STABILITY=stable
-  - TESTBENCH_VERSION=dev-master PHPUNIT_VERSION=~9 STABILITY=dev
+  - TESTBENCH_VERSION=3.8.* STABILITY=stable
+  - TESTBENCH_VERSION=4.* STABILITY=stable
+  - TESTBENCH_VERSION=5.* STABILITY=stable
 
 matrix:
 
   allow_failures:
-    - env: TESTBENCH_VERSION=dev-master PHPUNIT_VERSION=~9 STABILITY=dev
     - php: nightly
   fast_finish: true
 
 before_script:
   - travis_retry composer self-update
   - composer config minimum-stability ${STABILITY}
-  - travis_retry composer require "orchestra/testbench:${TESTBENCH_VERSION}" "phpunit/phpunit:${PHPUNIT_VERSION}" --no-update
+  - travis_retry composer require "orchestra/testbench:${TESTBENCH_VERSION}" --no-update
   - travis_retry composer update --no-interaction --prefer-source
 
 script:
