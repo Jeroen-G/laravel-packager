@@ -2,6 +2,11 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.5
+
+### Updated
+- Support for Laravel 7 and PHPUnit 9.
+
 ## Version 2.4
 
 ### Added
