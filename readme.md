@@ -55,7 +55,10 @@ $ php artisan packager:new --i
 The package will be created interactively, allowing to configure everything in the package's `composer.json`, such as the license and package description.
 
 **Remarks:**
-The new package will be based on [this custom skeleton](https://github.com/jeroen-g/packager-skeleton).
+The new package will be based on [this custom skeleton](https://github.com/jeroen-g/packager-skeleton). If you want to use a different package skeleton, you can either:
+- (A) publish the configuration file using ```php artisan vendor:publish --provider="JeroenG\Packager\PackagerServiceProvider"``` and change the default skeleton that will be used by all ```php artisan packager:new``` calls;
+- (B) attach a ```--skeleton="http://github.com/path/to/arhive/master.zip"``` to your call, to forcefully use the given skeleton for this one call, instead of the one in the config file;
+
 
 ### Get & Git
 **Command:**
