@@ -25,9 +25,9 @@ class IntegratedTest extends TestCase
     public function test_new_package_is_installed_from_custom_skeleton()
     {
         Artisan::call('packager:new', [
-            'vendor' => 'AnotherVendor', 
+            'vendor' => 'AnotherVendor',
             'name' => 'AnotherPackage',
-            '--skeleton' => 'http://github.com/Jeroen-G/packager-skeleton/archive/master.zip'
+            '--skeleton' => 'http://github.com/Jeroen-G/packager-skeleton/archive/master.zip',
         ]);
 
         $composer = file_get_contents(base_path('composer.json'));
