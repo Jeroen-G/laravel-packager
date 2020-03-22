@@ -56,9 +56,8 @@ The package will be created interactively, allowing to configure everything in t
 
 **Remarks:**
 The new package will be based on [this custom skeleton](https://github.com/jeroen-g/packager-skeleton). If you want to use a different package skeleton, you can either:
-- (A) publish the configuration file using ```php artisan vendor:publish --provider="JeroenG\Packager\PackagerServiceProvider"``` and change the default skeleton that will be used by all ```php artisan packager:new``` calls;
-- (B) attach a ```--skeleton="http://github.com/path/to/arhive/master.zip"``` to your call, to forcefully use the given skeleton for this one call, instead of the one in the config file;
-
+- (A) publish the configuration file and change the default skeleton that will be used by all `packager:new` calls.
+- (B) use the flag `--skeleton="http://github.com/path/to/archive/master.zip"` with your own skeleton to use the given skeleton for this one run instead of the one in the configuration.
 
 ### Get & Git
 **Command:**

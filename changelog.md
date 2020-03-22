@@ -4,6 +4,9 @@ All Notable changes to Packager will be documented in this file.
 
 ## Version 2.5
 
+### Added
+- A `--skeleton` flag for the `packager:new` command (#105).
+
 ### Updated
 - Support for Laravel 7 and PHPUnit 9.
 
