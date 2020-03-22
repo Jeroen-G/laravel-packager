@@ -20,7 +20,7 @@ class NewPackage extends Command
      * The name and signature of the console command.
      * @var string
      */
-    protected $signature = 'packager:new {vendor} {name} {--i}';
+    protected $signature = 'packager:new {vendor} {name} {--i} {--skeleton=}';
 
     /**
      * The console command description.
@@ -88,7 +88,11 @@ class NewPackage extends Command
 
         // Get the packager package skeleton
         $this->info('Downloading skeleton...');
-        $this->conveyor->downloadSkeleton();
+        if ($this->option('i')) {
+            $this->conveyor->downloadSkeleton($this->ask('What package skeleton would you like to use?', $this->option('skeleton') ?? config('packager.skeleton')));
+        } else {
+            $this->conveyor->downloadSkeleton($this->option('skeleton') ?? null);
+        }
         $manifest = (file_exists($this->conveyor->packagePath().'/rewriteRules.php')) ? $this->conveyor->packagePath().'/rewriteRules.php' : null;
         $this->conveyor->renameFiles($manifest);
         $this->makeProgress();

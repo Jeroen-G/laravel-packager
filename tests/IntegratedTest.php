@@ -22,6 +22,19 @@ class IntegratedTest extends TestCase
         $this->assertStringContainsString('MyVendor/MyPackage', $composer);
     }
 
+    public function test_new_package_is_installed_from_custom_skeleton()
+    {
+        Artisan::call('packager:new', [
+            'vendor' => 'AnotherVendor',
+            'name' => 'AnotherPackage',
+            '--skeleton' => 'http://github.com/Jeroen-G/packager-skeleton/archive/master.zip',
+        ]);
+
+        $composer = file_get_contents(base_path('composer.json'));
+
+        $this->assertStringContainsString('AnotherVendor/AnotherPackage', $composer);
+    }
+
     public function test_get_existing_package()
     {
         Artisan::call('packager:get',

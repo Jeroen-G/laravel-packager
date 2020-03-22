@@ -64,9 +64,9 @@ class Conveyor
     /**
      * Download the skeleton package.
      */
-    public function downloadSkeleton()
+    public function downloadSkeleton($skeletonArchiveUrl = null)
     {
-        $skeletonArchiveUrl = config('packager.skeleton');
+        $skeletonArchiveUrl = $skeletonArchiveUrl ?? config('packager.skeleton');
         $extension = $this->getArchiveExtension($skeletonArchiveUrl);
 
         $this->download($archive = $this->makeFilename($extension), $skeletonArchiveUrl)
