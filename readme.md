@@ -54,6 +54,11 @@ $ php artisan packager:new --i
 ```
 The package will be created interactively, allowing to configure everything in the package's `composer.json`, such as the license and package description.
 
+```bash
+$ php artisan packager:new MyVendor/MyPackage
+```
+Alternatively you may also define your vendor and name with a forward slash instead of a space.
+
 **Remarks:**
 The new package will be based on [this custom skeleton](https://github.com/jeroen-g/packager-skeleton). If you want to use a different package skeleton, you can either:
 - (A) publish the configuration file and change the default skeleton that will be used by all `packager:new` calls.

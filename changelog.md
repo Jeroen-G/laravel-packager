@@ -9,6 +9,7 @@ All Notable changes to Packager will be documented in this file.
 
 ### Updated
 - Support for Laravel 7 and PHPUnit 9.
+- `packager:new` now also supports separating vendor and name with a forward slash.
 
 ## Version 2.4
 
