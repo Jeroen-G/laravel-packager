@@ -41,6 +41,10 @@ class IntegratedTest extends TestCase
             ['url' => 'https://github.com/Jeroen-G/packager-skeleton', 'vendor' => 'MyVendor', 'name' => 'MyPackage']);
 
         $this->seeInConsoleOutput('Package downloaded successfully!');
+
+        Artisan::call('packager:get', ['url' => 'jeroen-g/laravel-packager']);
+
+        $this->seeInConsoleOutput('Package downloaded successfully!');
     }
 
     public function test_list_packages()

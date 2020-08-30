@@ -2,6 +2,17 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.6
+
+### Updated
+- `packager:get` and `packager:git` can now use other hosting solutions, including personal hosting
+- `packager:get` and `packager:git` can get source url from packagist
+- packages folder path is configurable
+
+### Fixed
+- run process timeout set to 300 (avoid long composer require timeout error)
+- progress bar buffering
+
 ## Version 2.5
 
 ### Added

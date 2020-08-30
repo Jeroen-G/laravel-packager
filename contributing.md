@@ -17,7 +17,7 @@ If you want to contribute but do not know where to start, this list provides som
 
 - **Add tests!** - Your patch likely won't be accepted if it doesn't have tests.
 
-- **Document any change in behaviour** - Make sure the `readme.md`, `changlog.md` and any other relevant documentation are kept up-to-date.
+- **Document any change in behaviour** - Make sure the `readme.md`, `changelog.md` and any other relevant documentation are kept up-to-date.
 
 - **Consider our release cycle** - We try to follow [SemVer v2.0.0](http://semver.org/). Randomly breaking public APIs is not an option.
 

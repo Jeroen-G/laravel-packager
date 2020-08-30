@@ -3,8 +3,8 @@
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\PackageRepository;
 use JeroenG\Packager\ProgressBar;
 use JeroenG\Packager\Wrapping;
 
@@ -22,7 +22,7 @@ class GitPackage extends Command
      * @var string
      */
     protected $signature = 'packager:git
-                            {url : The url of the git repository}
+                            {url : The url of the git repository or package name}
                             {vendor? : The vendor part of the namespace}
                             {name? : The name of package for the namespace}';
 
@@ -45,15 +45,22 @@ class GitPackage extends Command
     protected $wrapping;
 
     /**
+     * Package repository url parser
+     * @var object \JeroenG\Packager\PackageRepository
+     */
+    protected $packageRepository;
+
+    /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping, PackageRepository $packageRepository)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->wrapping = $wrapping;
+        $this->packageRepository = $packageRepository;
     }
 
     /**
@@ -64,31 +71,33 @@ class GitPackage extends Command
     public function handle()
     {
         // Start the progress bar
-        $this->startProgressBar(4);
+        $this->startProgressBar(6);
 
-        // Common variables
-        $source = $this->argument('url');
-        $origin = rtrim(strtolower($source), '/');
+        $this->info('Get package information...');
+        $packageRepository = $this->packageRepository->parse($this->argument('url'));
 
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
-            $this->setGitVendorAndPackage($origin);
+            $this->conveyor->vendor($packageRepository->vendor);
+            $this->conveyor->package($packageRepository->name);
         } else {
             $this->conveyor->vendor($this->argument('vendor'));
             $this->conveyor->package($this->argument('name'));
         }
+        $this->makeProgress();
+
+        // Create the package directory
+        $this->info('Creating packages directory...');
+        $this->conveyor->makeDir($this->conveyor->packagesPath());
+        $this->makeProgress();
 
         // Start creating the package
         $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
         $this->conveyor->checkIfPackageExists();
         $this->makeProgress();
 
-        // Create the package directory
-        $this->info('Creating packages directory...');
-        $this->conveyor->makeDir($this->conveyor->packagesPath());
-
         // Clone the repository
         $this->info('Cloning repository...');
-        exec("git clone $source ".$this->conveyor->packagePath(), $output, $exit_code);
+        exec("git clone -q $packageRepository->origin ".$this->conveyor->packagePath(), $output, $exit_code);
 
         if ($exit_code != 0) {
             $this->error('Unable to clone repository');
@@ -104,27 +113,12 @@ class GitPackage extends Command
         $this->conveyor->makeDir($this->conveyor->vendorPath());
         $this->makeProgress();
 
+        // Install the package (composer require)
         $this->info('Installing package...');
         $this->conveyor->installPackage();
         $this->makeProgress();
 
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package cloned successfully!');
-    }
-
-    protected function setGitVendorAndPackage($origin)
-    {
-        $pieces = explode('/', $origin);
-
-        if (Str::contains($origin, 'https')) {
-            $vendor = $pieces[3];
-            $package = $pieces[4];
-        } else {
-            $vendor = explode(':', $pieces[0])[1];
-            $package = rtrim($pieces[1], '.git');
-        }
-
-        $this->conveyor->vendor($vendor);
-        $this->conveyor->package($package);
     }
 }
