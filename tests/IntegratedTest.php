@@ -3,9 +3,46 @@
 namespace JeroenG\Packager\Tests;
 
 use Illuminate\Support\Facades\Artisan;
+use JeroenG\Packager\PackageRepository;
 
 class IntegratedTest extends TestCase
 {
+    public function test_url_parser()
+    {
+        $parser = new PackageRepository();
+
+        $url = $parser->parse('jeroen-g/laravel-packager')->getZipUrl();
+        $this->assertEquals('https://github.com/Jeroen-G/laravel-packager/archive/master.zip', $url);
+
+        $expected = 'https://github.com/author/package/archive/dev.zip';
+        $url = $parser->parse('https://github.com/author/package')->getZipUrl('dev');
+        $this->assertEquals($expected, $url);
+        $url = $parser->parse('git@github.com:author/package.git')->getZipUrl('dev');
+        $this->assertEquals($expected, $url);
+
+        $expected = 'https://gitlab.com/author/package/-/archive/dev/package-dev.zip';
+        $url = $parser->parse('https://gitlab.com/author/package')->getZipUrl('dev');
+        $this->assertEquals($expected, $url);
+        $url = $parser->parse('git@gitlab.com:author/package.git')->getZipUrl('dev');
+        $this->assertEquals($expected, $url);
+
+        $expected = 'https://bitbucket.org/author/package/get/dev.zip';
+        $url = $parser->parse('https://bitbucket.org/author/package')->getZipUrl('dev');
+        $this->assertEquals($expected, $url);
+        $url = $parser->parse('git@bitbucket.org:author/package.git')->getZipUrl('dev');
+        $this->assertEquals($expected, $url);
+
+        $this->app['config']->set('packager.repositories', [
+            'my.repo.com' => 'https://:host/:vendor/:name/:branch.zip'
+        ]);
+
+        $expected = 'https://my.repo.com/author/package/dev.zip';
+        $url = $parser->parse('https://my.repo.com/author/package')->getZipUrl('dev');
+        $this->assertEquals($expected, $url);
+        $url = $parser->parse('git@my.repo.com:author/package.git')->getZipUrl('dev');
+        $this->assertEquals($expected, $url);
+    }
+
     public function test_new_package_is_created()
     {
         Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);

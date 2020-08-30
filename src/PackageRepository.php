@@ -17,7 +17,7 @@ class PackageRepository
         $this->origin = $url;
 
         // get package url from Packagist API
-        if (preg_match('`^([^/]*)/([^/]*)$`', $url, $m)) {
+        if (preg_match('`^([^/:@]*)/([^/\.]*)$`', $url, $m)) {
             $client = new Client(['verify' => config('packager.curl_verify_cert')]);
             try {
                 $response = $client->get(sprintf('https://packagist.org/packages/%s/%s.json', $m[1], $m[2]));
@@ -46,7 +46,7 @@ class PackageRepository
         throw new RuntimeException('Unable to parse URL');
     }
 
-    public function getZipUrl($branch)
+    public function getZipUrl($branch = 'master')
     {
         if ($this->host === null) {
             throw new RuntimeException('You have to parse an URL');
