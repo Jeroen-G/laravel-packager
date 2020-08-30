@@ -31,7 +31,7 @@ class PackageRepository
         // parse url
         $regex = [
             '`^https?://([^/]*)/([^/]*)/([^./]*).*$`',
-            '`^git@([^:]*):([^/]*)/([^.]*)\.git$`'
+            '`^git@([^:]*):([^/]*)/([^.]*)\.git$`',
         ];
 
         foreach ($regex as $rx) {
@@ -62,7 +62,7 @@ class PackageRepository
         // merge with additionnal hosts
         $urls = array_merge($urls, config('packager.repositories'));
 
-        if (!isset($urls[$this->host])) {
+        if (! isset($urls[$this->host])) {
             throw new RuntimeException('Unknown repository host');
         }
 

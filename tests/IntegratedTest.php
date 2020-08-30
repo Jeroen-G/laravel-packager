@@ -33,7 +33,7 @@ class IntegratedTest extends TestCase
         $this->assertEquals($expected, $url);
 
         $this->app['config']->set('packager.repositories', [
-            'my.repo.com' => 'https://:host/:vendor/:name/:branch.zip'
+            'my.repo.com' => 'https://:host/:vendor/:name/:branch.zip',
         ]);
 
         $expected = 'https://my.repo.com/author/package/dev.zip';

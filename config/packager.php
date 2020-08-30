@@ -34,5 +34,5 @@ return [
      */
     'repositories' => [
         //'personal.repo.com' => 'https://:host/:vendor/:name/archive/:branch.zip',
-    ]
+    ],
 ];

@@ -46,7 +46,7 @@ class GetPackage extends Command
     protected $wrapping;
 
     /**
-     * Package repository url parser
+     * Package repository url parser.
      * @var object \JeroenG\Packager\PackageRepository
      */
     protected $packageRepository;
