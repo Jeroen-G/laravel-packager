@@ -39,6 +39,7 @@ class PackageRepository
                 $this->host = $m[1];
                 $this->vendor = $m[2];
                 $this->name = $m[3];
+
                 return $this;
             }
         }
