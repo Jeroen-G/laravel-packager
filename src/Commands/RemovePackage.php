@@ -20,7 +20,7 @@ class RemovePackage extends Command
      * The name and signature of the console command.
      * @var string
      */
-    protected $signature = 'packager:remove {vendor} {name}';
+    protected $signature = 'packager:remove {vendor} {name?}';
 
     /**
      * The console command description.
@@ -63,8 +63,15 @@ class RemovePackage extends Command
         $this->startProgressBar(4);
 
         // Defining vendor/package
-        $this->conveyor->vendor($this->argument('vendor'));
-        $this->conveyor->package($this->argument('name'));
+        $vendor = $this->argument('vendor');
+        $name = $this->argument('name');
+
+        if (strstr($vendor, '/')) {
+            [$vendor, $name] = explode('/', $vendor);
+        }
+
+        $this->conveyor->vendor($vendor);
+        $this->conveyor->package($name);
 
         // Start removing the package
         $this->info('Removing package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
@@ -82,8 +89,12 @@ class RemovePackage extends Command
 
         // Remove the vendor directory, if agreed to
         if ($this->confirm('Do you want to remove the vendor directory? [y|N]')) {
-            $this->info('removing vendor directory...');
-            $this->conveyor->removeDir($this->conveyor->vendorPath());
+            if (count(array_diff(scandir($this->conveyor->vendorPath()), ['.', '..'])) !== 0) {
+                $this->warn('vendor directory is not empty, continuing...');
+            } else {
+                $this->info('removing vendor directory...');
+                $this->conveyor->removeDir($this->conveyor->vendorPath());
+            }
         } else {
             $this->info('Continuing...');
         }
