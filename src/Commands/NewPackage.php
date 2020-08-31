@@ -66,7 +66,7 @@ class NewPackage extends Command
         $name = $this->argument('name');
 
         if (strstr($vendor, '/')) {
-            list($vendor, $name) = explode('/', $vendor);
+            [$vendor, $name] = explode('/', $vendor);
         }
 
         // Defining vendor/package, optionally defined interactively
