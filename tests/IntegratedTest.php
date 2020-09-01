@@ -22,6 +22,15 @@ class IntegratedTest extends TestCase
         $this->assertStringContainsString('MyVendor/MyPackage', $composer);
     }
 
+    public function test_new_package_studly_install()
+    {
+        Artisan::call('packager:new', ['vendor' => 'my-vendor', 'name' => 'my-package']);
+
+        $this->seeInConsoleOutput('Package created successfully!');
+        $this->assertStringContainsString('my-vendor/my-package', file_get_contents(base_path('composer.json')));
+        $this->assertTrue(is_file(base_path('packages/my-vendor/my-package/src/MyPackageServiceProvider.php')));
+    }
+
     public function test_new_package_is_installed_from_custom_skeleton()
     {
         Artisan::call('packager:new', [
