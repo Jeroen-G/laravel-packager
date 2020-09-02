@@ -191,4 +191,4 @@ The EU Public License. Please see [license.md](license.md) for more information.
 [link-travis]: https://travis-ci.org/Jeroen-G/laravel-packager
 [link-styleci]: https://styleci.io/repos/37218114
 [link-author]: https://github.com/Jeroen-G
-[link-contributors]: ../../contributors]
+[link-contributors]: ../../contributors

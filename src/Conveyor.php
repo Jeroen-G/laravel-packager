@@ -43,6 +43,16 @@ class Conveyor
     }
 
     /**
+     * Get the vendor name converted to StudlyCase.
+     *
+     * @return string|RuntimeException
+     */
+    public function vendorStudly()
+    {
+        return Str::studly($this->vendor());
+    }
+
+    /**
      * Set or get the package name.
      *
      * @param string $package
@@ -59,6 +69,16 @@ class Conveyor
         }
 
         return $this->package;
+    }
+
+    /**
+     * Get the package name converted to StudlyCase.
+     *
+     * @return string|RuntimeException
+     */
+    public function packageStudly()
+    {
+        return Str::studly($this->package());
     }
 
     /**
@@ -122,6 +142,9 @@ class Conveyor
         $params = json_encode([
             'type' => 'path',
             'url' => $this->packagePath(),
+            'options' => [
+                'symlink' => true,
+            ],
         ]);
         $command = [
             'composer',
@@ -150,7 +173,7 @@ class Conveyor
         return $this->runProcess([
             'composer',
             'require',
-            $this->vendor.'/'.$this->package,
+            $this->vendor.'/'.$this->package.':@dev',
         ]);
     }
 
