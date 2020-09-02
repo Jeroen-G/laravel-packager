@@ -12,6 +12,9 @@ All Notable changes to Packager will be documented in this file.
 - `packager:new` now also supports separating vendor and name with a forward slash.
 - `symlink` option is set to true as default for repositories in `composer.json`
 
+### Fixed
+- vendor-name and package-name not converted to StudlyCase with `packager:new`
+
 ## Version 2.4
 
 ### Added
