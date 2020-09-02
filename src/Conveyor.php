@@ -123,6 +123,9 @@ class Conveyor
         $params = json_encode([
             'type' => 'path',
             'url' => $this->packagePath(),
+            'options' => [
+                'symlink' => true,
+            ],
         ]);
         $command = [
             'composer',
@@ -151,7 +154,7 @@ class Conveyor
         return $this->runProcess([
             'composer',
             'require',
-            $this->vendor.'/'.$this->package,
+            $this->vendor.'/'.$this->package.':@dev',
         ]);
     }
 

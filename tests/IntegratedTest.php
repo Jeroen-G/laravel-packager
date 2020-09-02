@@ -48,6 +48,7 @@ class IntegratedTest extends TestCase
         Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);
 
         $this->seeInConsoleOutput('Package created successfully!');
+        $this->assertTrue(is_link(base_path('vendor/myvendor/mypackage')));
     }
 
     public function test_new_package_is_installed()
@@ -72,7 +73,7 @@ class IntegratedTest extends TestCase
         $this->assertStringContainsString('AnotherVendor/AnotherPackage', $composer);
     }
 
-    public function test_get_existing_package()
+    public function test_get_package()
     {
         Artisan::call('packager:get',
             ['url' => 'https://github.com/Jeroen-G/packager-skeleton', 'vendor' => 'MyVendor', 'name' => 'MyPackage']);
@@ -82,6 +83,24 @@ class IntegratedTest extends TestCase
         Artisan::call('packager:get', ['url' => 'jeroen-g/laravel-packager']);
 
         $this->seeInConsoleOutput('Package downloaded successfully!');
+    }
+
+    public function test_get_existing_package_with_git()
+    {
+        Artisan::call('packager:git',
+            ['url' => 'https://github.com/Seldaek/monolog', 'vendor' => 'monolog', 'name' => 'monolog']);
+
+        $this->seeInConsoleOutput('Package cloned successfully!');
+        $this->assertTrue(is_link(base_path('vendor/monolog/monolog')));
+    }
+
+    public function test_get_existing_package_with_get()
+    {
+        Artisan::call('packager:get',
+            ['url' => 'https://github.com/Seldaek/monolog', 'vendor' => 'monolog', 'name' => 'monolog']);
+
+        $this->seeInConsoleOutput('Package downloaded successfully!');
+        $this->assertTrue(is_link(base_path('vendor/monolog/monolog')));
     }
 
     public function test_list_packages()
