@@ -39,6 +39,13 @@ class PackagerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        /* Lumen Fix for error "Call to undefined function JeroenG\Packager\config_path()" */
+        if (!function_exists('config_path')) {
+            function config_path($path = '') {
+                return app()->basePath().DIRECTORY_SEPARATOR.'config' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+            }
+        }
+        
         $this->publishes([
             __DIR__.'/../config/packager.php' => config_path('packager.php'),
         ]);
