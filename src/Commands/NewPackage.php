@@ -20,7 +20,7 @@ class NewPackage extends Command
      * The name and signature of the console command.
      * @var string
      */
-    protected $signature = 'packager:new {vendor} {name?} {--i} {--skeleton=}';
+    protected $signature = 'packager:new {vendor} {name?} {--i} {--skeleton=} {--t|timeout=60}';
 
     /**
      * The console command description.
@@ -64,6 +64,9 @@ class NewPackage extends Command
 
         $vendor = $this->argument('vendor');
         $name = $this->argument('name');
+        $timeout = $this->option('timeout');
+
+        $this->conveyor->timeout($timeout);
 
         if (stripos($vendor, '/') > 0) {
             $part = explode('/', $vendor);

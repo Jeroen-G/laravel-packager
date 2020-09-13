@@ -24,6 +24,13 @@ class Conveyor
     protected $package;
 
     /**
+     * Package name.
+     *
+     * @var int
+     */
+    protected $processTimeout = 60;
+
+    /**
      * Set or get the package vendor namespace.
      *
      * @param string $vendor
@@ -79,6 +86,25 @@ class Conveyor
     public function packageStudly()
     {
         return Str::studly($this->package());
+    }
+
+    /**
+     * Set or get process timeout
+     *
+     * @param int $timeout
+     *
+     * @return string|RuntimeException
+     */
+    public function timeout($timeout = null)
+    {
+        if ($timeout !== null) {
+            return $this->processTimeout = $timeout;
+        }
+        if ($this->processTimeout === null) {
+            throw new RuntimeException('Please provide a valid process timeout');
+        }
+
+        return $this->processTimeout;
     }
 
     /**
@@ -192,6 +218,7 @@ class Conveyor
     protected function runProcess(array $command)
     {
         $process = new \Symfony\Component\Process\Process($command, base_path());
+        $process->setTimeout($this->processTimeout);
         $process->run();
 
         return $process->getExitCode() === 0;
