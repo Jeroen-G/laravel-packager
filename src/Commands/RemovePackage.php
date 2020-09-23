@@ -20,7 +20,7 @@ class RemovePackage extends Command
      * The name and signature of the console command.
      * @var string
      */
-    protected $signature = 'packager:remove {vendor} {name}';
+    protected $signature = 'packager:remove {vendor} {name?}';
 
     /**
      * The console command description.
@@ -62,9 +62,18 @@ class RemovePackage extends Command
         // Start the progress bar
         $this->startProgressBar(4);
 
+        $vendor = $this->argument('vendor');
+        $name = $this->argument('name');
+
+        if (stripos($vendor, '/') > 0) {
+            $part = explode('/', $vendor);
+            $vendor = $part[0];
+            $name = $part[1];
+        }
+
         // Defining vendor/package
-        $this->conveyor->vendor($this->argument('vendor'));
-        $this->conveyor->package($this->argument('name'));
+        $this->conveyor->vendor($vendor);
+        $this->conveyor->package($name);
 
         // Start removing the package
         $this->info('Removing package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
