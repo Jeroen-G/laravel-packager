@@ -172,16 +172,34 @@ trait FileHandler
             [$this->vendorStudly(), $this->packageStudly(), strtolower($this->vendor()), strtolower($this->package())],
         ];
 
-        $rewrites = require ($manifest === null) ? [
-            'src/MyPackage.php' => 'src/:uc:package.php',
-            'config/mypackage.php' => 'config/:lc:package.php',
-            'src/Facades/MyPackage.php' => 'src/Facades/:uc:package.php',
-            'src/MyPackageServiceProvider.php' => 'src/:uc:packageServiceProvider.php',
-        ] : $manifest;
+        for ($timeout = 30; $timeout > 0; $timeout--) {
+            try {
+                $rewrites = require ($manifest === null) ? [
+                    'src/MyPackage.php' => 'src/:uc:package.php',
+                    'config/mypackage.php' => 'config/:lc:package.php',
+                    'src/Facades/MyPackage.php' => 'src/Facades/:uc:package.php',
+                    'src/MyPackageServiceProvider.php' => 'src/:uc:packageServiceProvider.php',
+                ] : $manifest;
+                break;
+            } catch (\Exception $e) {
+                // take a break before trying again, we will do this until timeout
+                // this is to overcome a weird CentOS 7 caching issue
+                // see https://github.com/Jeroen-G/laravel-packager/issues/101
+                sleep(1);
+            }
+        }
 
         foreach ($rewrites as $file => $name) {
             $filename = str_replace($bindings[0], $bindings[1], $name);
-            rename($this->packagePath().'/'.$file, $this->packagePath().'/'.$filename);
+            for ($timeout = 30; $timeout > 0; $timeout--) {
+                try {
+                    rename($this->packagePath().'/'.$file, $this->packagePath().'/'.$filename);
+                    break;
+                } catch (\Exception $e) {
+                    // dealing with the same caching issue as above
+                    sleep(1);
+                }
+            }
         }
     }
 
