@@ -3,8 +3,11 @@
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Validation\Validator as ValidatorInterface;
+use Illuminate\Support\Facades\Validator;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\ProgressBar;
+use JeroenG\Packager\ValidationRules\ValidClassName;
 use JeroenG\Packager\Wrapping;
 
 /**
@@ -59,6 +62,14 @@ class NewPackage extends Command
      */
     public function handle()
     {
+        // Validate the vendor and package names
+        $validator = $this->validateInput();
+
+        if ($validator->fails()) {
+            $this->showErrors($validator);
+            return 1;
+        }
+
         // Start the progress bar
         $this->startProgressBar(6);
 
@@ -182,5 +193,22 @@ class NewPackage extends Command
             $description,
             $license,
         ]);
+    }
+
+    private function validateInput()
+    {
+        return Validator::make($this->arguments(), [
+            'vendor' => new ValidClassName,
+            'name' => new ValidClassName,
+        ]);
+    }
+
+    private function showErrors(ValidatorInterface $validator)
+    {
+        $this->info('Package was not created. Please choose a valid name.');
+
+        foreach ($validator->errors()->all() as $error) {
+            $this->error($error);
+        }
     }
 }
