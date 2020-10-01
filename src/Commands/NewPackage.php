@@ -67,6 +67,7 @@ class NewPackage extends Command
 
         if ($validator->fails()) {
             $this->showErrors($validator);
+
             return 1;
         }
 

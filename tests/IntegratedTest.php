@@ -37,7 +37,6 @@ class IntegratedTest extends TestCase
         Artisan::call('packager:new', ['vendor' => 'my-vendor', 'name' => '1234-Invalid']);
         $this->seeInConsoleOutput('Package was not created. Please choose a valid name.');
         $this->assertFalse(is_file(base_path('packages/my-vendor/4-Invalid/src/1234InvalidServiceProvider.php')));
-
     }
 
     public function test_new_package_vendor_name_should_be_valid()
