@@ -62,15 +62,6 @@ class NewPackage extends Command
      */
     public function handle()
     {
-        // Validate the vendor and package names
-        $validator = $this->validateInput();
-
-        if ($validator->fails()) {
-            $this->showErrors($validator);
-
-            return 1;
-        }
-
         // Start the progress bar
         $this->startProgressBar(6);
 
@@ -92,6 +83,11 @@ class NewPackage extends Command
             $this->conveyor->package($name);
         }
 
+        // Validate the vendor and package names
+        $validator = $this->validateInput($this->conveyor->vendor(), $this->conveyor->package());
+
+        if ($validator->fails()) {
+            $this->showErrors($validator);
 
             return 1;
         }
@@ -200,7 +196,7 @@ class NewPackage extends Command
         ]);
     }
 
-    private function validateInput()
+    private function validateInput(string $vendor, string $name)
     {
         return Validator::make(compact('vendor', 'name'), [
             'vendor' => new ValidClassName,
