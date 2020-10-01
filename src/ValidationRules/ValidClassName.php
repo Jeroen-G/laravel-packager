@@ -15,6 +15,6 @@ class ValidClassName implements Rule
 
     public function message()
     {
-        return 'The :attribute must conform to a valid PHP classname.';
+        return 'The package :attribute must conform to a valid PHP classname.';
     }
 }
