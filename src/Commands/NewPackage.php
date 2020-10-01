@@ -23,7 +23,7 @@ class NewPackage extends Command
      * The name and signature of the console command.
      * @var string
      */
-    protected $signature = 'packager:new {vendor} {name?} {--i} {--skeleton=}';
+    protected $signature = 'packager:new {vendor?} {name?} {--i} {--skeleton=}';
 
     /**
      * The console command description.
@@ -90,6 +90,10 @@ class NewPackage extends Command
         } else {
             $this->conveyor->vendor($vendor);
             $this->conveyor->package($name);
+        }
+
+
+            return 1;
         }
 
         // Start creating the package
@@ -198,7 +202,7 @@ class NewPackage extends Command
 
     private function validateInput()
     {
-        return Validator::make($this->arguments(), [
+        return Validator::make(compact('vendor', 'name'), [
             'vendor' => new ValidClassName,
             'name' => new ValidClassName,
         ]);
