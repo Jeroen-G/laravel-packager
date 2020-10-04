@@ -23,4 +23,5 @@ return [
     'author_email' => 'author email',
     'author_homepage' => 'author homepage',
     'license' => 'license',
+    'timeout' => '60',
 ];
