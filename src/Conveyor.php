@@ -4,7 +4,6 @@ namespace JeroenG\Packager;
 
 use Illuminate\Support\Str;
 use RuntimeException;
-use function config;
 
 class Conveyor
 {
