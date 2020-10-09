@@ -163,6 +163,9 @@ CURL_VERIFY=false
 ```
 Of course this means it will be less secure, but then again you are not supposed to run this package anywhere near a production environment.
 
+## Issues with timeout
+If you are having problems with timeouts when creating new packages, you can now change the config variable timeout in packager.php to fix this.
+
 ## Changelog
 
 Please see [changelog.md](changelog.md) for what has changed recently.

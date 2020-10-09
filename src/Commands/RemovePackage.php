@@ -62,7 +62,6 @@ class RemovePackage extends Command
         // Start the progress bar
         $this->startProgressBar(4);
 
-        // Defining vendor/package
         $vendor = $this->argument('vendor');
         $name = $this->argument('name');
 

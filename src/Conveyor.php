@@ -192,6 +192,7 @@ class Conveyor
     protected function runProcess(array $command)
     {
         $process = new \Symfony\Component\Process\Process($command, base_path());
+        $process->setTimeout(config('packager.timeout'));
         $process->run();
 
         return $process->getExitCode() === 0;
