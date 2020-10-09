@@ -2,6 +2,7 @@
 
 namespace JeroenG\Packager;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -34,6 +35,7 @@ class PackagerServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap the application events.
+     * @throws BindingResolutionException
      */
     public function boot()
     {

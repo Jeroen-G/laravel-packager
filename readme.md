@@ -5,7 +5,7 @@
 [![Build Status][ico-travis]][link-travis]
 [![StyleCI][ico-styleci]][link-styleci]
 
-This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate.
+This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate. If you like a visual explanation [check out this video by Jeffrey Way on Laracasts](https://laracasts.com/series/building-laracasts/episodes/3).
 
 ## Installation
 
@@ -54,8 +54,15 @@ $ php artisan packager:new --i
 ```
 The package will be created interactively, allowing to configure everything in the package's `composer.json`, such as the license and package description.
 
+```bash
+$ php artisan packager:new MyVendor/MyPackage
+```
+Alternatively you may also define your vendor and name with a forward slash instead of a space.
+
 **Remarks:**
-The new package will be based on [this custom skeleton](https://github.com/jeroen-g/packager-skeleton).
+The new package will be based on [this custom skeleton](https://github.com/jeroen-g/packager-skeleton). If you want to use a different package skeleton, you can either:
+- (A) publish the configuration file and change the default skeleton that will be used by all `packager:new` calls.
+- (B) use the flag `--skeleton="http://github.com/path/to/archive/master.zip"` with your own skeleton to use the given skeleton for this one run instead of the one in the configuration.
 
 ### Get & Git
 **Command:**
@@ -108,6 +115,12 @@ $ php artisan packager:list
 **Result:**
 An overview of all packages in the `/packages` directory.
 
+**Options:**
+```bash
+$ php artisan packager:list --git
+```
+The packages are displayed with information on the git status (branch, commit difference with origin) if it is a git repository.
+
 ### Remove
 **Command:**
 ```bash
@@ -150,8 +163,8 @@ CURL_VERIFY=false
 ```
 Of course this means it will be less secure, but then again you are not supposed to run this package anywhere near a production environment.
 
-## Extensions
-DelveFore started to work on a cool project to use various Artisan `make:` commands for the packages, [check it out](https://github.com/DelveFore/laravel-packager-hermes)!
+## Issues with timeout
+If you are having problems with timeouts when creating new packages, you can now change the config variable timeout in packager.php to fix this.
 
 ## Changelog
 
@@ -181,4 +194,4 @@ The EU Public License. Please see [license.md](license.md) for more information.
 [link-travis]: https://travis-ci.org/Jeroen-G/laravel-packager
 [link-styleci]: https://styleci.io/repos/37218114
 [link-author]: https://github.com/Jeroen-G
-[link-contributors]: ../../contributors]
+[link-contributors]: ../../contributors

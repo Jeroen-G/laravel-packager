@@ -2,8 +2,8 @@
 
 namespace JeroenG\Packager;
 
-use RuntimeException;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class Conveyor
 {
@@ -11,12 +11,14 @@ class Conveyor
 
     /**
      * Package vendor namespace.
+     *
      * @var string
      */
     protected $vendor;
 
     /**
      * Package name.
+     *
      * @var string
      */
     protected $package;
@@ -24,7 +26,8 @@ class Conveyor
     /**
      * Set or get the package vendor namespace.
      *
-     * @param  string  $vendor
+     * @param string $vendor
+     *
      * @return string|RuntimeException
      */
     public function vendor($vendor = null)
@@ -40,9 +43,20 @@ class Conveyor
     }
 
     /**
+     * Get the vendor name converted to StudlyCase.
+     *
+     * @return string|RuntimeException
+     */
+    public function vendorStudly()
+    {
+        return Str::studly($this->vendor());
+    }
+
+    /**
      * Set or get the package name.
      *
-     * @param  string  $package
+     * @param string $package
+     *
      * @return string|RuntimeException
      */
     public function package($package = null)
@@ -58,37 +72,53 @@ class Conveyor
     }
 
     /**
-     * Download the skeleton package.
+     * Get the package name converted to StudlyCase.
      *
-     * @return void
+     * @return string|RuntimeException
      */
-    public function downloadSkeleton()
+    public function packageStudly()
     {
-        $this->download($zipFile = $this->makeFilename(), config('packager.skeleton'))
-            ->extract($zipFile, $this->vendorPath())
-            ->cleanUp($zipFile);
-        rename($this->vendorPath().'/packager-skeleton-master', $this->packagePath());
+        return Str::studly($this->package());
+    }
+
+    /**
+     * Download the skeleton package.
+     */
+    public function downloadSkeleton($skeletonArchiveUrl = null)
+    {
+        $skeletonArchiveUrl = $skeletonArchiveUrl ?? config('packager.skeleton');
+        $extension = $this->getArchiveExtension($skeletonArchiveUrl);
+
+        $this->download($archive = $this->makeFilename($extension), $skeletonArchiveUrl)
+            ->extract($archive, $this->tempPath())
+            ->cleanUp($archive);
+
+        $firstInDirectory = scandir($this->tempPath())[2];
+        $extractedSkeletonLocation = $this->tempPath().'/'.$firstInDirectory;
+        rename($extractedSkeletonLocation, $this->packagePath());
+
+        if (is_dir($this->tempPath())) {
+            rmdir($this->tempPath());
+        }
     }
 
     /**
      * Download the package from Github.
      *
-     * @param  string  $origin  The Github URL
-     * @param  string  $branch  The branch to download
-     * @return void
+     * @param string $origin The Github URL
+     * @param string $branch The branch to download
      */
     public function downloadFromGithub($origin, $piece, $branch)
     {
         $this->download($zipFile = $this->makeFilename(), $origin)
             ->extract($zipFile, $this->vendorPath())
             ->cleanUp($zipFile);
+
         rename($this->vendorPath().'/'.$piece.'-'.$branch, $this->packagePath());
     }
 
     /**
      * Dump Composer's autoloads.
-     *
-     * @return void
      */
     public function dumpAutoloads()
     {
@@ -111,12 +141,15 @@ class Conveyor
     {
         $params = json_encode([
             'type' => 'path',
-            'url'  => $this->packagePath(),
+            'url' => $this->packagePath(),
+            'options' => [
+                'symlink' => true,
+            ],
         ]);
         $command = [
             'composer',
             'config',
-            'repositories.'.Str::slug($this->vendor.'-'.$this->package),
+            'repositories.'.Str::slug($this->vendor).'/'.Str::slug($this->package),
             $params,
             '--file',
             'composer.json',
@@ -131,7 +164,7 @@ class Conveyor
             'composer',
             'config',
             '--unset',
-            'repositories.'.Str::slug($this->vendor.'-', $this->package),
+            'repositories.'.Str::slug($this->vendor).'/'.Str::slug($this->package),
         ]);
     }
 
@@ -140,7 +173,7 @@ class Conveyor
         return $this->runProcess([
             'composer',
             'require',
-            $this->vendor.'/'.$this->package,
+            $this->vendor.'/'.$this->package.':@dev',
         ]);
     }
 
@@ -154,12 +187,12 @@ class Conveyor
     }
 
     /**
-     * @param  array  $command
      * @return bool
      */
     protected function runProcess(array $command)
     {
         $process = new \Symfony\Component\Process\Process($command, base_path());
+        $process->setTimeout(config('packager.timeout'));
         $process->run();
 
         return $process->getExitCode() === 0;

@@ -17,12 +17,14 @@
         }
     ],
     "require": {
+        "php": "^7.0",
         "ext-zip": "*",
-        "illuminate/support": "~5",
-        "guzzlehttp/guzzle": "~6"
+        "ext-json": "*",
+        "illuminate/support": "^5.0|^6.0|^7.0|^8.0",
+        "guzzlehttp/guzzle": "~7"
     },
     "require-dev": {
-        "phpunit/phpunit": "~8",
+        "phpunit/phpunit": "^8.0|^9.0",
         "orchestra/testbench": ">=3.8"
     },
     "autoload": {
@@ -37,6 +39,12 @@
     },
     "suggest": {
         "sensiolabs/security-checker": "Required to use the security check command"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit --no-coverage",
+        "test-f": "vendor/bin/phpunit --no-coverage --filter",
+        "test-coverage": "vendor/bin/phpunit",
+        "test-coverage-f": "vendor/bin/phpunit --filter"
     },
     "extra": {
         "laravel": {

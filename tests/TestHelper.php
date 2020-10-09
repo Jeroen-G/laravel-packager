@@ -2,9 +2,9 @@
 
 namespace JeroenG\Packager\Tests;
 
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
-use Illuminate\Contracts\Console\Kernel;
 
 trait TestHelper
 {

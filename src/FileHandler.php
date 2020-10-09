@@ -2,11 +2,11 @@
 
 namespace JeroenG\Packager;
 
-use ZipArchive;
-use RuntimeException;
 use GuzzleHttp\Client;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
+use JeroenG\Packager\ArchiveExtractors\Manager;
+use RuntimeException;
 
 trait FileHandler
 {
@@ -31,6 +31,16 @@ trait FileHandler
     }
 
     /**
+     * Get the path to store a vendor's temporary files.
+     *
+     * @return string $path
+     */
+    public function tempPath()
+    {
+        return $this->vendorPath().'/temp';
+    }
+
+    /**
      * Get the full package path.
      *
      * @return string $path
@@ -41,13 +51,15 @@ trait FileHandler
     }
 
     /**
-     * Generate a random temporary filename for the package zipfile.
+     * Generate a random temporary filename for the package archive file.
+     *
+     * @param string $extension
      *
      * @return string
      */
-    public function makeFilename()
+    public function makeFilename($extension = 'zip')
     {
-        return getcwd().'/package'.md5(time().uniqid()).'.zip';
+        return getcwd().'/package'.md5(time().uniqid()).'.'.$extension;
     }
 
     /**
@@ -103,48 +115,48 @@ trait FileHandler
     }
 
     /**
-     * Download the temporary Zip to the given file.
+     * Download the archive to the given file by url.
      *
-     * @param  string  $zipFile
-     * @param  string  $source
+     * @param  string  $filePath
+     * @param  string  $sourceFileUrl
      * @return $this
      */
-    public function download($zipFile, $source)
+    public function download($filePath, $sourceFileUrl)
     {
-        $client = new Client(['verify' => env('CURL_VERIFY', true)]);
-        $response = $client->get($source);
-        file_put_contents($zipFile, $response->getBody());
+        $client = new Client(['verify' => config('packager.curl_verify_cert')]);
+        $response = $client->get($sourceFileUrl);
+        file_put_contents($filePath, $response->getBody());
 
         return $this;
     }
 
     /**
-     * Extract the zip file into the given directory.
+     * Extract the downloaded archive into the given directory.
      *
-     * @param  string  $zipFile
-     * @param  string  $directory
+     * @param string $archiveFilePath
+     * @param string $directory
      * @return $this
      */
-    public function extract($zipFile, $directory)
+    public function extract($archiveFilePath, $directory)
     {
-        $archive = new ZipArchive;
-        $archive->open($zipFile);
-        $archive->extractTo($directory);
-        $archive->close();
+        $extension = $this->getArchiveExtension($archiveFilePath);
+        $extractorManager = new Manager();
+        $extractor = $extractorManager->getExtractor($extension);
+        $extractor->extract($archiveFilePath, $directory);
 
         return $this;
     }
 
     /**
-     * Clean-up the Zip file.
+     * Remove the archive.
      *
-     * @param  string  $zipFile
+     * @param  string  $pathToArchive
      * @return $this
      */
-    public function cleanUp($zipFile)
+    public function cleanUp($pathToArchive)
     {
-        @chmod($zipFile, 0777);
-        @unlink($zipFile);
+        @chmod($pathToArchive, 0777);
+        @unlink($pathToArchive);
 
         return $this;
     }
@@ -159,7 +171,7 @@ trait FileHandler
     {
         $bindings = [
             ['MyVendor', 'MyPackage', 'myvendor', 'mypackage'],
-            [$this->vendor(), $this->package(), strtolower($this->vendor()), strtolower($this->package())],
+            [$this->vendorStudly(), $this->packageStudly(), strtolower($this->vendor()), strtolower($this->package())],
         ];
 
         $files = new RecursiveDirectoryIterator($this->packagePath());
@@ -175,6 +187,9 @@ trait FileHandler
         }
     }
 
+    /**
+     * Remove the rules files if present.
+     */
     public function cleanUpRules()
     {
         $ruleFiles = ['rules.php', 'rewriteRules.php'];
@@ -184,5 +199,32 @@ trait FileHandler
                 unlink($this->packagePath().'/'.$file);
             }
         }
+    }
+
+    /**
+     * Based on the extension a different archive extractor is used.
+     *
+     * @param string $archiveFilePath
+     *
+     * @return string
+     */
+    protected function getArchiveExtension($archiveFilePath): string
+    {
+        $pathParts = pathinfo($archiveFilePath);
+        $extension = $pathParts['extension'];
+
+        // Here we check if it actually is supposed to be .tar.gz/.tar.xz
+        if (in_array($extension, ['gz', 'xz'])) {
+            $subExtension = pathinfo($pathParts['filename'], PATHINFO_EXTENSION);
+
+            if ($subExtension) {
+                $extension = implode('.', [
+                    $subExtension,
+                    $extension,
+                ]);
+            }
+        }
+
+        return $extension;
     }
 }
