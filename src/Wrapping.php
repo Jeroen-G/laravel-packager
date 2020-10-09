@@ -2,6 +2,9 @@
 
 namespace JeroenG\Packager;
 
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+
 class Wrapping
 {
     /**
@@ -47,17 +50,13 @@ class Wrapping
      */
     public function fill($path)
     {
-        $templates = array_merge(
-            glob($path.'/composer.json'),
-            glob($path.'/*.md'),
-            glob($path.'/*.php'),
-            glob($path.'/src/*.php'),
-            glob($path.'/src/Facades/*.php'),
-            glob($path.'/tests/*.php'),
-            glob($path.'/config/*.php')
-        );
-        foreach ($templates as $file) {
-            $this->fillInFile($file);
+        $files = new RecursiveDirectoryIterator($path);
+        foreach (new RecursiveIteratorIterator($files) as $file) {
+            if (! $file->isFile()) {
+                continue;
+            }
+
+            $this->fillInFile($file->getPath().'/'.$file->getFilename());
         }
     }
 

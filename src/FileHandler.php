@@ -3,6 +3,8 @@
 namespace JeroenG\Packager;
 
 use GuzzleHttp\Client;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use JeroenG\Packager\ArchiveExtractors\Manager;
 use RuntimeException;
 
@@ -168,20 +170,20 @@ trait FileHandler
     public function renameFiles($manifest = null)
     {
         $bindings = [
-            [':uc:vendor', ':uc:package', ':lc:vendor', ':lc:package'],
+            ['MyVendor', 'MyPackage', 'myvendor', 'mypackage'],
             [$this->vendorStudly(), $this->packageStudly(), strtolower($this->vendor()), strtolower($this->package())],
         ];
 
-        $rewrites = require ($manifest === null) ? [
-            'src/MyPackage.php' => 'src/:uc:package.php',
-            'config/mypackage.php' => 'config/:lc:package.php',
-            'src/Facades/MyPackage.php' => 'src/Facades/:uc:package.php',
-            'src/MyPackageServiceProvider.php' => 'src/:uc:packageServiceProvider.php',
-        ] : $manifest;
-
-        foreach ($rewrites as $file => $name) {
-            $filename = str_replace($bindings[0], $bindings[1], $name);
-            rename($this->packagePath().'/'.$file, $this->packagePath().'/'.$filename);
+        $files = new RecursiveDirectoryIterator($this->packagePath());
+        foreach (new RecursiveIteratorIterator($files) as $file) {
+            if (! $file->isFile()) {
+                continue;
+            }
+            $replaced = str_replace($bindings[0], $bindings[1], $file->getFilename());
+            if ($replaced === $file->getFilename()) {
+                continue;
+            }
+            rename($file->getPath().'/'.$file->getFilename(), $file->getPath().'/'.$replaced);
         }
     }
 
