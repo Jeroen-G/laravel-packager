@@ -1,8 +1,6 @@
 language: php
 
 php:
-  - 7.2
-  - 7.3
   - 7.4
   - nightly
 
@@ -14,6 +12,7 @@ env:
   - TESTBENCH_VERSION=3.8.* STABILITY=stable
   - TESTBENCH_VERSION=4.* STABILITY=stable
   - TESTBENCH_VERSION=5.* STABILITY=stable
+  - TESTBENCH_VERSION=6.* STABILITY=stable
 
 matrix:
 
@@ -29,7 +28,3 @@ before_script:
 
 script:
   - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
-
-after_script:
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
