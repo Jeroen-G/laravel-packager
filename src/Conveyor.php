@@ -4,33 +4,24 @@ namespace JeroenG\Packager;
 
 use Illuminate\Support\Str;
 use RuntimeException;
+use Symfony\Component\Process\Process;
 
 class Conveyor
 {
     use FileHandler;
 
-    /**
-     * Package vendor namespace.
-     *
-     * @var string
-     */
-    protected $vendor;
+    protected string $vendor;
 
-    /**
-     * Package name.
-     *
-     * @var string
-     */
-    protected $package;
+    protected string $package;
 
     /**
      * Set or get the package vendor namespace.
      *
-     * @param string $vendor
+     * @param string|null $vendor
      *
      * @return string|RuntimeException
      */
-    public function vendor($vendor = null)
+    public function vendor(?string $vendor = null)
     {
         if ($vendor !== null) {
             return $this->vendor = $vendor;
@@ -55,11 +46,11 @@ class Conveyor
     /**
      * Set or get the package name.
      *
-     * @param string $package
+     * @param string|null $package
      *
      * @return string|RuntimeException
      */
-    public function package($package = null)
+    public function package(?string $package = null)
     {
         if ($package !== null) {
             return $this->package = $package;
@@ -83,8 +74,9 @@ class Conveyor
 
     /**
      * Download the skeleton package.
+     * @param string|null $skeletonArchiveUrl
      */
-    public function downloadSkeleton($skeletonArchiveUrl = null)
+    public function downloadSkeleton(?string $skeletonArchiveUrl = null): void
     {
         $skeletonArchiveUrl = $skeletonArchiveUrl ?? config('packager.skeleton');
         $extension = $this->getArchiveExtension($skeletonArchiveUrl);
@@ -106,9 +98,10 @@ class Conveyor
      * Download the package from Github.
      *
      * @param string $origin The Github URL
+     * @param string $piece
      * @param string $branch The branch to download
      */
-    public function downloadFromGithub($origin, $piece, $branch)
+    public function downloadFromGithub(string $origin, string $piece, string $branch): void
     {
         $this->download($zipFile = $this->makeFilename(), $origin)
             ->extract($zipFile, $this->vendorPath())
@@ -120,24 +113,24 @@ class Conveyor
     /**
      * Dump Composer's autoloads.
      */
-    public function dumpAutoloads()
+    public function dumpAutoloads(): void
     {
         shell_exec('composer dump-autoload');
     }
 
-    public function installPackage()
+    public function installPackage(): void
     {
         $this->addPathRepository();
         $this->requirePackage();
     }
 
-    public function uninstallPackage()
+    public function uninstallPackage(): void
     {
         $this->removePackage();
         $this->removePathRepository();
     }
 
-    public function addPathRepository()
+    public function addPathRepository(): bool
     {
         $params = json_encode([
             'type' => 'path',
@@ -145,7 +138,7 @@ class Conveyor
             'options' => [
                 'symlink' => true,
             ],
-        ]);
+        ], JSON_THROW_ON_ERROR);
         $command = [
             'composer',
             'config',
@@ -158,7 +151,7 @@ class Conveyor
         return $this->runProcess($command);
     }
 
-    public function removePathRepository()
+    public function removePathRepository(): bool
     {
         return $this->runProcess([
             'composer',
@@ -168,7 +161,7 @@ class Conveyor
         ]);
     }
 
-    public function requirePackage()
+    public function requirePackage(): bool
     {
         return $this->runProcess([
             'composer',
@@ -177,7 +170,7 @@ class Conveyor
         ]);
     }
 
-    public function removePackage()
+    public function removePackage(): bool
     {
         return $this->runProcess([
             'composer',
@@ -187,11 +180,12 @@ class Conveyor
     }
 
     /**
+     * @param array $command
      * @return bool
      */
-    protected function runProcess(array $command)
+    protected function runProcess(array $command): bool
     {
-        $process = new \Symfony\Component\Process\Process($command, base_path());
+        $process = new Process($command, base_path());
         $process->setTimeout(config('packager.timeout'));
         $process->run();
 

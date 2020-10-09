@@ -2,6 +2,11 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 3
+
+### Updated
+- Bump PHP version to 7.4
+
 ## Version 2.6
 
 ### Added

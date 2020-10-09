@@ -16,35 +16,20 @@ class RemovePackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     * @var string
-     */
     protected $signature = 'packager:remove {vendor} {name?}';
 
-    /**
-     * The console command description.
-     * @var string
-     */
     protected $description = 'Remove an existing package.';
 
     /**
      * Packages roll off of the conveyor.
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
     /**
      * Packages are packed in wrappings to personalise them.
-     * @var object \JeroenG\Packager\Wrapping
      */
-    protected $wrapping;
+    protected Wrapping $wrapping;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct(Conveyor $conveyor, Wrapping $wrapping)
     {
         parent::__construct();
@@ -52,12 +37,7 @@ class RemovePackage extends Command
         $this->wrapping = $wrapping;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
         // Start the progress bar
         $this->startProgressBar(4);
@@ -65,7 +45,7 @@ class RemovePackage extends Command
         $vendor = $this->argument('vendor');
         $name = $this->argument('name');
 
-        if (strstr($vendor, '/')) {
+        if (strpos($vendor, '/') !== false) {
             [$vendor, $name] = explode('/', $vendor);
         }
 

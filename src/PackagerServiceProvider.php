@@ -2,8 +2,17 @@
 
 namespace JeroenG\Packager;
 
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\ServiceProvider;
+use JeroenG\Packager\Commands\CheckPackage;
+use JeroenG\Packager\Commands\DisablePackage;
+use JeroenG\Packager\Commands\EnablePackage;
+use JeroenG\Packager\Commands\GetPackage;
+use JeroenG\Packager\Commands\GitPackage;
+use JeroenG\Packager\Commands\ListPackages;
+use JeroenG\Packager\Commands\MoveTests;
+use JeroenG\Packager\Commands\NewPackage;
+use JeroenG\Packager\Commands\PublishPackage;
+use JeroenG\Packager\Commands\RemovePackage;
 
 /**
  * This is the service provider.
@@ -15,39 +24,27 @@ use Illuminate\Support\ServiceProvider;
  **/
 class PackagerServiceProvider extends ServiceProvider
 {
-    /**
-     * The console commands.
-     *
-     * @var bool
-     */
-    protected $commands = [
-        'JeroenG\Packager\Commands\NewPackage',
-        'JeroenG\Packager\Commands\RemovePackage',
-        'JeroenG\Packager\Commands\GetPackage',
-        'JeroenG\Packager\Commands\GitPackage',
-        'JeroenG\Packager\Commands\ListPackages',
-        'JeroenG\Packager\Commands\MoveTests',
-        'JeroenG\Packager\Commands\CheckPackage',
-        'JeroenG\Packager\Commands\PublishPackage',
-        'JeroenG\Packager\Commands\EnablePackage',
-        'JeroenG\Packager\Commands\DisablePackage',
+    protected array $commands = [
+        NewPackage::class,
+        RemovePackage::class,
+        GetPackage::class,
+        GitPackage::class,
+        ListPackages::class,
+        MoveTests::class,
+        CheckPackage::class,
+        PublishPackage::class,
+        EnablePackage::class,
+        DisablePackage::class,
     ];
 
-    /**
-     * Bootstrap the application events.
-     * @throws BindingResolutionException
-     */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
             __DIR__.'/../config/packager.php' => config_path('packager.php'),
         ]);
     }
 
-    /**
-     * Register the command.
-     */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/packager.php', 'packager');
 

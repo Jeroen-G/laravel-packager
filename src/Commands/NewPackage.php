@@ -19,35 +19,20 @@ class NewPackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     * @var string
-     */
     protected $signature = 'packager:new {vendor?} {name?} {--i} {--skeleton=}';
 
-    /**
-     * The console command description.
-     * @var string
-     */
     protected $description = 'Create a new package.';
 
     /**
      * Packages roll off of the conveyor.
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
     /**
      * Packages are packed in wrappings to personalise them.
-     * @var object \JeroenG\Packager\Wrapping
      */
-    protected $wrapping;
+    protected Wrapping $wrapping;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct(Conveyor $conveyor, Wrapping $wrapping)
     {
         parent::__construct();
@@ -55,12 +40,7 @@ class NewPackage extends Command
         $this->wrapping = $wrapping;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): ?int
     {
         // Start the progress bar
         $this->startProgressBar(6);
@@ -68,7 +48,7 @@ class NewPackage extends Command
         $vendor = $this->argument('vendor');
         $name = $this->argument('name');
 
-        if (strstr($vendor, '/')) {
+        if (strpos($vendor, '/') !== false) {
             [$vendor, $name] = explode('/', $vendor);
         }
 
@@ -110,10 +90,10 @@ class NewPackage extends Command
         if ($this->option('i')) {
             $this->conveyor->downloadSkeleton($this->ask('What package skeleton would you like to use?', $this->option('skeleton') ?? config('packager.skeleton')));
         } else {
-            $this->conveyor->downloadSkeleton($this->option('skeleton') ?? null);
+            $this->conveyor->downloadSkeleton($this->option('skeleton'));
         }
         $manifest = (file_exists($this->conveyor->packagePath().'/rewriteRules.php')) ? $this->conveyor->packagePath().'/rewriteRules.php' : null;
-        $this->conveyor->renameFiles($manifest);
+        $this->conveyor->renameFiles();
         $this->makeProgress();
 
         // Replacing skeleton placeholders
@@ -171,7 +151,7 @@ class NewPackage extends Command
      *
      * @return void
      */
-    protected function interactiveReplace()
+    protected function interactiveReplace(): void
     {
         $author = $this->ask('Who is the author?', config('packager.author_name'));
         $authorEmail = $this->ask('What is the author\'s e-mail?', config('packager.author_email'));
@@ -194,7 +174,7 @@ class NewPackage extends Command
         ]);
     }
 
-    private function validateInput(string $vendor, string $name)
+    private function validateInput(string $vendor, string $name): ValidatorInterface
     {
         return Validator::make(compact('vendor', 'name'), [
             'vendor' => new ValidClassName,
@@ -202,7 +182,7 @@ class NewPackage extends Command
         ]);
     }
 
-    private function showErrors(ValidatorInterface $validator)
+    private function showErrors(ValidatorInterface $validator): void
     {
         $this->info('Package was not created. Please choose a valid name.');
 

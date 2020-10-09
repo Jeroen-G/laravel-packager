@@ -17,38 +17,23 @@ class GitPackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     * @var string
-     */
     protected $signature = 'packager:git
                             {url : The url of the git repository}
                             {vendor? : The vendor part of the namespace}
                             {name? : The name of package for the namespace}';
 
-    /**
-     * The console command description.
-     * @var string
-     */
     protected $description = 'Retrieve an existing package with git.';
 
     /**
      * Packages roll off of the conveyor.
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
     /**
      * Packages are packed in wrappings to personalise them.
-     * @var object \JeroenG\Packager\Wrapping
      */
-    protected $wrapping;
+    protected Wrapping $wrapping;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct(Conveyor $conveyor, Wrapping $wrapping)
     {
         parent::__construct();
@@ -56,19 +41,14 @@ class GitPackage extends Command
         $this->wrapping = $wrapping;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
         // Start the progress bar
         $this->startProgressBar(4);
 
         // Common variables
         $source = $this->argument('url');
-        $origin = rtrim(strtolower($source), '/');
+        $origin = strtolower(rtrim($source, '/'));
 
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->setGitVendorAndPackage($origin);
@@ -90,7 +70,7 @@ class GitPackage extends Command
         $this->info('Cloning repository...');
         exec("git clone -q $source ".$this->conveyor->packagePath(), $output, $exit_code);
 
-        if ($exit_code != 0) {
+        if ($exit_code !== 0) {
             $this->error('Unable to clone repository');
             $this->warn('Please check credentials and try again');
 
@@ -112,7 +92,7 @@ class GitPackage extends Command
         $this->finishProgress('Package cloned successfully!');
     }
 
-    protected function setGitVendorAndPackage($origin)
+    protected function setGitVendorAndPackage($origin): void
     {
         $pieces = explode('/', $origin);
 

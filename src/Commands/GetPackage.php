@@ -16,10 +16,6 @@ class GetPackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     * @var string
-     */
     protected $signature = 'packager:get
                             {url : The url of the repository}
                             {vendor? : The vendor part of the namespace}
@@ -27,29 +23,18 @@ class GetPackage extends Command
                             {--host=github : Download from github or bitbucket?}
                             {--branch=master : The branch to download}';
 
-    /**
-     * The console command description.
-     * @var string
-     */
     protected $description = 'Retrieve an existing package from Github or Bitbucket.';
 
     /**
      * Packages roll off of the conveyor.
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
     /**
      * Packages are packed in wrappings to personalise them.
-     * @var object \JeroenG\Packager\Wrapping
      */
-    protected $wrapping;
+    protected Wrapping $wrapping;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct(Conveyor $conveyor, Wrapping $wrapping)
     {
         parent::__construct();
@@ -57,21 +42,16 @@ class GetPackage extends Command
         $this->wrapping = $wrapping;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
         // Start the progress bar
         $this->startProgressBar(4);
 
         // Common variables
-        if ($this->option('host') == 'bitbucket') {
-            $origin = rtrim(strtolower($this->argument('url')), '/').'/branch/'.$this->option('branch').'.zip';
+        if ($this->option('host') === 'bitbucket') {
+            $origin = strtolower(rtrim($this->argument('url'), '/')).'/branch/'.$this->option('branch').'.zip';
         } else {
-            $origin = rtrim(strtolower($this->argument('url')), '/').'/archive/'.$this->option('branch').'.zip';
+            $origin = strtolower(rtrim($this->argument('url'), '/')).'/archive/'.$this->option('branch').'.zip';
         }
         $pieces = explode('/', $origin);
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
@@ -98,7 +78,7 @@ class GetPackage extends Command
         $this->makeProgress();
 
         // Get the repo from Github or Bitbucket
-        if ($this->option('host') == ' bitbucket') {
+        if ($this->option('host') === ' bitbucket') {
             $this->info('Downloading from Bitbucket...');
             $this->conveyor->downloadFromBitbucket($origin, $pieces[4], $this->option('branch'));
         } else {
