@@ -16,37 +16,20 @@ class EnablePackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'packager:enable {vendor} {name}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Add a package to composer.json and the providers config.';
 
     /**
      * Packages roll off of the conveyor.
-     *
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
     /**
      * Packages are packed in wrappings to personalise them.
-     *
-     * @var object \JeroenG\Packager\Wrapping
      */
-    protected $wrapping;
+    protected Wrapping $wrapping;
 
-    /**
-     * Create a new command instance.
-     */
     public function __construct(Conveyor $conveyor, Wrapping $wrapping)
     {
         parent::__construct();
@@ -54,12 +37,7 @@ class EnablePackage extends Command
         $this->wrapping = $wrapping;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
         // Start the progress bar
         $this->startProgressBar(2);

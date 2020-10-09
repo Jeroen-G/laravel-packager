@@ -15,44 +15,25 @@ class PublishPackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     * @var string
-     */
     protected $signature = 'packager:publish
                             {vendor : The vendor part of the namespace}
                             {name : The name of package for the namespace}
                             {url : The url of the Github repository}';
 
-    /**
-     * The console command description.
-     * @var string
-     */
     protected $description = 'Publish your package to Github with git.';
 
     /**
      * Packages roll off of the conveyor.
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct(Conveyor $conveyor)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
         // Start the progress bar
         $this->startProgressBar(5);

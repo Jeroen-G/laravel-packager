@@ -15,7 +15,7 @@ trait FileHandler
      *
      * @return string $path
      */
-    public function packagesPath()
+    public function packagesPath(): string
     {
         return base_path('packages');
     }
@@ -25,7 +25,7 @@ trait FileHandler
      *
      * @return string $path
      */
-    public function vendorPath()
+    public function vendorPath(): string
     {
         return $this->packagesPath().'/'.$this->vendor();
     }
@@ -35,7 +35,7 @@ trait FileHandler
      *
      * @return string $path
      */
-    public function tempPath()
+    public function tempPath(): string
     {
         return $this->vendorPath().'/temp';
     }
@@ -45,7 +45,7 @@ trait FileHandler
      *
      * @return string $path
      */
-    public function packagePath()
+    public function packagePath(): string
     {
         return $this->vendorPath().'/'.$this->package();
     }
@@ -57,9 +57,9 @@ trait FileHandler
      *
      * @return string
      */
-    public function makeFilename($extension = 'zip')
+    public function makeFilename($extension = 'zip'): string
     {
-        return getcwd().'/package'.md5(time().uniqid()).'.'.$extension;
+        return getcwd().'/package'.md5(time().uniqid('', true)).'.'.$extension;
     }
 
     /**
@@ -67,7 +67,7 @@ trait FileHandler
      *
      * @return void    Throws error if package exists, aborts process
      */
-    public function checkIfPackageExists()
+    public function checkIfPackageExists(): void
     {
         if (is_dir($this->packagePath())) {
             throw new RuntimeException('Package already exists');
@@ -77,10 +77,10 @@ trait FileHandler
     /**
      * Create a directory if it doesn't exist.
      *
-     * @param  string $path Path of the directory to make
+     * @param string $path Path of the directory to make
      * @return bool
      */
-    public function makeDir($path)
+    public function makeDir(string $path): bool
     {
         if (! is_dir($path)) {
             return mkdir($path, 0777, true);
@@ -92,12 +92,12 @@ trait FileHandler
     /**
      * Remove a directory if it exists.
      *
-     * @param  string $path Path of the directory to remove.
+     * @param string $path Path of the directory to remove.
      * @return bool
      */
-    public function removeDir($path)
+    public function removeDir(string $path): bool
     {
-        if ($path == 'packages' || $path == '/') {
+        if ($path === 'packages' || $path === '/') {
             return false;
         }
 
@@ -117,11 +117,11 @@ trait FileHandler
     /**
      * Download the archive to the given file by url.
      *
-     * @param  string  $filePath
-     * @param  string  $sourceFileUrl
+     * @param string $filePath
+     * @param string $sourceFileUrl
      * @return $this
      */
-    public function download($filePath, $sourceFileUrl)
+    public function download(string $filePath, string $sourceFileUrl): self
     {
         $client = new Client(['verify' => config('packager.curl_verify_cert')]);
         $response = $client->get($sourceFileUrl);
@@ -137,7 +137,7 @@ trait FileHandler
      * @param string $directory
      * @return $this
      */
-    public function extract($archiveFilePath, $directory)
+    public function extract(string $archiveFilePath, string $directory): self
     {
         $extension = $this->getArchiveExtension($archiveFilePath);
         $extractorManager = new Manager();
@@ -150,10 +150,10 @@ trait FileHandler
     /**
      * Remove the archive.
      *
-     * @param  string  $pathToArchive
+     * @param string $pathToArchive
      * @return $this
      */
-    public function cleanUp($pathToArchive)
+    public function cleanUp(string $pathToArchive): self
     {
         @chmod($pathToArchive, 0777);
         @unlink($pathToArchive);
@@ -164,10 +164,9 @@ trait FileHandler
     /**
      * Rename generic files to package-specific ones.
      *
-     * @param array|null $manifest
      * @return void
-     **/
-    public function renameFiles($manifest = null)
+     */
+    public function renameFiles(): void
     {
         $bindings = [
             ['MyVendor', 'MyPackage', 'myvendor', 'mypackage'],
@@ -190,7 +189,7 @@ trait FileHandler
     /**
      * Remove the rules files if present.
      */
-    public function cleanUpRules()
+    public function cleanUpRules(): void
     {
         $ruleFiles = ['rules.php', 'rewriteRules.php'];
 
@@ -208,7 +207,7 @@ trait FileHandler
      *
      * @return string
      */
-    protected function getArchiveExtension($archiveFilePath): string
+    protected function getArchiveExtension(string $archiveFilePath): string
     {
         $pathParts = pathinfo($archiveFilePath);
         $extension = $pathParts['extension'];

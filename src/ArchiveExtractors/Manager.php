@@ -8,7 +8,7 @@ use InvalidArgumentException;
 final class Manager
 {
     /** @var Extractor[] */
-    protected $extractorsMap = [];
+    protected array $extractorsMap = [];
 
     public function __construct()
     {
