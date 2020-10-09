@@ -3,9 +3,9 @@
 namespace JeroenG\Packager;
 
 use GuzzleHttp\Client;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 use JeroenG\Packager\ArchiveExtractors\Manager;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use RuntimeException;
 
 trait FileHandler

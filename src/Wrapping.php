@@ -2,8 +2,8 @@
 
 namespace JeroenG\Packager;
 
-use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class Wrapping
 {
