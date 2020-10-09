@@ -3,8 +3,11 @@
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Validation\Validator as ValidatorInterface;
+use Illuminate\Support\Facades\Validator;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\ProgressBar;
+use JeroenG\Packager\ValidationRules\ValidClassName;
 use JeroenG\Packager\Wrapping;
 
 /**
@@ -20,7 +23,7 @@ class NewPackage extends Command
      * The name and signature of the console command.
      * @var string
      */
-    protected $signature = 'packager:new {vendor} {name?} {--i} {--skeleton=}';
+    protected $signature = 'packager:new {vendor?} {name?} {--i} {--skeleton=}';
 
     /**
      * The console command description.
@@ -78,6 +81,15 @@ class NewPackage extends Command
         } else {
             $this->conveyor->vendor($vendor);
             $this->conveyor->package($name);
+        }
+
+        // Validate the vendor and package names
+        $validator = $this->validateInput($this->conveyor->vendor(), $this->conveyor->package());
+
+        if ($validator->fails()) {
+            $this->showErrors($validator);
+
+            return 1;
         }
 
         // Start creating the package
@@ -182,5 +194,22 @@ class NewPackage extends Command
             $description,
             $license,
         ]);
+    }
+
+    private function validateInput(string $vendor, string $name)
+    {
+        return Validator::make(compact('vendor', 'name'), [
+            'vendor' => new ValidClassName,
+            'name' => new ValidClassName,
+        ]);
+    }
+
+    private function showErrors(ValidatorInterface $validator)
+    {
+        $this->info('Package was not created. Please choose a valid name.');
+
+        foreach ($validator->errors()->all() as $error) {
+            $this->error($error);
+        }
     }
 }

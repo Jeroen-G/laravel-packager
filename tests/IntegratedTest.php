@@ -32,6 +32,42 @@ class IntegratedTest extends TestCase
         $this->assertTrue(is_file(base_path('packages/my-vendor/my-package/src/MyPackageServiceProvider.php')));
     }
 
+    public function test_new_package_name_should_be_valid()
+    {
+        Artisan::call('packager:new', ['vendor' => 'my-vendor', 'name' => '1234-Invalid']);
+        $this->seeInConsoleOutput('Package was not created. Please choose a valid name.');
+        $this->assertFalse(is_file(base_path('packages/my-vendor/4-Invalid/src/1234InvalidServiceProvider.php')));
+    }
+
+    public function test_new_package_name_in_interactive_mode_should_be_valid()
+    {
+        $this->artisan('packager:new', ['--i' => true])
+            ->expectsQuestion('What will be the vendor name?', 'my-vendor')
+            ->expectsQuestion('What will be the package name?', '1234-Invalid')
+            ->expectsOutput('Package was not created. Please choose a valid name.')
+            ->assertExitCode(1);
+
+        $this->assertFalse(is_file(base_path('packages/my-vendor/4-Invalid/src/1234InvalidServiceProvider.php')));
+    }
+
+    public function test_new_package_vendor_name_should_be_valid()
+    {
+        Artisan::call('packager:new', ['vendor' => '1234-invalid', 'name' => 'my-package']);
+        $this->seeInConsoleOutput('Package was not created. Please choose a valid name.');
+        $this->assertFalse(is_file(base_path('packages/1234-invalid/my-package/src/MyPackageServiceProvider.php')));
+    }
+
+    public function test_new_package_vendor_name_in_interactive_mode_should_be_valid()
+    {
+        $this->artisan('packager:new', ['--i' => true])
+            ->expectsQuestion('What will be the vendor name?', '1234-invalid')
+            ->expectsQuestion('What will be the package name?', 'my-package')
+            ->expectsOutput('Package was not created. Please choose a valid name.')
+            ->assertExitCode(1);
+
+        $this->assertFalse(is_file(base_path('packages/my-vendor/4-Invalid/src/1234InvalidServiceProvider.php')));
+    }
+
     public function test_new_package_is_installed_from_custom_skeleton()
     {
         Artisan::call('packager:new', [
