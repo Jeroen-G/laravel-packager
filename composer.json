@@ -40,6 +40,12 @@
     "suggest": {
         "sensiolabs/security-checker": "Required to use the security check command"
     },
+    "scripts": {
+        "test": "vendor/bin/phpunit --no-coverage",
+        "test-f": "vendor/bin/phpunit --no-coverage --filter",
+        "test-coverage": "vendor/bin/phpunit",
+        "test-coverage-f": "vendor/bin/phpunit --filter"
+    },
     "extra": {
         "laravel": {
             "providers": [
