@@ -7,7 +7,6 @@ use RecursiveIteratorIterator;
 
 class Wrapping
 {
-
     public array $placeholders = [];
 
     public array $replacements = [];

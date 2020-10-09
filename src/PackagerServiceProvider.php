@@ -2,18 +2,17 @@
 
 namespace JeroenG\Packager;
 
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\ServiceProvider;
-use JeroenG\Packager\Commands\GitPackage;
-use JeroenG\Packager\Commands\NewPackage;
-use JeroenG\Packager\Commands\RemovePackage;
-use JeroenG\Packager\Commands\GetPackage;
+use JeroenG\Packager\Commands\CheckPackage;
 use JeroenG\Packager\Commands\DisablePackage;
 use JeroenG\Packager\Commands\EnablePackage;
-use JeroenG\Packager\Commands\PublishPackage;
-use JeroenG\Packager\Commands\CheckPackage;
-use JeroenG\Packager\Commands\MoveTests;
+use JeroenG\Packager\Commands\GetPackage;
+use JeroenG\Packager\Commands\GitPackage;
 use JeroenG\Packager\Commands\ListPackages;
+use JeroenG\Packager\Commands\MoveTests;
+use JeroenG\Packager\Commands\NewPackage;
+use JeroenG\Packager\Commands\PublishPackage;
+use JeroenG\Packager\Commands\RemovePackage;
 
 /**
  * This is the service provider.
