@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^7.0",
+        "php": "^7.1",
         "ext-zip": "*",
         "ext-json": "*",
         "illuminate/support": "^5.0|^6.0|^7.0|^8.0",

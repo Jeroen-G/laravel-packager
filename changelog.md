@@ -2,6 +2,20 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.6
+
+### Added
+- The `timeout` configuration setting.
+- Composer scripts for testing this package. 
+- Use `vendor/package` definition in the remove command. 
+
+### Updated
+- replacing references in all files of a skeleton instead of only the hardcoded files.
+
+### Fixed
+- Not the whole package vendor is removed if there are still files left.
+- `symlink` option is set to true as default for repositories in `composer.json`
+
 ## Version 2.5
 
 ### Added
@@ -12,9 +26,7 @@ All Notable changes to Packager will be documented in this file.
 - `packager:new` and `packager:remove` now also supports separating vendor and name with a forward slash.
 
 ### Fixed
-- Fix deletion of vendor directory when not empty
 - `packager:new` now also supports separating vendor and name with a forward slash.
-- `symlink` option is set to true as default for repositories in `composer.json`
 - vendor-name and package-name not converted to StudlyCase with `packager:new`
 
 ## Version 2.4

@@ -4,7 +4,10 @@ Contributions are **welcome** via Pull Requests on [Github](https://github.com/J
 
 An interesting read is [Contributing to a Github Project](http://jasonlewis.me/article/contributing-to-a-github-project).
 
-Also try to code in the same style as Laravel (which followes the [PSR standard](http://www.php-fig.org/) guidelines). StyleCI is set up to fix any discrepancies.
+Also try to code in the same style as Laravel (which followes the [PSR standard](http://www.php-fig.org/) guidelines).
+StyleCI is set up to fix any discrepancies automatically!
+
+If you want to run the test suite of Laravel Packager, try out the `composer test` or `composer test-coverage` commands.
 
 ## Things To Do
 If you want to contribute but do not know where to start, this list provides some starting points.
