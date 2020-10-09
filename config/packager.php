@@ -18,7 +18,7 @@ return [
 
     /**
      * On slow connections, setting a larger timeout might help to finish downloading package files.
-     * Default: 60
+     * Default: 60.
      */
     'timeout' => '60',
 
