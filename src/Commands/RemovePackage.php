@@ -65,13 +65,10 @@ class RemovePackage extends Command
         $vendor = $this->argument('vendor');
         $name = $this->argument('name');
 
-        if (stripos($vendor, '/') > 0) {
-            $part = explode('/', $vendor);
-            $vendor = $part[0];
-            $name = $part[1];
+        if (strstr($vendor, '/')) {
+            [$vendor, $name] = explode('/', $vendor);
         }
 
-        // Defining vendor/package
         $this->conveyor->vendor($vendor);
         $this->conveyor->package($name);
 
@@ -91,8 +88,12 @@ class RemovePackage extends Command
 
         // Remove the vendor directory, if agreed to
         if ($this->confirm('Do you want to remove the vendor directory? [y|N]')) {
-            $this->info('removing vendor directory...');
-            $this->conveyor->removeDir($this->conveyor->vendorPath());
+            if (count(scandir($this->conveyor->vendorPath())) !== 2) {
+                $this->warn('vendor directory is not empty, continuing...');
+            } else {
+                $this->info('removing vendor directory...');
+                $this->conveyor->removeDir($this->conveyor->vendorPath());
+            }
         } else {
             $this->info('Continuing...');
         }

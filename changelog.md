@@ -9,10 +9,12 @@ All Notable changes to Packager will be documented in this file.
 
 ### Updated
 - Support for Laravel 7 and PHPUnit 9.
-- `packager:new` now also supports separating vendor and name with a forward slash.
-- `symlink` option is set to true as default for repositories in `composer.json`
+- `packager:new` and `packager:remove` now also supports separating vendor and name with a forward slash.
 
 ### Fixed
+- Fix deletion of vendor directory when not empty
+- `packager:new` now also supports separating vendor and name with a forward slash.
+- `symlink` option is set to true as default for repositories in `composer.json`
 - vendor-name and package-name not converted to StudlyCase with `packager:new`
 
 ## Version 2.4
