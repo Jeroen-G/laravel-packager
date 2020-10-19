@@ -2,7 +2,7 @@
 
 All Notable changes to Packager will be documented in this file.
 
-## Version 2.6
+## Version 2.7
 
 ### Updated
 - `packager:get` and `packager:git` can now use other hosting solutions, including personal hosting
@@ -10,8 +10,21 @@ All Notable changes to Packager will be documented in this file.
 - packages folder path is configurable
 
 ### Fixed
-- run process timeout set to 300 (avoid long composer require timeout error)
 - progress bar buffering
+
+## Version 2.6
+
+### Added
+- The `timeout` configuration setting.
+- Composer scripts for testing this package. 
+- Use `vendor/package` definition in the remove command. 
+
+### Updated
+- replacing references in all files of a skeleton instead of only the hardcoded files.
+
+### Fixed
+- Not the whole package vendor is removed if there are still files left.
+- `symlink` option is set to true as default for repositories in `composer.json`
 
 ## Version 2.5
 
@@ -20,8 +33,11 @@ All Notable changes to Packager will be documented in this file.
 
 ### Updated
 - Support for Laravel 7 and PHPUnit 9.
+- `packager:new` and `packager:remove` now also supports separating vendor and name with a forward slash.
+
+### Fixed
 - `packager:new` now also supports separating vendor and name with a forward slash.
-- `symlink` option is set to true as default for repositories in `composer.json`
+- vendor-name and package-name not converted to StudlyCase with `packager:new`
 
 ## Version 2.4
 

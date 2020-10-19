@@ -20,6 +20,12 @@ return [
      */
     'curl_verify_cert' => env('CURL_VERIFY', true),
 
+    /**
+     * On slow connections, setting a larger timeout might help to finish downloading package files.
+     * Default: 60.
+     */
+    'timeout' => '60',
+
     /*
      * You can set defaults for the following placeholders.
      */

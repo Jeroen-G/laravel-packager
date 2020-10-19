@@ -44,6 +44,16 @@ class Conveyor
     }
 
     /**
+     * Get the vendor name converted to StudlyCase.
+     *
+     * @return string|RuntimeException
+     */
+    public function vendorStudly()
+    {
+        return Str::studly($this->vendor());
+    }
+
+    /**
      * Set or get the package name.
      *
      * @param string $package
@@ -60,6 +70,16 @@ class Conveyor
         }
 
         return $this->package;
+    }
+
+    /**
+     * Get the package name converted to StudlyCase.
+     *
+     * @return string|RuntimeException
+     */
+    public function packageStudly()
+    {
+        return Str::studly($this->package());
     }
 
     /**
@@ -173,7 +193,7 @@ class Conveyor
     protected function runProcess(array $command)
     {
         $process = new Process($command, base_path());
-        $process->setTimeout(300);
+        $process->setTimeout(config('packager.timeout'));
         $process->run();
 
         return $process->getExitCode() === 0;
