@@ -2,6 +2,16 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.7
+
+### Updated
+- `packager:get` and `packager:git` can now use other hosting solutions, including personal hosting
+- `packager:get` and `packager:git` can get source url from packagist
+- packages folder path is configurable
+
+### Fixed
+- progress bar buffering
+
 ## Version 2.6
 
 ### Added

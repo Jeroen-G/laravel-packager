@@ -67,21 +67,34 @@ The new package will be based on [this custom skeleton](https://github.com/jeroe
 ### Get & Git
 **Command:**
 ``` bash
+$ php artisan packager:get author/repository
+$ php artisan packager:git author/repository
 $ php artisan packager:get https://github.com/author/repository
 $ php artisan packager:git https://github.com/author/repository
 ```
 
+If you specify only the package name to get, `packager:get` and `packager:git` will ask packagist API to get the repository URL.
+
+If you specify the full URL instead of the package name, it will be directly used as the repository URL.
+This can be useful to get repository content from your personal hosting. To work with `packager:get`, you have to declare 
+the url template associated with your personal hosting domain in the configuration file to allow zip file download, 
+`packager:git` is not impacted.
+
 **Result:**
 This will register the package in the app's `composer.json` file.
-If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository. This also works with Bitbucket repositories, but you have to provide the flag `--host=bitbucket` for the `packager:get` command.
+If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository.
 
 **Options:**
+
 ```bash
-$ php artisan packager:get https://github.com/author/repository --branch=develop
+$ php artisan packager:git author/repository --branch=develop
 $ php artisan packager:get https://github.com/author/repository MyVendor MyPackage
 $ php artisan packager:git https://github.com/author/repository MyVendor MyPackage
 ```
-It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url.
+
+It is possible to specify a branch with the `--branch` option. 
+
+If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url.
 
 ### Tests
 **Command:**

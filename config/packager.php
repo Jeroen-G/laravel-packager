@@ -1,6 +1,10 @@
 <?php
 
 return [
+    /*
+     * You can set the default packages folder path.
+     */
+    'packages_path' => env('PACKAGES_PATH', base_path('packages')),
 
     /*
      * The following skeleton will be downloaded for each new package.
@@ -29,4 +33,12 @@ return [
     'author_email' => 'author email',
     'author_homepage' => 'author homepage',
     'license' => 'license',
+
+    /*
+     * For other public repositories. Enter the host and the associated url template
+     * to allow zip files to be downloaded.
+     */
+    'repositories' => [
+        //'personal.repo.com' => 'https://:host/:vendor/:name/archive/:branch.zip',
+    ],
 ];

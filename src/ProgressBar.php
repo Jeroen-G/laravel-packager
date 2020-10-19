@@ -44,6 +44,7 @@ trait ProgressBar
      */
     public function makeProgress()
     {
+        usleep(250 * 1000); // fix display buffering on slow computers
         $this->bar->advance();
     }
 

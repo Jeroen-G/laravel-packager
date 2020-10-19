@@ -4,6 +4,7 @@ namespace JeroenG\Packager;
 
 use Illuminate\Support\Str;
 use RuntimeException;
+use Symfony\Component\Process\Process;
 
 class Conveyor
 {
@@ -105,16 +106,16 @@ class Conveyor
     /**
      * Download the package from Github.
      *
-     * @param string $origin The Github URL
+     * @param PackageRepository $packageRepository Parsed URL
      * @param string $branch The branch to download
      */
-    public function downloadFromGithub($origin, $piece, $branch)
+    public function downloadZipFile(PackageRepository $packageRepository, $branch)
     {
-        $this->download($zipFile = $this->makeFilename(), $origin)
+        $this->download($zipFile = $this->makeFilename(), $packageRepository->getZipUrl($branch))
             ->extract($zipFile, $this->vendorPath())
             ->cleanUp($zipFile);
 
-        rename($this->vendorPath().'/'.$piece.'-'.$branch, $this->packagePath());
+        rename($this->vendorPath().'/'.$packageRepository->name.'-'.$branch, $this->packagePath());
     }
 
     /**
@@ -191,7 +192,7 @@ class Conveyor
      */
     protected function runProcess(array $command)
     {
-        $process = new \Symfony\Component\Process\Process($command, base_path());
+        $process = new Process($command, base_path());
         $process->setTimeout(config('packager.timeout'));
         $process->run();
 
