@@ -20,9 +20,9 @@ class IntegratedTest extends TestCase
 
         $this->seeInConsoleOutput('Package created successfully!');
 
-        // There's a problem here: the symlink in the vendor folder IS created when running 
+        // There's a problem here: the symlink in the vendor folder IS created when running
         // 'php artisan packager:new MyVendor MyPackage' from root, but it is NOT created
-        // when that's run as part of the tests. So this IS working for packager users, 
+        // when that's run as part of the tests. So this IS working for packager users,
         // but the test cannot confirm that.
         $this->markTestIncomplete();
         $this->assertTrue(is_link(base_path('vendor/myvendor/mypackage')));
