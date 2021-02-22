@@ -11,7 +11,7 @@ class IntegratedTest extends TestCase
         Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);
 
         $this->seeInConsoleOutput('Package created successfully!');
-        $this->assertTrue(is_link(base_path('vendor/myvendor/mypackage')));
+        $this->assertTrue(is_dir(base_path('packages/MyVendor/MyPackage')));
     }
 
     public function test_new_package_is_installed()
