@@ -123,11 +123,15 @@ class NewPackage extends Command
             ':uc:package',
             ':lc:vendor',
             ':lc:package',
+            ':kc:vendor',
+            ':kc:package',
         ], [
             $this->conveyor->vendorStudly(),
             $this->conveyor->packageStudly(),
             strtolower($this->conveyor->vendor()),
             strtolower($this->conveyor->package()),
+            $this->conveyor->vendorKebab(),
+            $this->conveyor->packageKebab(),
         ]);
 
         if ($this->option('i')) {
