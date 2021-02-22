@@ -101,7 +101,7 @@ class IntegratedTest extends TestCase
     public function test_get_existing_package_with_get()
     {
         Artisan::call('packager:get',
-            ['url' => 'https://github.com/Seldaek/monolog', 'vendor' => 'monolog', 'name' => 'monolog']);
+            ['url' => 'https://github.com/Seldaek/monolog', 'vendor' => 'monolog', 'name' => 'monolog', '--branch' => 'main']);
 
         $this->seeInConsoleOutput('Package downloaded successfully!');
         $this->assertTrue(is_link(base_path('vendor/monolog/monolog')));
