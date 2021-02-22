@@ -2,6 +2,11 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.7
+
+### Added
+- Allow kebab-case package and vendor names in skeletons (#135)
+
 ## Version 2.6
 
 ### Added
