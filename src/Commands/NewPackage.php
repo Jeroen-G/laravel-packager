@@ -65,8 +65,8 @@ class NewPackage extends Command
         // Start the progress bar
         $this->startProgressBar(6);
 
-        $vendor = $this->argument('vendor');
-        $name = $this->argument('name');
+        $vendor = $this->argument('vendor') ?? 'vendor-name';
+        $name = $this->argument('name') ?? 'package-name';
 
         if (strstr($vendor, '/')) {
             [$vendor, $name] = explode('/', $vendor);
