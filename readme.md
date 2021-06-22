@@ -41,7 +41,7 @@ $ php artisan vendor:publish --provider="JeroenG\Packager\PackagerServiceProvide
 ### New
 **Command:**
 ```bash
-$ php artisan packager:new MyVendor MyPackage
+$ php artisan packager:new my-vendor my-package
 ```
 
 **Result:**
@@ -49,13 +49,13 @@ The command will handle practically everything for you. It will create a package
 
 **Options:**
 ```bash
-$ php artisan packager:new MyVendor MyPackage --i
+$ php artisan packager:new my-vendor my-package --i
 $ php artisan packager:new --i
 ```
 The package will be created interactively, allowing to configure everything in the package's `composer.json`, such as the license and package description.
 
 ```bash
-$ php artisan packager:new MyVendor/MyPackage
+$ php artisan packager:new my-vendor/my-package
 ```
 Alternatively you may also define your vendor and name with a forward slash instead of a space.
 
@@ -78,8 +78,8 @@ If the `packager:git` command is used, the entire Git repository is cloned. If `
 **Options:**
 ```bash
 $ php artisan packager:get https://github.com/author/repository --branch=develop
-$ php artisan packager:get https://github.com/author/repository MyVendor MyPackage
-$ php artisan packager:git https://github.com/author/repository MyVendor MyPackage
+$ php artisan packager:get https://github.com/author/repository my-vendor my-package
+$ php artisan packager:git https://github.com/author/repository my-vendor my-package
 ```
 It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url.
 
@@ -100,7 +100,7 @@ Add the following to phpunit.xml (under the other testsuites) in order to run th
 
 **Options:**
 ```bash
-$ php artisan packager:tests MyVendor MyPackage
+$ php artisan packager:tests my-vendor my-package
 ```
 
 **Remarks:**
@@ -124,29 +124,29 @@ The packages are displayed with information on the git status (branch, commit di
 ### Remove
 **Command:**
 ```bash
-$ php artisan packager:remove MyVendor MyPackage
+$ php artisan packager:remove my-vendor my-package
 ```
 
 **Result:**
-The `MyVendor\MyPackage` package is deleted, including its references in `composer.json` and `config/app.php`.
+The `my-vendor\my-package` package is deleted, including its references in `composer.json` and `config/app.php`.
 
 ### Publish
 **Command:**
 ```bash
-$ php artisan packager:publish MyVendor MyPackage https://github.com/myvendor/mypackage
+$ php artisan packager:publish my-vendor my-package https://github.com/my-vendor/my-package
 ```
 
 **Result:**
-The `MyVendor\MyPackage` package will be published to Github using the provided url.
+The `my-vendor\my-package` package will be published to Github using the provided url.
 
 ### Check
 **Command:**
 ```bash
-$ php artisan packager:check MyVendor MyPackage
+$ php artisan packager:check my-vendor my-package
 ```
 
 **Result:**
-The `MyVendor\MyPackage` package will be checked for security vulnerabilities using SensioLabs security checker.
+The `my-vendor\my-package` package will be checked for security vulnerabilities using SensioLabs security checker.
 
 **Remarks**
 You first need to run
