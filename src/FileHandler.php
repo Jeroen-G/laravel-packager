@@ -53,8 +53,7 @@ trait FileHandler
     /**
      * Generate a random temporary filename for the package archive file.
      *
-     * @param string $extension
-     *
+     * @param  string  $extension
      * @return string
      */
     public function makeFilename($extension = 'zip')
@@ -65,7 +64,7 @@ trait FileHandler
     /**
      * Check if the package already exists.
      *
-     * @return void    Throws error if package exists, aborts process
+     * @return void Throws error if package exists, aborts process
      */
     public function checkIfPackageExists()
     {
@@ -77,7 +76,7 @@ trait FileHandler
     /**
      * Create a directory if it doesn't exist.
      *
-     * @param  string $path Path of the directory to make
+     * @param  string  $path  Path of the directory to make
      * @return bool
      */
     public function makeDir($path)
@@ -92,7 +91,7 @@ trait FileHandler
     /**
      * Remove a directory if it exists.
      *
-     * @param  string $path Path of the directory to remove.
+     * @param  string  $path  Path of the directory to remove.
      * @return bool
      */
     public function removeDir($path)
@@ -133,8 +132,8 @@ trait FileHandler
     /**
      * Extract the downloaded archive into the given directory.
      *
-     * @param string $archiveFilePath
-     * @param string $directory
+     * @param  string  $archiveFilePath
+     * @param  string  $directory
      * @return $this
      */
     public function extract($archiveFilePath, $directory)
@@ -164,7 +163,7 @@ trait FileHandler
     /**
      * Rename generic files to package-specific ones.
      *
-     * @param array|null $manifest
+     * @param  array|null  $manifest
      * @return void
      **/
     public function renameFiles($manifest = null)
@@ -204,8 +203,7 @@ trait FileHandler
     /**
      * Based on the extension a different archive extractor is used.
      *
-     * @param string $archiveFilePath
-     *
+     * @param  string  $archiveFilePath
      * @return string
      */
     protected function getArchiveExtension($archiveFilePath): string

@@ -9,12 +9,14 @@ class Wrapping
 {
     /**
      * Placeholders.
+     *
      * @var array
      */
     public $placeholders = [];
 
     /**
      * Replacements.
+     *
      * @var array
      */
     public $replacements = [];
@@ -23,7 +25,7 @@ class Wrapping
      * Open haystack, find and replace needles, save haystack.
      *
      * @param  string|array  $placeholder  String or array to look for (the needles)
-     * @param  string|array $replacement What to replace the needles for?
+     * @param  string|array  $replacement  What to replace the needles for?
      * @return $this
      */
     public function replace($placeholder, $replacement)
@@ -45,7 +47,7 @@ class Wrapping
     /**
      * Fill all placeholders with their replacements.
      *
-     * @param  string $path The directory of the files containing placeholders
+     * @param  string  $path  The directory of the files containing placeholders
      * @return void
      */
     public function fill($path)
@@ -63,8 +65,8 @@ class Wrapping
     /**
      * Fill placeholders in a single file.
      *
-     * @param  string $template     The file with the generic placeholders in it
-     * @param  string|null $destiniation    Where to save, defaults to $template
+     * @param  string  $template  The file with the generic placeholders in it
+     * @param  string|null  $destiniation  Where to save, defaults to $template
      * @return $this
      */
     public function fillInFile($template, $destination = null)
@@ -80,8 +82,8 @@ class Wrapping
     /**
      * Add the package to composer.json.
      *
-     * @param  string $vendor
-     * @param  string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return $this
      */
     public function addToComposer($vendor, $package)
@@ -96,8 +98,8 @@ class Wrapping
     /**
      * Remove the package from composer.json.
      *
-     * @param  string $vendor
-     * @param  string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return $this
      */
     public function removeFromComposer($vendor, $package)
@@ -109,8 +111,8 @@ class Wrapping
     /**
      * Add the package to the providers in config/app.php.
      *
-     * @param  string $vendor
-     * @param  string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return $this
      */
     public function addToProviders($vendor, $package)
@@ -129,8 +131,8 @@ class Wrapping
     /**
      * Remove the package from the providers in config/app.php.
      *
-     * @param  string $vendor
-     * @param  string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return $this
      */
     public function removeFromProviders($vendor, $package)
@@ -142,8 +144,8 @@ class Wrapping
     /**
      * Format vendor and package strings to camel case.
      *
-     * @param  string $vendor
-     * @param  string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return array
      */
     protected function formatVars($vendor, $package)

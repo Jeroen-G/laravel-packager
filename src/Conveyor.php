@@ -26,8 +26,7 @@ class Conveyor
     /**
      * Set or get the package vendor namespace.
      *
-     * @param string $vendor
-     *
+     * @param  string  $vendor
      * @return string|RuntimeException
      */
     public function vendor($vendor = null)
@@ -65,8 +64,7 @@ class Conveyor
     /**
      * Set or get the package name.
      *
-     * @param string $package
-     *
+     * @param  string  $package
      * @return string|RuntimeException
      */
     public function package($package = null)
@@ -125,8 +123,8 @@ class Conveyor
     /**
      * Download the package from Github.
      *
-     * @param string $origin The Github URL
-     * @param string $branch The branch to download
+     * @param  string  $origin  The Github URL
+     * @param  string  $branch  The branch to download
      */
     public function downloadFromGithub($origin, $piece, $branch)
     {

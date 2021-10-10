@@ -19,6 +19,7 @@ class GitPackage extends Command
 
     /**
      * The name and signature of the console command.
+     *
      * @var string
      */
     protected $signature = 'packager:git
@@ -28,18 +29,21 @@ class GitPackage extends Command
 
     /**
      * The console command description.
+     *
      * @var string
      */
     protected $description = 'Retrieve an existing package with git.';
 
     /**
      * Packages roll off of the conveyor.
+     *
      * @var object \JeroenG\Packager\Conveyor
      */
     protected $conveyor;
 
     /**
      * Packages are packed in wrappings to personalise them.
+     *
      * @var object \JeroenG\Packager\Wrapping
      */
     protected $wrapping;

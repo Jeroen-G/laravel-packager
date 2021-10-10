@@ -17,6 +17,7 @@ class PublishPackage extends Command
 
     /**
      * The name and signature of the console command.
+     *
      * @var string
      */
     protected $signature = 'packager:publish
@@ -26,12 +27,14 @@ class PublishPackage extends Command
 
     /**
      * The console command description.
+     *
      * @var string
      */
     protected $description = 'Publish your package to Github with git.';
 
     /**
      * Packages roll off of the conveyor.
+     *
      * @var object \JeroenG\Packager\Conveyor
      */
     protected $conveyor;

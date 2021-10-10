@@ -15,6 +15,7 @@ class ListPackages extends Command
 {
     /**
      * The name and signature of the console command.
+     *
      * @var string
      */
     protected $signature = 'packager:list
@@ -22,6 +23,7 @@ class ListPackages extends Command
 
     /**
      * The console command description.
+     *
      * @var string
      */
     protected $description = 'List all locally installed packages.';
@@ -67,7 +69,7 @@ class ListPackages extends Command
     /**
      * Render the list as a simple table.
      *
-     * @param array $packages
+     * @param  array  $packages
      */
     private function renderBasicTable(array $packages): void
     {
@@ -95,8 +97,7 @@ class ListPackages extends Command
     /**
      * If a package has a git history, add its status.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return array
      */
     private function getGitStatus(string $path): array
@@ -118,8 +119,7 @@ class ListPackages extends Command
      * It returns the difference in commits as a positive or negative integer.
      * A positive number means the local package is behind. Otherwise it is ahead.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return int
      */
     private function getCommitDifference(string $path): int
@@ -138,7 +138,6 @@ class ListPackages extends Command
      * Gets the branch name for a package.
      *
      * @param $path
-     *
      * @return string|null
      */
     private function getCurrentBranchForPackage($path): ?string

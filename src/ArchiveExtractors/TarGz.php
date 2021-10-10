@@ -21,7 +21,7 @@ class TarGz extends Extractor
     /**
      * Get the path to the tar within the gz folder.
      *
-     * @param string $pathToArchive
+     * @param  string  $pathToArchive
      * @return string
      */
     private function extractTarPathFromGz(string $pathToArchive): string

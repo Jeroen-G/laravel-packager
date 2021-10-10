@@ -15,12 +15,14 @@ class CheckPackage extends Command
 {
     /**
      * The name and signature of the console command.
+     *
      * @var string
      */
     protected $signature = 'packager:check {vendor} {name}';
 
     /**
      * The console command description.
+     *
      * @var string
      */
     protected $description = 'Check the composer.lock for security vulnerabilities.';
