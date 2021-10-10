@@ -4,6 +4,7 @@ php:
   - 7.2
   - 7.3
   - 7.4
+  - 8.0
   - nightly
 
 cache:
@@ -14,6 +15,8 @@ env:
   - TESTBENCH_VERSION=3.8.* STABILITY=stable
   - TESTBENCH_VERSION=4.* STABILITY=stable
   - TESTBENCH_VERSION=5.* STABILITY=stable
+  - TESTBENCH_VERSION=6.* STABILITY=stable
+  - TESTBENCH_VERSION=6.* STABILITY=stable
 
 matrix:
 
