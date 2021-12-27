@@ -86,7 +86,7 @@ class ListPackages extends Command
     {
         $gitPackages = [];
         foreach ($packages as $package) {
-            $gitPackages[] = array_merge($package, $this->getGitStatus($package[1]));
+            $gitPackages[] = array_merge($package, $this->getGitStatus('packages/' . $package[0] . '/' . $package[1]));
         }
 
         $headers = ['Package', 'Path', 'Commits behind', 'Branch'];
@@ -103,7 +103,7 @@ class ListPackages extends Command
     private function getGitStatus(string $path): array
     {
         if (file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
-            (new Process(['git fetch'], $path))->disableOutput()->run();
+            (new Process(['git', 'fetch'], $path))->disableOutput()->run();
 
             $commitDifference = $this->getCommitDifference($path);
             $branch = $this->getCurrentBranchForPackage($path);
@@ -126,7 +126,7 @@ class ListPackages extends Command
     {
         $commitDifference = 0;
 
-        (new Process(['git rev-list HEAD..origin --count'], $path))
+        (new Process(['git', 'rev-list', 'HEAD..origin', '--count'], $path))
             ->run(function ($type, $buffer) use (&$commitDifference) {
                 $commitDifference = str_replace(["\n", "\r"], '', $buffer);
             });
@@ -145,7 +145,7 @@ class ListPackages extends Command
         $branch = null;
 
         // This command lists all branches
-        (new Process(['git branch'], $path))
+        (new Process(['git', 'branch'], $path))
             ->run(function ($type, $buffer) use (&$branch) {
                 // The current branch is prefixed with an asterisk
                 if (Str::startsWith($buffer, '*')) {
