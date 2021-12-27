@@ -89,7 +89,7 @@ class ListPackages extends Command
             $gitPackages[] = array_merge($package, $this->getGitStatus('packages/' . $package[0] . '/' . $package[1]));
         }
 
-        $headers = ['Package', 'Path', 'Commits behind', 'Branch', 'Local Git Status'];
+        $headers = ['Package', 'Path', 'Commits behind', 'Branch'];
 
         $this->table($headers, $gitPackages);
     }
@@ -107,33 +107,11 @@ class ListPackages extends Command
 
             $commitDifference = $this->getCommitDifference($path);
             $branch = $this->getCurrentBranchForPackage($path);
-            $status = $this->getLocalGitStatusMessage($path);
 
-            return [$commitDifference, $branch, $status];
+            return [$commitDifference, $branch];
         }
 
-        return ['-', '-', '-'];
-    }
-
-    /**
-     * Output the local "git status" to check if there are any changed files lying around
-     * It returns the output as "colored" multiline-string.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    private function getLocalGitStatusMessage(string $path): string
-    {
-        $message = '';
-
-        (new Process(['git', 'status'], $path))
-            ->run(function ($type, $buffer) use (&$message) {
-                foreach (explode(PHP_EOL, $buffer) as $key => $value) {
-                    $message .= str_replace('modified:', "\033[31m" . ' modified:', trim($value)) . PHP_EOL;
-                }
-            });
-
-        return $message;
+        return ['-', '-'];
     }
 
     /**
