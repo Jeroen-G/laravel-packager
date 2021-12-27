@@ -86,10 +86,10 @@ class ListPackages extends Command
     {
         $gitPackages = [];
         foreach ($packages as $package) {
-            $gitPackages[] = array_merge($package, $this->getGitStatus($package[1]));
+            $gitPackages[] = array_merge($package, $this->getGitStatus('packages/' . $package[0] . '/' . $package[1]));
         }
 
-        $headers = ['Package', 'Path', 'Commits behind', 'Branch'];
+        $headers = ['Package', 'Path', 'Commits behind', 'Branch', 'Local Git Status'];
 
         $this->table($headers, $gitPackages);
     }
@@ -103,15 +103,37 @@ class ListPackages extends Command
     private function getGitStatus(string $path): array
     {
         if (file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
-            (new Process(['git fetch'], $path))->disableOutput()->run();
+            (new Process(['git', 'fetch'], $path))->disableOutput()->run();
 
             $commitDifference = $this->getCommitDifference($path);
             $branch = $this->getCurrentBranchForPackage($path);
+            $status = $this->getLocalGitStatusMessage($path);
 
-            return [$commitDifference, $branch];
+            return [$commitDifference, $branch, $status];
         }
 
-        return ['-', '-'];
+        return ['-', '-', '-'];
+    }
+
+    /**
+     * Output the local "git status" to check if there are any changed files lying around
+     * It returns the output as "colored" multiline-string.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    private function getLocalGitStatusMessage(string $path): string
+    {
+        $message = '';
+
+        (new Process(['git', 'status'], $path))
+            ->run(function ($type, $buffer) use (&$message) {
+                foreach (explode(PHP_EOL, $buffer) as $key => $value) {
+                    $message .= str_replace('modified:', "\033[31m" . ' modified:', trim($value)) . PHP_EOL;
+                }
+            });
+
+        return $message;
     }
 
     /**
@@ -126,7 +148,7 @@ class ListPackages extends Command
     {
         $commitDifference = 0;
 
-        (new Process(['git rev-list HEAD..origin --count'], $path))
+        (new Process(['git', 'rev-list', 'HEAD..origin', '--count'], $path))
             ->run(function ($type, $buffer) use (&$commitDifference) {
                 $commitDifference = str_replace(["\n", "\r"], '', $buffer);
             });
@@ -145,7 +167,7 @@ class ListPackages extends Command
         $branch = null;
 
         // This command lists all branches
-        (new Process(['git branch'], $path))
+        (new Process(['git', 'branch'], $path))
             ->run(function ($type, $buffer) use (&$branch) {
                 // The current branch is prefixed with an asterisk
                 if (Str::startsWith($buffer, '*')) {
