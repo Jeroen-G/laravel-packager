@@ -86,7 +86,7 @@ class ListPackages extends Command
     {
         $gitPackages = [];
         foreach ($packages as $package) {
-            $gitPackages[] = array_merge($package, $this->getGitStatus('packages/' . $package[0] . '/' . $package[1]));
+            $gitPackages[] = array_merge($package, $this->getGitStatus('packages/'.$package[0].'/'.$package[1]));
         }
 
         $headers = ['Package', 'Path', 'Commits behind', 'Branch'];
