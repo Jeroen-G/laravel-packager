@@ -53,8 +53,7 @@ trait FileHandler
     /**
      * Generate a random temporary filename for the package archive file.
      *
-     * @param string $extension
-     *
+     * @param  string  $extension
      * @return string
      */
     public function makeFilename($extension = 'zip'): string
@@ -65,7 +64,7 @@ trait FileHandler
     /**
      * Check if the package already exists.
      *
-     * @return void    Throws error if package exists, aborts process
+     * @return void Throws error if package exists, aborts process
      */
     public function checkIfPackageExists(): void
     {
@@ -133,8 +132,8 @@ trait FileHandler
     /**
      * Extract the downloaded archive into the given directory.
      *
-     * @param string $archiveFilePath
-     * @param string $directory
+     * @param  string  $archiveFilePath
+     * @param  string  $directory
      * @return $this
      */
     public function extract(string $archiveFilePath, string $directory): self
@@ -203,8 +202,7 @@ trait FileHandler
     /**
      * Based on the extension a different archive extractor is used.
      *
-     * @param string $archiveFilePath
-     *
+     * @param  string  $archiveFilePath
      * @return string
      */
     protected function getArchiveExtension(string $archiveFilePath): string

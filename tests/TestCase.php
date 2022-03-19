@@ -46,7 +46,6 @@ abstract class TestCase extends TestBench
      * Tell Testbench to use this package.
      *
      * @param $app
-     *
      * @return array
      */
     protected function getPackageProviders($app)

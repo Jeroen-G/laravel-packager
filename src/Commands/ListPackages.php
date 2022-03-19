@@ -54,7 +54,7 @@ class ListPackages extends Command
     /**
      * Render the list as a simple table.
      *
-     * @param array $packages
+     * @param  array  $packages
      */
     private function renderBasicTable(array $packages): void
     {
@@ -71,7 +71,7 @@ class ListPackages extends Command
     {
         $gitPackages = [];
         foreach ($packages as $package) {
-            $gitPackages[] = array_merge($package, $this->getGitStatus($package[1]));
+            $gitPackages[] = array_merge($package, $this->getGitStatus('packages/'.$package[0].'/'.$package[1]));
         }
 
         $headers = ['Package', 'Path', 'Commits behind', 'Branch'];
@@ -82,14 +82,13 @@ class ListPackages extends Command
     /**
      * If a package has a git history, add its status.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return array
      */
     private function getGitStatus(string $path): array
     {
         if (file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
-            (new Process(['git fetch'], $path))->disableOutput()->run();
+            (new Process(['git', 'fetch'], $path))->disableOutput()->run();
 
             $commitDifference = $this->getCommitDifference($path);
             $branch = $this->getCurrentBranchForPackage($path);
@@ -105,15 +104,14 @@ class ListPackages extends Command
      * It returns the difference in commits as a positive or negative integer.
      * A positive number means the local package is behind. Otherwise it is ahead.
      *
-     * @param string $path
-     *
+     * @param  string  $path
      * @return int
      */
     private function getCommitDifference(string $path): int
     {
         $commitDifference = 0;
 
-        (new Process(['git rev-list HEAD..origin --count'], $path))
+        (new Process(['git', 'rev-list', 'HEAD..origin', '--count'], $path))
             ->run(function ($type, $buffer) use (&$commitDifference) {
                 $commitDifference = str_replace(["\n", "\r"], '', $buffer);
             });
@@ -125,7 +123,6 @@ class ListPackages extends Command
      * Gets the branch name for a package.
      *
      * @param $path
-     *
      * @return string|null
      */
     private function getCurrentBranchForPackage($path): ?string
@@ -133,7 +130,7 @@ class ListPackages extends Command
         $branch = null;
 
         // This command lists all branches
-        (new Process(['git branch'], $path))
+        (new Process(['git', 'branch'], $path))
             ->run(function ($type, $buffer) use (&$branch) {
                 // The current branch is prefixed with an asterisk
                 if (Str::startsWith($buffer, '*')) {

@@ -18,9 +18,9 @@ final class Manager
     }
 
     /**
-     * @param string $archiveExtension
-     *
+     * @param  string  $archiveExtension
      * @return Extractor
+     *
      * @throws InvalidArgumentException
      */
     public function getExtractor(string $archiveExtension): Extractor
@@ -35,9 +35,8 @@ final class Manager
     }
 
     /**
-     * @param string $archiveExtension
-     * @param Extractor $instance
-     *
+     * @param  string  $archiveExtension
+     * @param  Extractor  $instance
      * @return self
      */
     public function addExtractor(string $archiveExtension, Extractor $instance): self

@@ -44,10 +44,19 @@ class Conveyor
     }
 
     /**
+     * Get the vendor name converted to kebab-case.
+     *
+     * @return string|RuntimeException
+     */
+    public function vendorKebab()
+    {
+        return Str::kebab($this->vendor());
+    }
+
+    /**
      * Set or get the package name.
      *
-     * @param string|null $package
-     *
+     * @param  string  $package
      * @return string|RuntimeException
      */
     public function package(?string $package = null)
@@ -70,6 +79,16 @@ class Conveyor
     public function packageStudly()
     {
         return Str::studly($this->package());
+    }
+
+    /**
+     * Get the package name converted to kebab-case.
+     *
+     * @return string|RuntimeException
+     */
+    public function packageKebab()
+    {
+        return Str::kebab($this->package());
     }
 
     /**

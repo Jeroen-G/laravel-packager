@@ -5,7 +5,13 @@ All Notable changes to Packager will be documented in this file.
 ## Version 3
 
 ### Updated
-- Bump PHP version to 7.4
+- Bump PHP version to 8
+
+## Version 2.7
+
+### Added
+- Allow kebab-case package and vendor names in skeletons (#135)
+- PHP8 support (#133)
 
 ## Version 2.6
 

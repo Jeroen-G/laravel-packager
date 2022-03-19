@@ -45,8 +45,8 @@ class NewPackage extends Command
         // Start the progress bar
         $this->startProgressBar(6);
 
-        $vendor = $this->argument('vendor');
-        $name = $this->argument('name');
+        $vendor = $this->argument('vendor') ?? 'vendor-name';
+        $name = $this->argument('name') ?? 'package-name';
 
         if (strpos($vendor, '/') !== false) {
             [$vendor, $name] = explode('/', $vendor);
@@ -103,11 +103,15 @@ class NewPackage extends Command
             ':uc:package',
             ':lc:vendor',
             ':lc:package',
+            ':kc:vendor',
+            ':kc:package',
         ], [
             $this->conveyor->vendorStudly(),
             $this->conveyor->packageStudly(),
             strtolower($this->conveyor->vendor()),
             strtolower($this->conveyor->package()),
+            $this->conveyor->vendorKebab(),
+            $this->conveyor->packageKebab(),
         ]);
 
         if ($this->option('i')) {

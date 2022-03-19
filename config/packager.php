@@ -4,9 +4,9 @@ return [
 
     /*
      * The following skeleton will be downloaded for each new package.
-     * Default: http://github.com/Jeroen-G/packager-skeleton/archive/master.zip
+     * Default: https://github.com/Jeroen-G/packager-skeleton/archive/master.zip
      */
-    'skeleton' => 'http://github.com/Jeroen-G/packager-skeleton/archive/master.zip',
+    'skeleton' => 'https://github.com/Jeroen-G/packager-skeleton/archive/master.zip',
 
     /*
      * When you run into issues downloading the skeleton, this might be because of
@@ -25,8 +25,8 @@ return [
     /*
      * You can set defaults for the following placeholders.
      */
-    'author_name' => 'author name',
-    'author_email' => 'author email',
-    'author_homepage' => 'author homepage',
-    'license' => 'license',
+    'author_name' => 'Author Name',
+    'author_email' => 'author@email.com',
+    'author_homepage' => 'http://author.com',
+    'license' => 'MIT',
 ];

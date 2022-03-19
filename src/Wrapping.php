@@ -15,7 +15,7 @@ class Wrapping
      * Open haystack, find and replace needles, save haystack.
      *
      * @param  string|array  $placeholder  String or array to look for (the needles)
-     * @param  string|array $replacement What to replace the needles for?
+     * @param  string|array  $replacement  What to replace the needles for?
      * @return $this
      */
     public function replace($placeholder, $replacement): self
