@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Tests;
 
 use Illuminate\Support\Facades\Artisan;

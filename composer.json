@@ -21,13 +21,14 @@
         "ext-zip": "*",
         "ext-json": "*",
         "illuminate/support": "^8.0|^9.0",
-        "guzzlehttp/guzzle": "^7.0",
-        "infection/infection": "^0.26.6",
-        "symplify/easy-coding-standard": "^10.1"
+        "guzzlehttp/guzzle": "^7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0",
-        "orchestra/testbench": "^6"
+        "orchestra/testbench": "^6",
+        "infection/infection": "^0.26.6",
+        "slevomat/coding-standard": "^7.0",
+        "symplify/easy-coding-standard": "^10.1"
     },
     "autoload": {
         "psr-4": {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Tests;
 
 use Orchestra\Testbench\TestCase as TestBench;
@@ -9,6 +11,7 @@ abstract class TestCase extends TestBench
     use TestHelper;
 
     protected const TEST_APP_TEMPLATE = __DIR__.'/../testbench/template';
+
     protected const TEST_APP = __DIR__.'/../testbench/laravel';
 
     public static function setUpBeforeClass(): void
@@ -17,11 +20,6 @@ abstract class TestCase extends TestBench
             self::setUpLocalTestbench();
         }
         parent::setUpBeforeClass();
-    }
-
-    protected function getBasePath()
-    {
-        return self::TEST_APP;
     }
 
     /**
@@ -40,6 +38,11 @@ abstract class TestCase extends TestBench
     {
         $this->uninstallTestApp();
         parent::tearDown();
+    }
+
+    protected function getBasePath()
+    {
+        return self::TEST_APP;
     }
 
     /**

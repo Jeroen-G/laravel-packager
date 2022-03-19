@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
@@ -45,7 +47,7 @@ class RemovePackage extends Command
         $vendor = $this->argument('vendor');
         $name = $this->argument('name');
 
-        if (strpos($vendor, '/') !== false) {
+        if (mb_strpos($vendor, '/') !== false) {
             [$vendor, $name] = explode('/', $vendor);
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
@@ -49,9 +51,9 @@ class GetPackage extends Command
 
         // Common variables
         if ($this->option('host') === 'bitbucket') {
-            $origin = strtolower(rtrim($this->argument('url'), '/')).'/branch/'.$this->option('branch').'.zip';
+            $origin = mb_strtolower(rtrim($this->argument('url'), '/')).'/branch/'.$this->option('branch').'.zip';
         } else {
-            $origin = strtolower(rtrim($this->argument('url'), '/')).'/archive/'.$this->option('branch').'.zip';
+            $origin = mb_strtolower(rtrim($this->argument('url'), '/')).'/archive/'.$this->option('branch').'.zip';
         }
         $pieces = explode('/', $origin);
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Tests;
 
 use Illuminate\Contracts\Console\Kernel;
@@ -20,6 +22,21 @@ trait TestHelper
         $consoleOutput = $this->app[Kernel::class]->output();
         $this->assertStringNotContainsString($unExpectedText, $consoleOutput,
             "Did not expect to see `{$unExpectedText}` in console output: `$consoleOutput`");
+    }
+
+    protected function installTestApp()
+    {
+        $this->uninstallTestApp();
+        $files = new Filesystem();
+        $files->copyDirectory(self::TEST_APP_TEMPLATE, self::TEST_APP);
+    }
+
+    protected function uninstallTestApp()
+    {
+        $files = new Filesystem();
+        if ($files->exists(self::TEST_APP)) {
+            $files->deleteDirectory(self::TEST_APP);
+        }
     }
 
     /**
@@ -47,20 +64,5 @@ trait TestHelper
         (new Process(['composer', 'install', '--no-dev'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
             fwrite(STDOUT, $buffer);
         });
-    }
-
-    protected function installTestApp()
-    {
-        $this->uninstallTestApp();
-        $files = new Filesystem();
-        $files->copyDirectory(self::TEST_APP_TEMPLATE, self::TEST_APP);
-    }
-
-    protected function uninstallTestApp()
-    {
-        $files = new Filesystem();
-        if ($files->exists(self::TEST_APP)) {
-            $files->deleteDirectory(self::TEST_APP);
-        }
     }
 }

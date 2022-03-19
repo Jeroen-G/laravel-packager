@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
@@ -48,7 +50,7 @@ class GitPackage extends Command
 
         // Common variables
         $source = $this->argument('url');
-        $origin = strtolower(rtrim($source, '/'));
+        $origin = mb_strtolower(rtrim($source, '/'));
 
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->setGitVendorAndPackage($origin);

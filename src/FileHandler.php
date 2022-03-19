@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager;
 
 use GuzzleHttp\Client;
@@ -169,7 +171,7 @@ trait FileHandler
     {
         $bindings = [
             ['MyVendor', 'MyPackage', 'myvendor', 'mypackage'],
-            [$this->vendorStudly(), $this->packageStudly(), strtolower($this->vendor()), strtolower($this->package())],
+            [$this->vendorStudly(), $this->packageStudly(), mb_strtolower($this->vendor()), mb_strtolower($this->package())],
         ];
 
         $files = new RecursiveDirectoryIterator($this->packagePath());
@@ -211,7 +213,7 @@ trait FileHandler
         $extension = $pathParts['extension'];
 
         // Here we check if it actually is supposed to be .tar.gz/.tar.xz
-        if (in_array($extension, ['gz', 'xz'])) {
+        if (in_array($extension, ['gz', 'xz'], true)) {
             $subExtension = pathinfo($pathParts['filename'], PATHINFO_EXTENSION);
 
             if ($subExtension) {

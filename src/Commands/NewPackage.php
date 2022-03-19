@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
@@ -48,7 +50,7 @@ class NewPackage extends Command
         $vendor = $this->argument('vendor') ?? 'vendor-name';
         $name = $this->argument('name') ?? 'package-name';
 
-        if (strpos($vendor, '/') !== false) {
+        if (mb_strpos($vendor, '/') !== false) {
             [$vendor, $name] = explode('/', $vendor);
         }
 
@@ -108,8 +110,8 @@ class NewPackage extends Command
         ], [
             $this->conveyor->vendorStudly(),
             $this->conveyor->packageStudly(),
-            strtolower($this->conveyor->vendor()),
-            strtolower($this->conveyor->package()),
+            mb_strtolower($this->conveyor->vendor()),
+            mb_strtolower($this->conveyor->package()),
             $this->conveyor->vendorKebab(),
             $this->conveyor->packageKebab(),
         ]);
