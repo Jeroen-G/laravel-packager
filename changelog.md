@@ -6,6 +6,9 @@ All Notable changes to Packager will be documented in this file.
 
 ### Updated
 - Bump PHP version to 8
+- Dropped support of old Laravel versions
+- Dropped check command because the security checker package is deprecated
+- Moved to GitHub actions
 
 ## Version 2.7
 
