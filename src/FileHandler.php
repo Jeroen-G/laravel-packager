@@ -78,7 +78,7 @@ trait FileHandler
     /**
      * Create a directory if it doesn't exist.
      *
-     * @param string $path Path of the directory to make
+     * @param  string  $path  Path of the directory to make
      * @return bool
      */
     public function makeDir(string $path): bool
@@ -93,7 +93,7 @@ trait FileHandler
     /**
      * Remove a directory if it exists.
      *
-     * @param string $path Path of the directory to remove.
+     * @param  string  $path  Path of the directory to remove.
      * @return bool
      */
     public function removeDir(string $path): bool
@@ -118,8 +118,8 @@ trait FileHandler
     /**
      * Download the archive to the given file by url.
      *
-     * @param string $filePath
-     * @param string $sourceFileUrl
+     * @param  string  $filePath
+     * @param  string  $sourceFileUrl
      * @return $this
      */
     public function download(string $filePath, string $sourceFileUrl): self
@@ -151,7 +151,7 @@ trait FileHandler
     /**
      * Remove the archive.
      *
-     * @param string $pathToArchive
+     * @param  string  $pathToArchive
      * @return $this
      */
     public function cleanUp(string $pathToArchive): self

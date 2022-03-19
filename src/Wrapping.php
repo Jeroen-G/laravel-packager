@@ -39,7 +39,7 @@ class Wrapping
     /**
      * Fill all placeholders with their replacements.
      *
-     * @param string $path The directory of the files containing placeholders
+     * @param  string  $path  The directory of the files containing placeholders
      * @return void
      */
     public function fill(string $path): void
@@ -57,8 +57,8 @@ class Wrapping
     /**
      * Fill placeholders in a single file.
      *
-     * @param  string $template     The file with the generic placeholders in it
-     * @param  string|null $destination    Where to save, defaults to $template
+     * @param  string  $template  The file with the generic placeholders in it
+     * @param  string|null  $destination  Where to save, defaults to $template
      * @return $this
      */
     public function fillInFile(string $template, ?string $destination = null): self
@@ -74,8 +74,8 @@ class Wrapping
     /**
      * Add the package to composer.json.
      *
-     * @param string $vendor
-     * @param string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return $this
      */
     public function addToComposer(string $vendor, string $package): self
@@ -90,8 +90,8 @@ class Wrapping
     /**
      * Remove the package from composer.json.
      *
-     * @param string $vendor
-     * @param string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return $this
      */
     public function removeFromComposer(string $vendor, string $package): self
@@ -103,8 +103,8 @@ class Wrapping
     /**
      * Add the package to the providers in config/app.php.
      *
-     * @param string $vendor
-     * @param string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return $this
      */
     public function addToProviders(string $vendor, string $package): self
@@ -123,8 +123,8 @@ class Wrapping
     /**
      * Remove the package from the providers in config/app.php.
      *
-     * @param string $vendor
-     * @param string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return $this
      */
     public function removeFromProviders(string $vendor, string $package): self
@@ -136,8 +136,8 @@ class Wrapping
     /**
      * Format vendor and package strings to camel case.
      *
-     * @param string $vendor
-     * @param string $package
+     * @param  string  $vendor
+     * @param  string  $package
      * @return array
      */
     protected function formatVars(string $vendor, string $package): array

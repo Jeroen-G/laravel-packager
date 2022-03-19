@@ -19,8 +19,7 @@ class Conveyor
     /**
      * Set or get the package vendor namespace.
      *
-     * @param string|null $vendor
-     *
+     * @param  string|null  $vendor
      * @return string|RuntimeException
      */
     public function vendor(?string $vendor = null)
@@ -95,7 +94,8 @@ class Conveyor
 
     /**
      * Download the skeleton package.
-     * @param string|null $skeletonArchiveUrl
+     *
+     * @param  string|null  $skeletonArchiveUrl
      */
     public function downloadSkeleton(?string $skeletonArchiveUrl = null): void
     {
@@ -118,9 +118,9 @@ class Conveyor
     /**
      * Download the package from Github.
      *
-     * @param string $origin The Github URL
-     * @param string $piece
-     * @param string $branch The branch to download
+     * @param  string  $origin  The Github URL
+     * @param  string  $piece
+     * @param  string  $branch  The branch to download
      */
     public function downloadFromGithub(string $origin, string $piece, string $branch): void
     {
@@ -201,7 +201,7 @@ class Conveyor
     }
 
     /**
-     * @param array $command
+     * @param  array  $command
      * @return bool
      */
     protected function runProcess(array $command): bool
