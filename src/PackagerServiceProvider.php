@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace JeroenG\Packager;
 
 use Illuminate\Support\ServiceProvider;
-use JeroenG\Packager\Commands\CheckPackage;
 use JeroenG\Packager\Commands\DisablePackage;
 use JeroenG\Packager\Commands\EnablePackage;
 use JeroenG\Packager\Commands\GetPackage;
@@ -33,7 +32,6 @@ class PackagerServiceProvider extends ServiceProvider
         GitPackage::class,
         ListPackages::class,
         MoveTests::class,
-        CheckPackage::class,
         PublishPackage::class,
         EnablePackage::class,
         DisablePackage::class,

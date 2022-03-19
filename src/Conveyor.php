@@ -207,7 +207,7 @@ class Conveyor
     protected function runProcess(array $command): bool
     {
         $process = new Process($command, base_path());
-        $process->setTimeout(config('packager.timeout'));
+        $process->setTimeout((float) config('packager.timeout'));
         $process->run();
 
         return $process->getExitCode() === 0;

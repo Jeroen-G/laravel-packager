@@ -12,7 +12,7 @@ class ValidClassName implements Rule
 
     public function passes($attribute, $value): bool
     {
-        return preg_match($this->pattern, $value);
+        return preg_match($this->pattern, $value) === 1;
     }
 
     public function message(): string

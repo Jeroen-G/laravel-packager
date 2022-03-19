@@ -42,7 +42,7 @@ class NewPackage extends Command
         $this->wrapping = $wrapping;
     }
 
-    public function handle(): ?int
+    public function handle(): int
     {
         // Start the progress bar
         $this->startProgressBar(6);
@@ -150,6 +150,8 @@ class NewPackage extends Command
 
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package created successfully!');
+
+        return 1;
     }
 
     /**

@@ -139,23 +139,6 @@ $ php artisan packager:publish my-vendor my-package https://github.com/my-vendor
 **Result:**
 The `my-vendor\my-package` package will be published to Github using the provided url.
 
-### Check
-**Command:**
-```bash
-$ php artisan packager:check my-vendor my-package
-```
-
-**Result:**
-The `my-vendor\my-package` package will be checked for security vulnerabilities using SensioLabs security checker.
-
-**Remarks**
-You first need to run
-
-```bash
-$ composer require sensiolabs/security-checker
-```
-
-
 ## Issues with cURL SSL certificate
 It turns out that, especially on Windows, there might arise some problems with the downloading of the skeleton, due to a file regarding SSL certificates missing on the OS. This can be solved by opening up your .env file and putting this in it:
 ```
