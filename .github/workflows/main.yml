@@ -45,5 +45,8 @@ jobs:
       - name: Execute unit tests
         run: vendor/bin/phpunit --testsuite unit --testdox --colors=always
 
+      - name: Execute integration tests
+        run: vendor/bin/phpunit --testsuite integration --testdox --colors=always
+
       - name: Execute mutation tests
         run: vendor/bin/infection --threads=4 --min-covered-msi=50 --min-msi=50
