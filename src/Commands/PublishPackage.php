@@ -6,6 +6,7 @@ namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 
 /**
@@ -29,10 +30,13 @@ class PublishPackage extends Command
      */
     protected Conveyor $conveyor;
 
-    public function __construct(Conveyor $conveyor)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
+        $this->fileHandler = $fileHandler;
     }
 
     public function handle(): void
@@ -45,17 +49,17 @@ class PublishPackage extends Command
         $this->conveyor->package($this->argument('name'));
 
         $this->info('Initialising Git if not already done so...');
-        if (! file_exists($this->conveyor->packagePath().'/.git/')) {
-            exec('cd '.$this->conveyor->packagePath().' && git init && git add --all && git commit -m "Initial commit"');
+        if (! file_exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/.git/')) {
+            exec('cd '.$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).' && git init && git add --all && git commit -m "Initial commit"');
         }
         $this->makeProgress();
 
         $this->info('Git is set up, adding the remote repository...');
-        exec('cd '.$this->conveyor->packagePath().' && git remote add origin '.$this->argument('url'));
+        exec('cd '.$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).' && git remote add origin '.$this->argument('url'));
         $this->makeProgress();
 
         $this->info('Pushing to Github...');
-        exec('cd '.$this->conveyor->packagePath().' && git push -u origin master');
+        exec('cd '.$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).' && git push -u origin master');
         $this->makeProgress();
 
         // Finished publishing the package, end of the progress bar

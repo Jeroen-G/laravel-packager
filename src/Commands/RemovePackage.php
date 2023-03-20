@@ -6,6 +6,8 @@ namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandler;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 use JeroenG\Packager\Wrapping;
 
@@ -32,11 +34,14 @@ class RemovePackage extends Command
      */
     protected Wrapping $wrapping;
 
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->wrapping = $wrapping;
+        $this->fileHandler = $fileHandler;
     }
 
     public function handle(): void
@@ -65,16 +70,16 @@ class RemovePackage extends Command
 
         // remove the package directory
         $this->info('Removing packages directory...');
-        $this->conveyor->removeDir($this->conveyor->packagePath());
+        $this->fileHandler->removeDir($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()));
         $this->makeProgress();
 
         // Remove the vendor directory, if agreed to
         if ($this->confirm('Do you want to remove the vendor directory? [y|N]')) {
-            if (count(scandir($this->conveyor->vendorPath())) !== 2) {
+            if (count(scandir($this->fileHandler->vendorPath($this->conveyor->vendor()))) !== 2) {
                 $this->warn('vendor directory is not empty, continuing...');
             } else {
                 $this->info('removing vendor directory...');
-                $this->conveyor->removeDir($this->conveyor->vendorPath());
+                $this->fileHandler->removeDir($this->fileHandler->vendorPath($this->conveyor->vendor()));
             }
         } else {
             $this->info('Continuing...');

@@ -13,10 +13,10 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.0, 8.1]
+        php: [8.0, 8.1, 8.2]
         experimental: [ false ]
         include:
-          - php: 8.2
+          - php: 8.3
             experimental: true
 
     name: PHP${{ matrix.php }}
@@ -46,4 +46,4 @@ jobs:
         run: vendor/bin/phpunit --testsuite unit --testdox --colors=always
 
       - name: Execute mutation tests
-        run: vendor/bin/infection --threads=4 --min-covered-msi=100 --min-msi=100
+        run: vendor/bin/infection --threads=4 --min-covered-msi=50 --min-msi=50

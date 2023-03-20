@@ -6,7 +6,7 @@ namespace JeroenG\Packager\Tests;
 
 use Orchestra\Testbench\TestCase as TestBench;
 
-abstract class TestCase extends TestBench
+abstract class IntegrationTestCase extends TestBench
 {
     use TestHelper;
 
@@ -22,36 +22,24 @@ abstract class TestCase extends TestBench
         parent::setUpBeforeClass();
     }
 
-    /**
-     * Setup before each test.
-     */
     public function setUp(): void
     {
         $this->installTestApp();
         parent::setUp();
     }
 
-    /**
-     * Tear down after each test.
-     */
     public function tearDown(): void
     {
         $this->uninstallTestApp();
         parent::tearDown();
     }
 
-    protected function getBasePath()
+    protected function getBasePath(): string
     {
         return self::TEST_APP;
     }
 
-    /**
-     * Tell Testbench to use this package.
-     *
-     * @param $app
-     * @return array
-     */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return ['JeroenG\Packager\PackagerServiceProvider'];
     }

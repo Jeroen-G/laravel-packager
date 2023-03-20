@@ -12,10 +12,10 @@ use PhpCsFixer\Fixer\Strict\DeclareStrictTypesFixer;
 use PhpCsFixer\Fixer\Strict\StrictComparisonFixer;
 use PhpCsFixer\Fixer\Strict\StrictParamFixer;
 use SlevomatCodingStandard\Sniffs\ControlStructures\AssignmentInConditionSniff;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symplify\CodingStandard\Fixer\Strict\BlankLineAfterStrictTypesFixer;
+use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
+return static function (ECSConfig $containerConfigurator): void {
     $services = $containerConfigurator->services();
     $parameters = $containerConfigurator->parameters();
 
@@ -32,5 +32,5 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(StrictParamFixer::class);
 
     $parameters->set('sets', ['clean-code', 'psr12']);
-    $parameters->set('exclude_files', ['node_modules/*', 'vendor/*', 'docs/*']);
+    $parameters->set('exclude_files', ['node_modules/*', 'vendor/*', 'docs/*', 'testbench/*']);
 };

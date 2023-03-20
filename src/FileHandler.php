@@ -10,77 +10,40 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
 
-trait FileHandler
+class FileHandler implements FileHandlerInterface
 {
-    /**
-     * Get the path to the packages directory.
-     *
-     * @return string $path
-     */
     public function packagesPath(): string
     {
         return base_path('packages');
     }
 
-    /**
-     * Get the vendor path.
-     *
-     * @return string $path
-     */
-    public function vendorPath(): string
+    public function vendorPath(string $vendor): string
     {
-        return $this->packagesPath().'/'.$this->vendor();
+        return $this->packagesPath().'/'.$vendor;
     }
 
-    /**
-     * Get the path to store a vendor's temporary files.
-     *
-     * @return string $path
-     */
-    public function tempPath(): string
+    public function tempPath($vendor): string
     {
-        return $this->vendorPath().'/temp';
+        return $this->vendorPath($vendor).'/temp';
     }
 
-    /**
-     * Get the full package path.
-     *
-     * @return string $path
-     */
-    public function packagePath(): string
+    public function packagePath($vendor, $package): string
     {
-        return $this->vendorPath().'/'.$this->package();
+        return $this->vendorPath($vendor).'/'.$package;
     }
 
-    /**
-     * Generate a random temporary filename for the package archive file.
-     *
-     * @param  string  $extension
-     * @return string
-     */
     public function makeFilename($extension = 'zip'): string
     {
         return getcwd().'/package'.md5(time().uniqid('', true)).'.'.$extension;
     }
 
-    /**
-     * Check if the package already exists.
-     *
-     * @return void Throws error if package exists, aborts process
-     */
-    public function checkIfPackageExists(): void
+    public function checkIfPackageExists($vendor, $package): void
     {
-        if (is_dir($this->packagePath())) {
+        if (is_dir($this->packagePath($vendor, $package))) {
             throw new RuntimeException('Package already exists');
         }
     }
 
-    /**
-     * Create a directory if it doesn't exist.
-     *
-     * @param  string  $path  Path of the directory to make
-     * @return bool
-     */
     public function makeDir(string $path): bool
     {
         if (! is_dir($path)) {
@@ -90,12 +53,6 @@ trait FileHandler
         return false;
     }
 
-    /**
-     * Remove a directory if it exists.
-     *
-     * @param  string  $path  Path of the directory to remove.
-     * @return bool
-     */
     public function removeDir(string $path): bool
     {
         if ($path === 'packages' || $path === '/') {
@@ -115,13 +72,6 @@ trait FileHandler
         return rmdir($path);
     }
 
-    /**
-     * Download the archive to the given file by url.
-     *
-     * @param  string  $filePath
-     * @param  string  $sourceFileUrl
-     * @return $this
-     */
     public function download(string $filePath, string $sourceFileUrl): self
     {
         $client = new Client(['verify' => config('packager.curl_verify_cert')]);
@@ -131,13 +81,6 @@ trait FileHandler
         return $this;
     }
 
-    /**
-     * Extract the downloaded archive into the given directory.
-     *
-     * @param  string  $archiveFilePath
-     * @param  string  $directory
-     * @return $this
-     */
     public function extract(string $archiveFilePath, string $directory): self
     {
         $extension = $this->getArchiveExtension($archiveFilePath);
@@ -148,12 +91,6 @@ trait FileHandler
         return $this;
     }
 
-    /**
-     * Remove the archive.
-     *
-     * @param  string  $pathToArchive
-     * @return $this
-     */
     public function cleanUp(string $pathToArchive): self
     {
         @chmod($pathToArchive, 0777);
@@ -162,19 +99,14 @@ trait FileHandler
         return $this;
     }
 
-    /**
-     * Rename generic files to package-specific ones.
-     *
-     * @return void
-     */
-    public function renameFiles(): void
+    public function renameFiles(string $vendorStudly, string $packageStudly, string $vendor, string $package): void
     {
         $bindings = [
             ['MyVendor', 'MyPackage', 'myvendor', 'mypackage'],
-            [$this->vendorStudly(), $this->packageStudly(), mb_strtolower($this->vendor()), mb_strtolower($this->package())],
+            [$vendorStudly, $packageStudly, mb_strtolower($vendor), mb_strtolower($package)],
         ];
 
-        $files = new RecursiveDirectoryIterator($this->packagePath());
+        $files = new RecursiveDirectoryIterator($this->packagePath($vendor, $package));
         foreach (new RecursiveIteratorIterator($files) as $file) {
             if (! $file->isFile()) {
                 continue;
@@ -187,27 +119,18 @@ trait FileHandler
         }
     }
 
-    /**
-     * Remove the rules files if present.
-     */
-    public function cleanUpRules(): void
+    public function cleanUpRules($vendor, $package): void
     {
         $ruleFiles = ['rules.php', 'rewriteRules.php'];
 
         foreach ($ruleFiles as $file) {
-            if (file_exists($this->packagePath().'/'.$file)) {
-                unlink($this->packagePath().'/'.$file);
+            if (file_exists($this->packagePath($vendor, $package).'/'.$file)) {
+                unlink($this->packagePath($vendor, $package).'/'.$file);
             }
         }
     }
 
-    /**
-     * Based on the extension a different archive extractor is used.
-     *
-     * @param  string  $archiveFilePath
-     * @return string
-     */
-    protected function getArchiveExtension(string $archiveFilePath): string
+    public function getArchiveExtension(string $archiveFilePath): string
     {
         $pathParts = pathinfo($archiveFilePath);
         $extension = $pathParts['extension'];

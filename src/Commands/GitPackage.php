@@ -7,6 +7,7 @@ namespace JeroenG\Packager\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 use JeroenG\Packager\Wrapping;
 
@@ -36,11 +37,14 @@ class GitPackage extends Command
      */
     protected Wrapping $wrapping;
 
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->wrapping = $wrapping;
+        $this->fileHandler = $fileHandler;
     }
 
     public function handle(): void
@@ -61,16 +65,16 @@ class GitPackage extends Command
 
         // Start creating the package
         $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
-        $this->conveyor->checkIfPackageExists();
+        $this->fileHandler->checkIfPackageExists($this->conveyor->vendor(), $this->conveyor->package());
         $this->makeProgress();
 
         // Create the package directory
         $this->info('Creating packages directory...');
-        $this->conveyor->makeDir($this->conveyor->packagesPath());
+        $this->fileHandler->makeDir($this->fileHandler->packagesPath());
 
         // Clone the repository
         $this->info('Cloning repository...');
-        exec("git clone -q $source ".$this->conveyor->packagePath(), $output, $exit_code);
+        exec("git clone -q $source ".$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()), $output, $exit_code);
 
         if ($exit_code !== 0) {
             $this->error('Unable to clone repository');
@@ -83,7 +87,7 @@ class GitPackage extends Command
 
         // Create the vendor directory
         $this->info('Creating vendor...');
-        $this->conveyor->makeDir($this->conveyor->vendorPath());
+        $this->fileHandler->makeDir($this->fileHandler->vendorPath($this->conveyor->vendor()));
         $this->makeProgress();
 
         $this->info('Installing package...');

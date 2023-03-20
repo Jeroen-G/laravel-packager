@@ -6,6 +6,7 @@ namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 use JeroenG\Packager\Wrapping;
 
@@ -22,7 +23,6 @@ class GetPackage extends Command
                             {url : The url of the repository}
                             {vendor? : The vendor part of the namespace}
                             {name? : The name of package for the namespace}
-                            {--host=github : Download from github or bitbucket?}
                             {--branch=master : The branch to download}';
 
     protected $description = 'Retrieve an existing package from Github or Bitbucket.';
@@ -37,11 +37,14 @@ class GetPackage extends Command
      */
     protected Wrapping $wrapping;
 
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->wrapping = $wrapping;
+        $this->fileHandler = $fileHandler;
     }
 
     public function handle(): void
@@ -50,11 +53,7 @@ class GetPackage extends Command
         $this->startProgressBar(4);
 
         // Common variables
-        if ($this->option('host') === 'bitbucket') {
-            $origin = mb_strtolower(rtrim($this->argument('url'), '/')).'/branch/'.$this->option('branch').'.zip';
-        } else {
-            $origin = mb_strtolower(rtrim($this->argument('url'), '/')).'/archive/'.$this->option('branch').'.zip';
-        }
+        $origin = mb_strtolower(rtrim($this->argument('url'), '/')).'/archive/'.$this->option('branch').'.zip';
         $pieces = explode('/', $origin);
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->conveyor->vendor($pieces[3]);
@@ -66,27 +65,22 @@ class GetPackage extends Command
 
         // Start creating the package
         $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
-        $this->conveyor->checkIfPackageExists();
+        $this->fileHandler->checkIfPackageExists($this->conveyor->vendor(), $this->conveyor->package());
         $this->makeProgress();
 
         // Create the package directory
         $this->info('Creating packages directory...');
-        $this->conveyor->makeDir($this->conveyor->packagesPath());
+        $this->fileHandler->makeDir($this->fileHandler->packagesPath());
         $this->makeProgress();
 
         // Create the vendor directory
         $this->info('Creating vendor...');
-        $this->conveyor->makeDir($this->conveyor->vendorPath());
+        $this->fileHandler->makeDir($this->fileHandler->vendorPath($this->conveyor->vendor()));
         $this->makeProgress();
 
-        // Get the repo from Github or Bitbucket
-        if ($this->option('host') === ' bitbucket') {
-            $this->info('Downloading from Bitbucket...');
-            $this->conveyor->downloadFromBitbucket($origin, $pieces[4], $this->option('branch'));
-        } else {
-            $this->info('Downloading from Github...');
-            $this->conveyor->downloadFromGithub($origin, $pieces[4], $this->option('branch'));
-        }
+        $this->info('Downloading from Github...');
+        $this->conveyor->downloadFromGithub($origin, $pieces[4], $this->option('branch'));
+
         $this->makeProgress();
 
         // Install the package

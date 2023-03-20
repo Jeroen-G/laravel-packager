@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Validation\Validator as ValidatorInterface;
 use Illuminate\Support\Facades\Validator;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 use JeroenG\Packager\ValidationRules\ValidClassName;
 use JeroenG\Packager\Wrapping;
@@ -35,11 +36,14 @@ class NewPackage extends Command
      */
     protected Wrapping $wrapping;
 
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->wrapping = $wrapping;
+        $this->fileHandler = $fileHandler;
     }
 
     public function handle(): int
@@ -74,17 +78,17 @@ class NewPackage extends Command
 
         // Start creating the package
         $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
-        $this->conveyor->checkIfPackageExists();
+        $this->fileHandler->checkIfPackageExists($this->conveyor->vendor(), $this->conveyor->package());
         $this->makeProgress();
 
         // Create the package directory
         $this->info('Creating packages directory...');
-        $this->conveyor->makeDir($this->conveyor->packagesPath());
+        $this->fileHandler->makeDir($this->fileHandler->packagesPath());
         $this->makeProgress();
 
         // Create the vendor directory
         $this->info('Creating vendor...');
-        $this->conveyor->makeDir($this->conveyor->vendorPath());
+        $this->fileHandler->makeDir($this->fileHandler->vendorPath($this->conveyor->vendor()));
         $this->makeProgress();
 
         // Get the packager package skeleton
@@ -94,8 +98,13 @@ class NewPackage extends Command
         } else {
             $this->conveyor->downloadSkeleton($this->option('skeleton'));
         }
-        $manifest = (file_exists($this->conveyor->packagePath().'/rewriteRules.php')) ? $this->conveyor->packagePath().'/rewriteRules.php' : null;
-        $this->conveyor->renameFiles();
+        $manifest = (file_exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php')) ? $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php' : null;
+        $this->fileHandler->renameFiles(
+            $this->conveyor->vendorStudly(),
+            $this->conveyor->packageStudly(),
+            $this->conveyor->vendor(),
+            $this->conveyor->package(),
+        );
         $this->makeProgress();
 
         // Replacing skeleton placeholders
@@ -133,11 +142,11 @@ class NewPackage extends Command
         }
 
         // Fill all placeholders in all files with the replacements.
-        $this->wrapping->fill($this->conveyor->packagePath());
+        $this->wrapping->fill($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()));
 
         // Make sure to remove the rule files to avoid clutter.
         if ($manifest !== null) {
-            $this->conveyor->cleanUpRules();
+            $this->fileHandler->cleanUpRules($this->conveyor->vendor(), $this->conveyor->package());
         }
 
         $this->makeProgress();

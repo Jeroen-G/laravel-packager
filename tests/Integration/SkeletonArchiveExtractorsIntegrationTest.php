@@ -2,21 +2,22 @@
 
 declare(strict_types=1);
 
-namespace JeroenG\Packager\Tests;
+namespace JeroenG\Packager\Tests\Integration;
 
 use Illuminate\Config\Repository;
 use Illuminate\Support\Facades\Artisan;
+use JeroenG\Packager\Tests\IntegrationTestCase;
 
-class SkeletonArchiveExtractorsTest extends TestCase
+class SkeletonArchiveExtractorsIntegrationTest extends IntegrationTestCase
 {
-    public function test_new_package_is_created_with_tar_gz_skeleton()
+    public function test_new_package_is_created_with_tar_gz_skeleton(): void
     {
         Artisan::call('packager:new', ['vendor' => 'MyVendor', 'name' => 'MyPackage']);
 
         $this->seeInConsoleOutput('Package created successfully!');
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         /** @var Repository $config */
         $config = $app['config'];

@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.0|^8.1",
+        "php": "8.0.*||8.1.*||8.2.*",
         "ext-zip": "*",
         "ext-json": "*",
         "illuminate/support": "^8.0|^9.0",
@@ -45,6 +45,12 @@
             "providers": [
                 "JeroenG\\Packager\\PackagerServiceProvider"
             ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": false,
+            "infection/extension-installer": false
         }
     }
 }

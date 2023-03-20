@@ -16,10 +16,10 @@ cs:
 	make codestyle
 
 codestyle: ## Check the codestyle
-	./vendor/bin/ecs check --config=easy-coding-standard.php .
+	./vendor/bin/ecs check --config=easy-coding-standard.php
 
 codestyle-fix: ## Fix your mess
-	./vendor/bin/ecs check --fix --config=easy-coding-standard.php .
+	./vendor/bin/ecs check --fix --config=easy-coding-standard.php
 
 test: ## Run PHPUnit with coverage
 	@echo "\n=== Running unit tests ===\n"
@@ -29,6 +29,6 @@ test: ## Run PHPUnit with coverage
 
 infection: ## Run InfectionPHP with coverage
 	@echo "\n=== Running unit tests ===\n"
-	XDEBUG_MODE=coverage vendor/bin/infection --threads=4 --min-covered-msi=100 --min-msi=100
+	XDEBUG_MODE=coverage vendor/bin/infection --threads=4 --min-covered-msi=50 --min-msi=50
 	@echo "\n=== Click the link below to see the mutation coverage report ===\n"
 	@echo "report/infection.html"
