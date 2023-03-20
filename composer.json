@@ -20,7 +20,7 @@
         "php": "8.0.*||8.1.*||8.2.*",
         "ext-zip": "*",
         "ext-json": "*",
-        "illuminate/support": "^8.0|^9.0",
+        "illuminate/support": "^8.0|^9.0|^10.0",
         "guzzlehttp/guzzle": "^7.0"
     },
     "require-dev": {
