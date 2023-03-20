@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 use JeroenG\Packager\Wrapping;
 
@@ -16,52 +19,31 @@ class RemovePackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'packager:remove {vendor} {name?}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Remove an existing package.';
 
     /**
      * Packages roll off of the conveyor.
-     *
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
     /**
      * Packages are packed in wrappings to personalise them.
-     *
-     * @var object \JeroenG\Packager\Wrapping
      */
-    protected $wrapping;
+    protected Wrapping $wrapping;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->wrapping = $wrapping;
+        $this->fileHandler = $fileHandler;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
         // Start the progress bar
         $this->startProgressBar(4);
@@ -69,7 +51,7 @@ class RemovePackage extends Command
         $vendor = $this->argument('vendor');
         $name = $this->argument('name');
 
-        if (strstr($vendor, '/')) {
+        if (mb_strpos($vendor, '/') !== false) {
             [$vendor, $name] = explode('/', $vendor);
         }
 
@@ -87,16 +69,16 @@ class RemovePackage extends Command
 
         // remove the package directory
         $this->info('Removing packages directory...');
-        $this->conveyor->removeDir($this->conveyor->packagePath());
+        $this->fileHandler->removeDir($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()));
         $this->makeProgress();
 
         // Remove the vendor directory, if agreed to
         if ($this->confirm('Do you want to remove the vendor directory? [y|N]')) {
-            if (count(scandir($this->conveyor->vendorPath())) !== 2) {
+            if (count(scandir($this->fileHandler->vendorPath($this->conveyor->vendor()))) !== 2) {
                 $this->warn('vendor directory is not empty, continuing...');
             } else {
                 $this->info('removing vendor directory...');
-                $this->conveyor->removeDir($this->conveyor->vendorPath());
+                $this->fileHandler->removeDir($this->fileHandler->vendorPath($this->conveyor->vendor()));
             }
         } else {
             $this->info('Continuing...');

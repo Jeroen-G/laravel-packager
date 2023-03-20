@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
@@ -12,49 +14,26 @@ use Illuminate\Filesystem\Filesystem;
  **/
 class MoveTests extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'packager:tests
                             {vendor? : The package for which to move the tests}
                             {name? : The package for which to move the tests}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Move test files to the Laravel app tests folder';
 
-    /**
-     * The filesystem handler.
-     *
-     * @var object
-     */
-    protected $files;
+    protected Filesystem $files;
 
-    /**
-     * Create a new instance.
-     */
     public function __construct(Filesystem $files)
     {
         parent::__construct();
         $this->files = $files;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->info('Moving tests for all local packages');
 
-            $composer = json_decode(file_get_contents('composer.json'), true);
+            $composer = json_decode(file_get_contents('composer.json'), true, 512, JSON_THROW_ON_ERROR);
 
             $packages = [];
             foreach ($composer['autoload']['psr-4'] as $package => $path) {

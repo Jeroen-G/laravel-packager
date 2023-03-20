@@ -1,0 +1,32 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "text": "infection.log",
+        "html": "report/infection.html"
+    },
+    "mutators": {
+        "@arithmetic": true,
+        "@boolean": true,
+        "@cast": true,
+        "@conditional_boundary": true,
+        "@conditional_negotiation": true,
+        "@equal": true,
+        "@function_signature": true,
+        "IdenticalEqual": false,
+        "@number": true,
+        "@operator": true,
+        "@regex": true,
+        "@removal": true,
+        "@return_value": true,
+        "@sort": true,
+        "@unwrap": true,
+        "@loop": true,
+        "@extensions": true,
+        "@default": true
+    }
+}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager;
 
 use RecursiveDirectoryIterator;
@@ -7,19 +9,9 @@ use RecursiveIteratorIterator;
 
 class Wrapping
 {
-    /**
-     * Placeholders.
-     *
-     * @var array
-     */
-    public $placeholders = [];
+    public array $placeholders = [];
 
-    /**
-     * Replacements.
-     *
-     * @var array
-     */
-    public $replacements = [];
+    public array $replacements = [];
 
     /**
      * Open haystack, find and replace needles, save haystack.
@@ -28,7 +20,7 @@ class Wrapping
      * @param  string|array  $replacement  What to replace the needles for?
      * @return $this
      */
-    public function replace($placeholder, $replacement)
+    public function replace($placeholder, $replacement): self
     {
         if (is_array($placeholder)) {
             $this->placeholders = array_merge($this->placeholders, $placeholder);
@@ -50,7 +42,7 @@ class Wrapping
      * @param  string  $path  The directory of the files containing placeholders
      * @return void
      */
-    public function fill($path)
+    public function fill(string $path): void
     {
         $files = new RecursiveDirectoryIterator($path);
         foreach (new RecursiveIteratorIterator($files) as $file) {
@@ -66,12 +58,12 @@ class Wrapping
      * Fill placeholders in a single file.
      *
      * @param  string  $template  The file with the generic placeholders in it
-     * @param  string|null  $destiniation  Where to save, defaults to $template
+     * @param  string|null  $destination  Where to save, defaults to $template
      * @return $this
      */
-    public function fillInFile($template, $destination = null)
+    public function fillInFile(string $template, ?string $destination = null): self
     {
-        $destination = ($destination === null) ? $template : $destination;
+        $destination = $destination ?? $template;
 
         $filledFile = str_replace($this->placeholders, $this->replacements, file_get_contents($template));
         file_put_contents($destination, $filledFile);
@@ -86,7 +78,7 @@ class Wrapping
      * @param  string  $package
      * @return $this
      */
-    public function addToComposer($vendor, $package)
+    public function addToComposer(string $vendor, string $package): self
     {
         [$vendor, $package] = $this->formatVars($vendor, $package);
 
@@ -102,7 +94,7 @@ class Wrapping
      * @param  string  $package
      * @return $this
      */
-    public function removeFromComposer($vendor, $package)
+    public function removeFromComposer(string $vendor, string $package): self
     {
         return $this->replace('"'.$vendor.'\\\\'.$package.'\\\\": "packages/'.$vendor.'/'.$package.'/src",', '')
                     ->fillInFile(base_path('composer.json'));
@@ -115,7 +107,7 @@ class Wrapping
      * @param  string  $package
      * @return $this
      */
-    public function addToProviders($vendor, $package)
+    public function addToProviders(string $vendor, string $package): self
     {
         [$vendor, $package] = $this->formatVars($vendor, $package);
 
@@ -135,7 +127,7 @@ class Wrapping
      * @param  string  $package
      * @return $this
      */
-    public function removeFromProviders($vendor, $package)
+    public function removeFromProviders(string $vendor, string $package): self
     {
         return $this->replace($vendor.'\\'.$package.'\\'.$package.'ServiceProvider::class,', '')
                     ->fillInFile(config_path('app.php'));
@@ -148,7 +140,7 @@ class Wrapping
      * @param  string  $package
      * @return array
      */
-    protected function formatVars($vendor, $package)
+    protected function formatVars(string $vendor, string $package): array
     {
         foreach (['vendor', 'package'] as $var) {
             ${$var} = collect(explode('-', ${$var}))->map(function ($segment, $key) {

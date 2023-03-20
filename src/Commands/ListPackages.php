@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
@@ -13,26 +15,11 @@ use Symfony\Component\Process\Process;
  **/
 class ListPackages extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'packager:list
                            {--g|git : Show Git branch status}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'List all locally installed packages.';
 
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     */
     public function handle(): void
     {
         $packages = $this->getPackagesList();
@@ -51,7 +38,7 @@ class ListPackages extends Command
      */
     private function getPackagesList(): array
     {
-        $composerFile = json_decode(file_get_contents(base_path('composer.json')), true);
+        $composerFile = json_decode(file_get_contents(base_path('composer.json')), true, 512, JSON_THROW_ON_ERROR);
         $packagesPath = base_path('packages/');
         $repositories = $composerFile['repositories'] ?? [];
         $packages = [];

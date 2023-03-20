@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Validation\Validator as ValidatorInterface;
 use Illuminate\Support\Facades\Validator;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 use JeroenG\Packager\ValidationRules\ValidClassName;
 use JeroenG\Packager\Wrapping;
@@ -19,52 +22,31 @@ class NewPackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'packager:new {vendor?} {name?} {--i} {--skeleton=}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Create a new package.';
 
     /**
      * Packages roll off of the conveyor.
-     *
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
     /**
      * Packages are packed in wrappings to personalise them.
-     *
-     * @var object \JeroenG\Packager\Wrapping
      */
-    protected $wrapping;
+    protected Wrapping $wrapping;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->wrapping = $wrapping;
+        $this->fileHandler = $fileHandler;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): int
     {
         // Start the progress bar
         $this->startProgressBar(6);
@@ -72,7 +54,7 @@ class NewPackage extends Command
         $vendor = $this->argument('vendor') ?? 'vendor-name';
         $name = $this->argument('name') ?? 'package-name';
 
-        if (strstr($vendor, '/')) {
+        if (mb_strpos($vendor, '/') !== false) {
             [$vendor, $name] = explode('/', $vendor);
         }
 
@@ -96,17 +78,17 @@ class NewPackage extends Command
 
         // Start creating the package
         $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
-        $this->conveyor->checkIfPackageExists();
+        $this->fileHandler->checkIfPackageExists($this->conveyor->vendor(), $this->conveyor->package());
         $this->makeProgress();
 
         // Create the package directory
         $this->info('Creating packages directory...');
-        $this->conveyor->makeDir($this->conveyor->packagesPath());
+        $this->fileHandler->makeDir($this->fileHandler->packagesPath());
         $this->makeProgress();
 
         // Create the vendor directory
         $this->info('Creating vendor...');
-        $this->conveyor->makeDir($this->conveyor->vendorPath());
+        $this->fileHandler->makeDir($this->fileHandler->vendorPath($this->conveyor->vendor()));
         $this->makeProgress();
 
         // Get the packager package skeleton
@@ -114,10 +96,15 @@ class NewPackage extends Command
         if ($this->option('i')) {
             $this->conveyor->downloadSkeleton($this->ask('What package skeleton would you like to use?', $this->option('skeleton') ?? config('packager.skeleton')));
         } else {
-            $this->conveyor->downloadSkeleton($this->option('skeleton') ?? null);
+            $this->conveyor->downloadSkeleton($this->option('skeleton'));
         }
-        $manifest = (file_exists($this->conveyor->packagePath().'/rewriteRules.php')) ? $this->conveyor->packagePath().'/rewriteRules.php' : null;
-        $this->conveyor->renameFiles($manifest);
+        $manifest = (file_exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php')) ? $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php' : null;
+        $this->fileHandler->renameFiles(
+            $this->conveyor->vendorStudly(),
+            $this->conveyor->packageStudly(),
+            $this->conveyor->vendor(),
+            $this->conveyor->package(),
+        );
         $this->makeProgress();
 
         // Replacing skeleton placeholders
@@ -132,8 +119,8 @@ class NewPackage extends Command
         ], [
             $this->conveyor->vendorStudly(),
             $this->conveyor->packageStudly(),
-            strtolower($this->conveyor->vendor()),
-            strtolower($this->conveyor->package()),
+            mb_strtolower($this->conveyor->vendor()),
+            mb_strtolower($this->conveyor->package()),
             $this->conveyor->vendorKebab(),
             $this->conveyor->packageKebab(),
         ]);
@@ -155,11 +142,11 @@ class NewPackage extends Command
         }
 
         // Fill all placeholders in all files with the replacements.
-        $this->wrapping->fill($this->conveyor->packagePath());
+        $this->wrapping->fill($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()));
 
         // Make sure to remove the rule files to avoid clutter.
         if ($manifest !== null) {
-            $this->conveyor->cleanUpRules();
+            $this->fileHandler->cleanUpRules($this->conveyor->vendor(), $this->conveyor->package());
         }
 
         $this->makeProgress();
@@ -172,6 +159,8 @@ class NewPackage extends Command
 
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package created successfully!');
+
+        return 1;
     }
 
     /**
@@ -179,7 +168,7 @@ class NewPackage extends Command
      *
      * @return void
      */
-    protected function interactiveReplace()
+    protected function interactiveReplace(): void
     {
         $author = $this->ask('Who is the author?', config('packager.author_name'));
         $authorEmail = $this->ask('What is the author\'s e-mail?', config('packager.author_email'));
@@ -202,7 +191,7 @@ class NewPackage extends Command
         ]);
     }
 
-    private function validateInput(string $vendor, string $name)
+    private function validateInput(string $vendor, string $name): ValidatorInterface
     {
         return Validator::make(compact('vendor', 'name'), [
             'vendor' => new ValidClassName,
@@ -210,7 +199,7 @@ class NewPackage extends Command
         ]);
     }
 
-    private function showErrors(ValidatorInterface $validator)
+    private function showErrors(ValidatorInterface $validator): void
     {
         $this->info('Package was not created. Please choose a valid name.');
 

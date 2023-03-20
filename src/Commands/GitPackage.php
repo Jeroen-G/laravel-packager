@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 use JeroenG\Packager\Wrapping;
 
@@ -17,62 +20,41 @@ class GitPackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'packager:git
                             {url : The url of the git repository}
                             {vendor? : The vendor part of the namespace}
                             {name? : The name of package for the namespace}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Retrieve an existing package with git.';
 
     /**
      * Packages roll off of the conveyor.
-     *
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
     /**
      * Packages are packed in wrappings to personalise them.
-     *
-     * @var object \JeroenG\Packager\Wrapping
      */
-    protected $wrapping;
+    protected Wrapping $wrapping;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, Wrapping $wrapping, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->wrapping = $wrapping;
+        $this->fileHandler = $fileHandler;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
         // Start the progress bar
         $this->startProgressBar(4);
 
         // Common variables
         $source = $this->argument('url');
-        $origin = rtrim(strtolower($source), '/');
+        $origin = mb_strtolower(rtrim($source, '/'));
 
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->setGitVendorAndPackage($origin);
@@ -83,18 +65,18 @@ class GitPackage extends Command
 
         // Start creating the package
         $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
-        $this->conveyor->checkIfPackageExists();
+        $this->fileHandler->checkIfPackageExists($this->conveyor->vendor(), $this->conveyor->package());
         $this->makeProgress();
 
         // Create the package directory
         $this->info('Creating packages directory...');
-        $this->conveyor->makeDir($this->conveyor->packagesPath());
+        $this->fileHandler->makeDir($this->fileHandler->packagesPath());
 
         // Clone the repository
         $this->info('Cloning repository...');
-        exec("git clone -q $source ".$this->conveyor->packagePath(), $output, $exit_code);
+        exec("git clone -q $source ".$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()), $output, $exit_code);
 
-        if ($exit_code != 0) {
+        if ($exit_code !== 0) {
             $this->error('Unable to clone repository');
             $this->warn('Please check credentials and try again');
 
@@ -105,7 +87,7 @@ class GitPackage extends Command
 
         // Create the vendor directory
         $this->info('Creating vendor...');
-        $this->conveyor->makeDir($this->conveyor->vendorPath());
+        $this->fileHandler->makeDir($this->fileHandler->vendorPath($this->conveyor->vendor()));
         $this->makeProgress();
 
         $this->info('Installing package...');
@@ -116,7 +98,7 @@ class GitPackage extends Command
         $this->finishProgress('Package cloned successfully!');
     }
 
-    protected function setGitVendorAndPackage($origin)
+    protected function setGitVendorAndPackage($origin): void
     {
         $pieces = explode('/', $origin);
 

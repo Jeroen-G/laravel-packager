@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\ArchiveExtractors;
 
 use Illuminate\Support\Arr;
@@ -8,7 +10,7 @@ use InvalidArgumentException;
 final class Manager
 {
     /** @var Extractor[] */
-    protected $extractorsMap = [];
+    protected array $extractorsMap = [];
 
     public function __construct()
     {

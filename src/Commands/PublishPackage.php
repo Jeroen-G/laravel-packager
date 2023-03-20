@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 
 /**
@@ -15,47 +18,28 @@ class PublishPackage extends Command
 {
     use ProgressBar;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'packager:publish
                             {vendor : The vendor part of the namespace}
                             {name : The name of package for the namespace}
                             {url : The url of the Github repository}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Publish your package to Github with git.';
 
     /**
      * Packages roll off of the conveyor.
-     *
-     * @var object \JeroenG\Packager\Conveyor
      */
-    protected $conveyor;
+    protected Conveyor $conveyor;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct(Conveyor $conveyor)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
+        $this->fileHandler = $fileHandler;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
         // Start the progress bar
         $this->startProgressBar(5);
@@ -65,17 +49,17 @@ class PublishPackage extends Command
         $this->conveyor->package($this->argument('name'));
 
         $this->info('Initialising Git if not already done so...');
-        if (! file_exists($this->conveyor->packagePath().'/.git/')) {
-            exec('cd '.$this->conveyor->packagePath().' && git init && git add --all && git commit -m "Initial commit"');
+        if (! file_exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/.git/')) {
+            exec('cd '.$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).' && git init && git add --all && git commit -m "Initial commit"');
         }
         $this->makeProgress();
 
         $this->info('Git is set up, adding the remote repository...');
-        exec('cd '.$this->conveyor->packagePath().' && git remote add origin '.$this->argument('url'));
+        exec('cd '.$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).' && git remote add origin '.$this->argument('url'));
         $this->makeProgress();
 
         $this->info('Pushing to Github...');
-        exec('cd '.$this->conveyor->packagePath().' && git push -u origin master');
+        exec('cd '.$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).' && git push -u origin master');
         $this->makeProgress();
 
         // Finished publishing the package, end of the progress bar
