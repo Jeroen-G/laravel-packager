@@ -38,7 +38,7 @@ final class ConveyorTest extends UnitTestCase
             'repositories.myvendor/mypackage',
             '{"type":"path","url":"packages\/myvendor\/mypackage","options":{"symlink":true}}',
             '--file',
-            'composer.json'
+            'composer.json',
         ], true);
 
         $this->expectNotToPerformAssertions();

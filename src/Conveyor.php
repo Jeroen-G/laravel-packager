@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace JeroenG\Packager;
 
 use Illuminate\Support\Str;
-use RuntimeException;
-use Symfony\Component\Process\Process;
 
 final class Conveyor
 {
@@ -135,7 +133,7 @@ final class Conveyor
             'composer',
             'config',
             '--unset',
-            'repositories.' . Str::slug($this->vendor) . '/' . Str::slug($this->package),
+            'repositories.'.Str::slug($this->vendor).'/'.Str::slug($this->package),
         ]);
     }
 
@@ -144,7 +142,7 @@ final class Conveyor
         $this->runProcess([
             'composer',
             'require',
-            $this->vendor . '/' . $this->package . ':@dev',
+            $this->vendor.'/'.$this->package.':@dev',
         ]);
     }
 
@@ -153,7 +151,7 @@ final class Conveyor
         $this->runProcess([
             'composer',
             'remove',
-            $this->vendor . '/' . $this->package,
+            $this->vendor.'/'.$this->package,
         ]);
     }
 }
