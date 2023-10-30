@@ -168,11 +168,11 @@ If you are having problems with timeouts when creating new packages, you can now
 
 ## Changelog
 
-Please see [changelog.md](changelog.md) for what has changed recently.
+Please see [CHANGELOG.md](CHANGELOG.md) for what has changed recently.
 
 ## Contributing
 
-Please see [contributing.md](contributing.md) for details and a todolist.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details and a todolist.
 
 ## Credits
 
@@ -181,7 +181,7 @@ Please see [contributing.md](contributing.md) for details and a todolist.
 
 ## License
 
-The EU Public License. Please see [license.md](license.md) for more information.
+The EU Public License. Please see [LICENSE.md](LICENSE.md) for more information.
 
 
 [ico-version]: https://poser.pugx.org/jeroen-g/laravel-packager/v/stable?format=flat-square
