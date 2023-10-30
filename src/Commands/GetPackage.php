@@ -26,7 +26,7 @@ class GetPackage extends Command
                             {vendor? : The vendor part of the namespace}
                             {name? : The name of package for the namespace}
                             {--host=github : Download from github or bitbucket?}
-                            {--branch=master : The branch to download}';
+                            {--branch=main : The branch to download}';
 
     /**
      * The console command description.

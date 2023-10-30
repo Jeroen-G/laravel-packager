@@ -75,7 +75,7 @@ class PublishPackage extends Command
         $this->makeProgress();
 
         $this->info('Pushing to Github...');
-        exec('cd '.$this->conveyor->packagePath().' && git push -u origin master');
+        exec('cd '.$this->conveyor->packagePath().' && git push -u origin main');
         $this->makeProgress();
 
         // Finished publishing the package, end of the progress bar
