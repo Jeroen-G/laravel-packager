@@ -12,7 +12,7 @@ This package provides you with a simple tool to set up a new package and it will
 Via Composer
 
 ```bash
-$ composer require jeroen-g/laravel-packager --dev
+composer require jeroen-g/laravel-packager --dev
 ```
 
 If you do not run Laravel 5.5 (or higher), then add the service provider in `config/app.php`:
@@ -33,7 +33,7 @@ if ($this->app->environment('local')) {
 Optional you can publish the configuration to provide a different service provider stub. The default is [here](https://github.com/jeroen-g/packager-skeleton).
 
 ```bash
-$ php artisan vendor:publish --provider="JeroenG\Packager\PackagerServiceProvider"
+php artisan vendor:publish --provider="JeroenG\Packager\PackagerServiceProvider"
 ```
 
 ## Available commands
@@ -41,7 +41,7 @@ $ php artisan vendor:publish --provider="JeroenG\Packager\PackagerServiceProvide
 ### New
 **Command:**
 ```bash
-$ php artisan packager:new my-vendor my-package
+php artisan packager:new my-vendor my-package
 ```
 
 **Result:**
@@ -49,13 +49,13 @@ The command will handle practically everything for you. It will create a package
 
 **Options:**
 ```bash
-$ php artisan packager:new my-vendor my-package --i
-$ php artisan packager:new --i
+php artisan packager:new my-vendor my-package --i
+php artisan packager:new --i
 ```
 The package will be created interactively, allowing to configure everything in the package's `composer.json`, such as the license and package description.
 
 ```bash
-$ php artisan packager:new my-vendor/my-package
+php artisan packager:new my-vendor/my-package
 ```
 Alternatively you may also define your vendor and name with a forward slash instead of a space.
 
@@ -66,9 +66,9 @@ The new package will be based on [this custom skeleton](https://github.com/jeroe
 
 ### Get & Git
 **Command:**
-``` bash
-$ php artisan packager:get https://github.com/author/repository
-$ php artisan packager:git https://github.com/author/repository
+```bash
+php artisan packager:get https://github.com/author/repository
+php artisan packager:git https://github.com/author/repository
 ```
 
 **Result:**
@@ -77,16 +77,16 @@ If the `packager:git` command is used, the entire Git repository is cloned. If `
 
 **Options:**
 ```bash
-$ php artisan packager:get https://github.com/author/repository --branch=develop
-$ php artisan packager:get https://github.com/author/repository my-vendor my-package
-$ php artisan packager:git https://github.com/author/repository my-vendor my-package
+php artisan packager:get https://github.com/author/repository --branch=develop
+php artisan packager:get https://github.com/author/repository my-vendor my-package
+php artisan packager:git https://github.com/author/repository my-vendor my-package
 ```
 It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url.
 
 ### Tests
 **Command:**
 ```bash
-$ php artisan packager:tests
+php artisan packager:tests
 ```
 
 **Result:**
@@ -100,7 +100,7 @@ Add the following to phpunit.xml (under the other testsuites) in order to run th
 
 **Options:**
 ```bash
-$ php artisan packager:tests my-vendor my-package
+php artisan packager:tests my-vendor my-package
 ```
 
 **Remarks:**
@@ -109,7 +109,7 @@ If a tests folder exists, the files will be copied to a dedicated folder in the 
 ### List
 **Command:**
 ```bash
-$ php artisan packager:list
+php artisan packager:list
 ```
 
 **Result:**
@@ -117,14 +117,14 @@ An overview of all packages in the `/packages` directory.
 
 **Options:**
 ```bash
-$ php artisan packager:list --git
+php artisan packager:list --git
 ```
 The packages are displayed with information on the git status (branch, commit difference with origin) if it is a git repository.
 
 ### Remove
 **Command:**
 ```bash
-$ php artisan packager:remove my-vendor my-package
+php artisan packager:remove my-vendor my-package
 ```
 
 **Result:**
@@ -133,7 +133,7 @@ The `my-vendor\my-package` package is deleted, including its references in `comp
 ### Publish
 **Command:**
 ```bash
-$ php artisan packager:publish my-vendor my-package https://github.com/my-vendor/my-package
+php artisan packager:publish my-vendor my-package https://github.com/my-vendor/my-package
 ```
 
 **Result:**
@@ -142,7 +142,7 @@ The `my-vendor\my-package` package will be published to Github using the provide
 ### Check
 **Command:**
 ```bash
-$ php artisan packager:check my-vendor my-package
+php artisan packager:check my-vendor my-package
 ```
 
 **Result:**
@@ -152,7 +152,7 @@ The `my-vendor\my-package` package will be checked for security vulnerabilities 
 You first need to run
 
 ```bash
-$ composer require sensiolabs/security-checker
+composer require sensiolabs/security-checker
 ```
 
 
