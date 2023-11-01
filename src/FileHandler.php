@@ -27,12 +27,7 @@ trait FileHandler
      */
     public function vendorPath()
     {
-        if (PHP_OS === 'WINNT')
-        {
-            return $this->packagesPath() . '\\' . $this->vendor();
-        }
-
-        return $this->packagesPath() . '/' . $this->vendor();
+        return $this->packagesPath().DIRECTORY_SEPARATOR.$this->vendor();
     }
 
     /**
@@ -52,12 +47,7 @@ trait FileHandler
      */
     public function packagePath()
     {
-        if (PHP_OS === 'WINNT')
-        {
-            return $this->vendorPath().'\\'.$this->package();
-        }
-
-        return $this->vendorPath().'/'.$this->package();
+        return $this->vendorPath().DIRECTORY_SEPARATOR.$this->package();
     }
 
     /**
