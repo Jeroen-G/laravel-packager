@@ -27,7 +27,7 @@ trait FileHandler
      */
     public function vendorPath()
     {
-        return $this->packagesPath().'/'.$this->vendor();
+        return $this->packagesPath().'\\'.$this->vendor();
     }
 
     /**
@@ -47,7 +47,7 @@ trait FileHandler
      */
     public function packagePath()
     {
-        return $this->vendorPath().'/'.$this->package();
+        return $this->vendorPath().'\\'.$this->package();
     }
 
     /**
