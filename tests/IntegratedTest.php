@@ -4,7 +4,7 @@ namespace JeroenG\Packager\Tests;
 
 use Illuminate\Support\Facades\Artisan;
 
-class IntegratedTest extends TestCase
+final class IntegratedTest extends TestCase
 {
     public function test_new_package_is_created(): void
     {
