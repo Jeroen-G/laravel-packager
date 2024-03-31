@@ -2,6 +2,11 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.10
+
+### Added
+- Laravel 11 supprt
+
 ## Version 2.7
 
 ### Added
