@@ -2,6 +2,11 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 2.12
+
+### Added
+- Laravel Boost AI guidelines and skill
+
 ## Version 2.11
 
 ### Added
