@@ -54,6 +54,10 @@ class PublishPackage extends Command
         $path = $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package());
         $url = $this->argument('url');
 
+        if (!is_dir($path)) {
+            return $this->abort('The package '.$this->conveyor->vendor().'/'.$this->conveyor->package().' does not exist.');
+        }
+
         $this->info('Initialising Git if not already done so...');
         if (!file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
             $initialised = $this->git(['init'], $path)

@@ -7,7 +7,6 @@ namespace JeroenG\Packager\Commands;
 use Illuminate\Console\Command;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\ProgressBar;
-use JeroenG\Packager\Wrapping;
 
 /**
  * Enable an existing package.
@@ -27,16 +26,10 @@ class EnablePackage extends Command
      */
     protected Conveyor $conveyor;
 
-    /**
-     * Packages are packed in wrappings to personalise them.
-     */
-    protected Wrapping $wrapping;
-
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping)
+    public function __construct(Conveyor $conveyor)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
-        $this->wrapping = $wrapping;
     }
 
     public function handle(): void

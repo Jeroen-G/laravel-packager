@@ -9,3 +9,4 @@ report
 *.sublime-workspace
 testbench/
 .phpunit.cache
+infection.log

@@ -3,9 +3,12 @@
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Build Status][ico-actions]][link-actions]
-[![StyleCI][ico-styleci]][link-styleci]
 
 This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate. If you like a visual explanation [check out this video by Jeffrey Way on Laracasts](https://laracasts.com/series/building-laracasts/episodes/3).
+
+## Requirements
+
+Packager 3 requires PHP 8.2 or higher and Laravel 11, 12 or 13. Use Packager 2 for older versions.
 
 ## Installation
 
@@ -141,7 +144,14 @@ CURL_VERIFY=false
 Of course this means it will be less secure, but then again you are not supposed to run this package anywhere near a production environment.
 
 ## Issues with timeout
-If you are having problems with timeouts when creating new packages, you can now change the config variable timeout in config/packager.php to fix this.
+All `composer` and `git` commands that Packager runs (for example installing a package or cloning and pushing a repository) are stopped after the number of seconds in the `timeout` config variable, which defaults to 60. On slow connections or for large repositories you can increase it in config/packager.php.
+
+## Upgrading from 2.x to 3.0
+- Packager now requires PHP 8.2+ and Laravel 11, 12 or 13.
+- The `packager:check` command has been removed, because the SensioLabs security checker it relied on is abandoned. Run `composer audit` in the package directory instead.
+- `git` commands of `packager:git` and `packager:publish` now respect the `timeout` config variable.
+- `packager:publish` pushes the current branch instead of `master`.
+- If you extended Packager's classes: the `FileHandler` trait is now a `FileHandler` class implementing `FileHandlerInterface`, its path methods take the vendor and package as arguments, and `Conveyor` is a final class that is resolved from the container. See the [changelog](changelog.md) for all changes.
 
 ## Changelog
 
@@ -164,11 +174,9 @@ The EU Public License. Please see [license.md](license.md) for more information.
 [ico-version]: https://poser.pugx.org/jeroen-g/laravel-packager/v/stable?format=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/jeroen-g/laravel-packager.svg?style=flat-square
 [ico-actions]: https://img.shields.io/github/actions/workflow/status/Jeroen-G/laravel-packager/main.yml?branch=master&style=flat-square
-[ico-styleci]: https://styleci.io/repos/37218114/shield
 
 [link-packagist]: https://packagist.org/packages/jeroen-g/laravel-packager
 [link-downloads]: https://packagist.org/packages/jeroen-g/laravel-packager
 [link-actions]: https://github.com/Jeroen-G/laravel-packager/actions
-[link-styleci]: https://styleci.io/repos/37218114
 [link-author]: https://github.com/Jeroen-G
 [link-contributors]: ../../contributors

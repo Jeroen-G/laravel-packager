@@ -55,7 +55,7 @@ class FileHandler implements FileHandlerInterface
 
     public function removeDir(string $path): bool
     {
-        if ($path === 'packages' || $path === '/') {
+        if (!is_dir($path) || in_array(rtrim($path, '/\\'), ['', $this->packagesPath()], true)) {
             return false;
         }
 

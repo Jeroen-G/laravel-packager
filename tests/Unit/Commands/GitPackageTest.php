@@ -9,7 +9,6 @@ use JeroenG\Packager\Commands\GitPackage;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\Tests\UnitTestCase;
-use JeroenG\Packager\Wrapping;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionMethod;
@@ -36,7 +35,6 @@ final class GitPackageTest extends UnitTestCase
         );
         $command = new GitPackage(
             $conveyor,
-            new Wrapping(),
             Mockery::mock(FileHandlerInterface::class),
             Mockery::mock(CommandRunnerInterface::class),
         );

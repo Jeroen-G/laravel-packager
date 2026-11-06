@@ -10,7 +10,6 @@ use JeroenG\Packager\CommandRunnerInterface;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
-use JeroenG\Packager\Wrapping;
 
 /**
  * Get an existing package from a remote git repository with its VCS.
@@ -33,24 +32,17 @@ class GitPackage extends Command
      */
     protected Conveyor $conveyor;
 
-    /**
-     * Packages are packed in wrappings to personalise them.
-     */
-    protected Wrapping $wrapping;
-
     protected FileHandlerInterface $fileHandler;
 
     protected CommandRunnerInterface $commandRunner;
 
     public function __construct(
         Conveyor $conveyor,
-        Wrapping $wrapping,
         FileHandlerInterface $fileHandler,
         CommandRunnerInterface $commandRunner,
     ) {
         parent::__construct();
         $this->conveyor = $conveyor;
-        $this->wrapping = $wrapping;
         $this->fileHandler = $fileHandler;
         $this->commandRunner = $commandRunner;
     }

@@ -44,8 +44,15 @@ trait TestHelper
         fwrite(STDOUT, "Setting up test environment for first use.\n");
         $files = new Filesystem();
         $files->makeDirectory(self::TEST_APP_TEMPLATE, 0755, true);
-        $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel/';
-        $files->copyDirectory($original, self::TEST_APP_TEMPLATE);
+        $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel';
+        // Testbench may symlink its skeleton's vendor directory to ours, which must not be copied.
+        foreach (array_diff(scandir($original), ['.', '..', 'vendor']) as $item) {
+            if (is_dir($original.'/'.$item)) {
+                $files->copyDirectory($original.'/'.$item, self::TEST_APP_TEMPLATE.'/'.$item);
+            } else {
+                $files->copy($original.'/'.$item, self::TEST_APP_TEMPLATE.'/'.$item);
+            }
+        }
         // Modify the composer.json file
         $composer = json_decode($files->get(self::TEST_APP_TEMPLATE.'/composer.json'), true);
         // Remove "tests/IntegrationTestCase.php" from autoload (it doesn't exist)

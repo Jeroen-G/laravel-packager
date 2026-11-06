@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Tests\Unit\ValidationRules;
 
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Translation\PotentiallyTranslatedString;
 use JeroenG\Packager\Tests\UnitTestCase;
 use JeroenG\Packager\ValidationRules\ValidClassName;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ValidClassNameTest extends UnitTestCase
@@ -39,20 +42,33 @@ final class ValidClassNameTest extends UnitTestCase
     #[DataProvider('validNames')]
     public function test_it_accepts_valid_class_names(string $name): void
     {
-        $this->assertTrue((new ValidClassName())->passes('name', $name));
+        $this->assertNull($this->validate($name));
     }
 
     #[DataProvider('invalidNames')]
     public function test_it_rejects_invalid_class_names(string $name): void
     {
-        $this->assertFalse((new ValidClassName())->passes('name', $name));
+        $this->assertSame('The package :attribute must conform to a valid PHP classname.', $this->validate($name));
     }
 
-    public function test_it_has_a_message_with_the_attribute_placeholder(): void
+    public function test_it_rejects_non_string_values(): void
     {
-        $this->assertSame(
-            'The package :attribute must conform to a valid PHP classname.',
-            (new ValidClassName())->message()
-        );
+        $this->assertNotNull($this->validate(['Foo']));
+        $this->assertNotNull($this->validate(null));
+    }
+
+    private function validate(mixed $value): ?string
+    {
+        $message = null;
+
+        $fail = function (string $error, ?string $translate = null) use (&$message): PotentiallyTranslatedString {
+            $message = $error;
+
+            return new PotentiallyTranslatedString($error, Mockery::mock(Translator::class));
+        };
+
+        (new ValidClassName())->validate('name', $value, $fail);
+
+        return $message;
     }
 }

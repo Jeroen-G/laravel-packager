@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JeroenG\Packager;
 
 use Illuminate\Support\Str;
+use RuntimeException;
 
 final class Conveyor
 {
@@ -30,6 +31,10 @@ final class Conveyor
             return $this->vendor = $vendor;
         }
 
+        if (!isset($this->vendor)) {
+            throw new RuntimeException('Please provide a vendor name');
+        }
+
         return $this->vendor;
     }
 
@@ -47,6 +52,10 @@ final class Conveyor
     {
         if ($package !== null) {
             return $this->package = $package;
+        }
+
+        if (!isset($this->package)) {
+            throw new RuntimeException('Please provide a package name');
         }
 
         return $this->package;

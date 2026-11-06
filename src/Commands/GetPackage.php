@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
-use JeroenG\Packager\Wrapping;
 
 /**
  * Get an existing package from a remote git repository.
@@ -32,18 +31,12 @@ class GetPackage extends Command
      */
     protected Conveyor $conveyor;
 
-    /**
-     * Packages are packed in wrappings to personalise them.
-     */
-    protected Wrapping $wrapping;
-
     protected FileHandlerInterface $fileHandler;
 
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping, FileHandlerInterface $fileHandler)
+    public function __construct(Conveyor $conveyor, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
-        $this->wrapping = $wrapping;
         $this->fileHandler = $fileHandler;
     }
 

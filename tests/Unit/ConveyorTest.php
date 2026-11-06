@@ -85,4 +85,20 @@ final class ConveyorTest extends UnitTestCase
 
         $this->conveyor->uninstallPackage();
     }
+
+    public function test_it_requires_a_vendor_name(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Please provide a vendor name');
+
+        $this->conveyor->vendor();
+    }
+
+    public function test_it_requires_a_package_name(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Please provide a package name');
+
+        $this->conveyor->package();
+    }
 }

@@ -82,4 +82,11 @@ final class PublishPackageTest extends CommandTestCase
             ->doesntExpectOutputToContain('Package published successfully!')
             ->assertExitCode(1);
     }
+
+    public function test_it_fails_when_the_package_does_not_exist(): void
+    {
+        $this->artisan('packager:publish', ['vendor' => 'acme', 'name' => 'comet', 'url' => self::URL])
+            ->expectsOutputToContain('The package acme/comet does not exist.')
+            ->assertExitCode(1);
+    }
 }

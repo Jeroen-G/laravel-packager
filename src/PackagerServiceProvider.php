@@ -42,14 +42,14 @@ class PackagerServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/packager.php' => config_path('packager.php'),
         ]);
-
-        $this->app->bind(CommandRunnerInterface::class, CommandRunner::class);
-        $this->app->bind(FileHandlerInterface::class, FileHandler::class);
     }
 
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/packager.php', 'packager');
+
+        $this->app->bind(CommandRunnerInterface::class, CommandRunner::class);
+        $this->app->bind(FileHandlerInterface::class, FileHandler::class);
 
         $this->commands($this->commands);
     }

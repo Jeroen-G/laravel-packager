@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Tests\Unit;
 
+use Illuminate\Filesystem\Filesystem;
 use JeroenG\Packager\FileHandler;
 use JeroenG\Packager\Tests\UnitTestCase;
 use Mockery;
@@ -29,9 +30,7 @@ final class FileHandlerTest extends UnitTestCase
 
     protected function tearDown(): void
     {
-        if (is_dir($this->workDir)) {
-            (new FileHandler())->removeDir($this->workDir);
-        }
+        (new Filesystem())->deleteDirectory($this->workDir);
 
         parent::tearDown();
     }
@@ -104,8 +103,15 @@ final class FileHandlerTest extends UnitTestCase
 
     public function test_it_refuses_to_remove_protected_directories(): void
     {
-        $this->assertFalse($this->fileHandler->removeDir('packages'));
         $this->assertFalse($this->fileHandler->removeDir('/'));
+        $this->assertFalse($this->fileHandler->removeDir($this->workDir));
+        $this->assertFalse($this->fileHandler->removeDir($this->workDir.'/'));
+        $this->assertDirectoryExists($this->workDir);
+    }
+
+    public function test_it_does_not_fail_on_a_missing_directory(): void
+    {
+        $this->assertFalse($this->fileHandler->removeDir($this->workDir.'/missing'));
     }
 
     public function test_it_removes_a_directory_recursively(): void
