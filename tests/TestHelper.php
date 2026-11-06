@@ -24,14 +24,14 @@ trait TestHelper
     {
         $this->uninstallTestApp();
         $files = new Filesystem();
-        $files->copyDirectory(self::TEST_APP_TEMPLATE, self::TEST_APP);
+        $files->copyDirectory(self::TEST_APP_TEMPLATE, static::testApp());
     }
 
     protected function uninstallTestApp(): void
     {
         $files = new Filesystem();
-        if ($files->exists(self::TEST_APP)) {
-            $files->deleteDirectory(self::TEST_APP);
+        if ($files->exists(static::testApp())) {
+            $files->deleteDirectory(static::testApp());
         }
     }
 

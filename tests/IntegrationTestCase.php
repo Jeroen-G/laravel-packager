@@ -12,8 +12,6 @@ abstract class IntegrationTestCase extends TestBench
 
     protected const TEST_APP_TEMPLATE = __DIR__.'/../testbench/template';
 
-    protected const TEST_APP = __DIR__.'/../testbench/laravel';
-
     public static function setUpBeforeClass(): void
     {
         if (!file_exists(self::TEST_APP_TEMPLATE)) {
@@ -36,7 +34,16 @@ abstract class IntegrationTestCase extends TestBench
 
     public static function applicationBasePath(): string
     {
-        return self::TEST_APP;
+        return static::testApp();
+    }
+
+    /**
+     * Each process gets its own application, so parallel runs (e.g. Infection threads)
+     * cannot see each other's packages and composer.json changes.
+     */
+    protected static function testApp(): string
+    {
+        return __DIR__.'/../testbench/laravel-'.getmypid();
     }
 
     protected function getPackageProviders($app): array
