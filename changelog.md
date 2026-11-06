@@ -9,6 +9,7 @@ All Notable changes to Packager will be documented in this file.
 - Dropped support of Laravel versions older than 11
 - Dropped check command because the security checker package is deprecated
 - Moved to GitHub actions
+- Added PHPStan (Larastan) static analysis and mutation testing annotations on pull requests
 
 ## Version 2.12
 

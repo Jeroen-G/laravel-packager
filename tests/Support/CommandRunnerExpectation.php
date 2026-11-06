@@ -6,7 +6,7 @@ namespace JeroenG\Packager\Tests\Support;
 
 use JeroenG\Packager\CommandRunnerInterface;
 use Mockery;
-use Mockery\CompositeExpectation;
+use Mockery\ExpectationInterface;
 use Mockery\MockInterface;
 
 final class CommandRunnerExpectation
@@ -28,7 +28,7 @@ final class CommandRunnerExpectation
         return $this->mock;
     }
 
-    public function expectRun(array $commandInput, bool $success = true): CompositeExpectation
+    public function expectRun(array $commandInput, bool $success = true): ExpectationInterface
     {
         return $this->mock
             ->expects('run')

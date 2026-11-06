@@ -53,3 +53,7 @@ jobs:
 
       - name: Execute mutation tests
         run: vendor/bin/infection --threads=4 --min-covered-msi=50 --min-msi=50
+
+      - name: PHPStan analysis
+        run: vendor/bin/phpstan analyse --no-progress
+        if: ${{ matrix.experimental == false }}

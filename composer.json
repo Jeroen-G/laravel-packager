@@ -28,7 +28,10 @@
         "orchestra/testbench": "^9.0|^10.0|^11.0",
         "infection/infection": "^0.29|^0.31",
         "slevomat/coding-standard": "^8.0",
-        "symplify/easy-coding-standard": "^13.0"
+        "symplify/easy-coding-standard": "^13.0",
+        "larastan/larastan": "^3.0",
+        "phpstan/phpstan-mockery": "^2.0",
+        "mockery/mockery": "^1.6"
     },
     "autoload": {
         "psr-4": {

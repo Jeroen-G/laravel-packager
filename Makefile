@@ -21,6 +21,9 @@ codestyle: ## Check the codestyle
 codestyle-fix: ## Fix your mess
 	./vendor/bin/ecs check --fix --config=easy-coding-standard.php
 
+phpstan: ## Run PHPStan static analysis
+	./vendor/bin/phpstan analyse
+
 test: ## Run PHPUnit with coverage
 	@echo "\n=== Running unit tests ===\n"
 	XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-html ./report
