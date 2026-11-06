@@ -23,6 +23,8 @@ final class CommandRunner implements CommandRunnerInterface
 
     /**
      * Run the command and return the process when it succeeded, or null when it failed or timed out.
+     *
+     * @param  list<string>  $command
      */
     private function execute(array $command, ?string $workingDirectory): ?Process
     {

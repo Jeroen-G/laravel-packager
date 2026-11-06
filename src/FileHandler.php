@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JeroenG\Packager;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use JeroenG\Packager\ArchiveExtractors\Manager;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -12,6 +13,13 @@ use RuntimeException;
 
 class FileHandler implements FileHandlerInterface
 {
+    private ClientInterface $client;
+
+    public function __construct(?ClientInterface $client = null)
+    {
+        $this->client = $client ?? new Client();
+    }
+
     public function packagesPath(): string
     {
         return base_path('packages');
@@ -22,22 +30,22 @@ class FileHandler implements FileHandlerInterface
         return $this->packagesPath().DIRECTORY_SEPARATOR.$vendor;
     }
 
-    public function tempPath($vendor): string
+    public function tempPath(string $vendor): string
     {
         return $this->vendorPath($vendor).DIRECTORY_SEPARATOR.'temp';
     }
 
-    public function packagePath($vendor, $package): string
+    public function packagePath(string $vendor, string $package): string
     {
         return $this->vendorPath($vendor).DIRECTORY_SEPARATOR.$package;
     }
 
-    public function makeFilename($extension = 'zip'): string
+    public function makeFilename(string $extension = 'zip'): string
     {
         return getcwd().'/package'.md5(time().uniqid('', true)).'.'.$extension;
     }
 
-    public function checkIfPackageExists($vendor, $package): void
+    public function checkIfPackageExists(string $vendor, string $package): void
     {
         if (is_dir($this->packagePath($vendor, $package))) {
             throw new RuntimeException('Package already exists');
@@ -74,8 +82,9 @@ class FileHandler implements FileHandlerInterface
 
     public function download(string $filePath, string $sourceFileUrl): self
     {
-        $client = new Client(['verify' => config('packager.curl_verify_cert')]);
-        $response = $client->get($sourceFileUrl);
+        $response = $this->client->request('GET', $sourceFileUrl, [
+            'verify' => config('packager.curl_verify_cert'),
+        ]);
         file_put_contents($filePath, $response->getBody());
 
         return $this;
@@ -119,7 +128,7 @@ class FileHandler implements FileHandlerInterface
         }
     }
 
-    public function cleanUpRules($vendor, $package): void
+    public function cleanUpRules(string $vendor, string $package): void
     {
         $ruleFiles = ['rules.php', 'rewriteRules.php'];
 
@@ -133,7 +142,7 @@ class FileHandler implements FileHandlerInterface
     public function getArchiveExtension(string $archiveFilePath): string
     {
         $pathParts = pathinfo($archiveFilePath);
-        $extension = $pathParts['extension'];
+        $extension = $pathParts['extension'] ?? '';
 
         // Here we check if it actually is supposed to be .tar.gz/.tar.xz
         if (in_array($extension, ['gz', 'xz'], true)) {

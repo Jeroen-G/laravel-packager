@@ -44,7 +44,7 @@ trait ProgressBar
      */
     public function makeProgress(): void
     {
-        $this->bar->advance();
+        $this->bar?->advance();
     }
 
     /**
@@ -66,7 +66,7 @@ trait ProgressBar
      */
     public function finishProgress(string $message): void
     {
-        $this->bar->finish();
+        $this->bar?->finish();
         $this->info($message);
         $this->output->newLine(2);
         $this->bar = null;

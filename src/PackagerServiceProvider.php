@@ -25,6 +25,7 @@ use JeroenG\Packager\Commands\RemovePackage;
  **/
 class PackagerServiceProvider extends ServiceProvider
 {
+    /** @var list<class-string<\Illuminate\Console\Command>> */
     protected array $commands = [
         NewPackage::class,
         RemovePackage::class,

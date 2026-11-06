@@ -11,7 +11,7 @@ use Mockery\MockInterface;
 
 final class CommandRunnerExpectation
 {
-    private CommandRunnerInterface|MockInterface $mock;
+    private CommandRunnerInterface&MockInterface $mock;
 
     private function __construct()
     {
@@ -23,11 +23,14 @@ final class CommandRunnerExpectation
         return new CommandRunnerExpectation();
     }
 
-    public function getMock(): CommandRunnerInterface|MockInterface
+    public function getMock(): CommandRunnerInterface&MockInterface
     {
         return $this->mock;
     }
 
+    /**
+     * @param  list<string>  $commandInput
+     */
     public function expectRun(array $commandInput, bool $success = true, ?string $workingDirectory = null): ExpectationInterface
     {
         $arguments = $workingDirectory === null ? [$commandInput] : [$commandInput, $workingDirectory];
@@ -38,6 +41,9 @@ final class CommandRunnerExpectation
             ->andReturn($success);
     }
 
+    /**
+     * @param  list<string>  $commandInput
+     */
     public function expectOutput(array $commandInput, ?string $output, string $workingDirectory): ExpectationInterface
     {
         return $this->mock

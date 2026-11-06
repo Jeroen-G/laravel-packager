@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use JeroenG\Packager\CommandRunnerInterface;
 use JeroenG\Packager\FileHandlerInterface;
 
@@ -49,7 +50,7 @@ class ListPackages extends Command
      */
     private function getPackagesList(): array
     {
-        $composerFile = json_decode(file_get_contents(base_path('composer.json')), true, 512, JSON_THROW_ON_ERROR);
+        $composerFile = File::json(base_path('composer.json'), JSON_THROW_ON_ERROR);
         $pattern = '{^'.preg_quote($this->fileHandler->packagesPath().DIRECTORY_SEPARATOR, '{').'([^'.preg_quote(DIRECTORY_SEPARATOR, '{').']+)'.preg_quote(DIRECTORY_SEPARATOR, '{').'(.+)$}';
         $packages = [];
 
@@ -62,13 +63,18 @@ class ListPackages extends Command
         return $packages;
     }
 
+    /**
+     * @param  array<int, array{0: string, 1: string}>  $packages
+     */
     private function renderBasicTable(array $packages): void
     {
-        $this->table(['Package', 'Path'], $packages);
+        $this->table(['Vendor', 'Package'], $packages);
     }
 
     /**
      * Render the list, but with git status if the package has git initialised.
+     *
+     * @param  array<int, array{0: string, 1: string}>  $packages
      */
     private function renderGitTable(array $packages): void
     {
@@ -77,11 +83,13 @@ class ListPackages extends Command
             $gitPackages[] = array_merge($package, $this->getGitStatus($this->fileHandler->packagePath($package[0], $package[1])));
         }
 
-        $this->table(['Package', 'Path', 'Commits behind', 'Branch'], $gitPackages);
+        $this->table(['Vendor', 'Package', 'Commits behind', 'Branch'], $gitPackages);
     }
 
     /**
      * If a package has a git history, add its status.
+     *
+     * @return array{0: int|string, 1: string}
      */
     private function getGitStatus(string $path): array
     {
@@ -91,15 +99,17 @@ class ListPackages extends Command
 
         $this->commandRunner->run(['git', 'fetch'], $path);
 
-        return [$this->getCommitDifference($path), $this->getCurrentBranch($path) ?? '-'];
+        return [$this->getCommitDifference($path) ?? '-', $this->getCurrentBranch($path) ?? '-'];
     }
 
     /**
-     * The number of commits the local package is behind on the origin remote.
+     * The number of commits the local package is behind on the origin remote, or null when unknown.
      */
-    private function getCommitDifference(string $path): int
+    private function getCommitDifference(string $path): ?int
     {
-        return (int) $this->commandRunner->output(['git', 'rev-list', 'HEAD..origin', '--count'], $path);
+        $count = $this->commandRunner->output(['git', 'rev-list', 'HEAD..origin', '--count'], $path);
+
+        return is_numeric($count) ? (int) $count : null;
     }
 
     private function getCurrentBranch(string $path): ?string

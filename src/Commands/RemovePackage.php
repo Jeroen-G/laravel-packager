@@ -16,6 +16,7 @@ use JeroenG\Packager\ProgressBar;
  **/
 class RemovePackage extends Command
 {
+    use InteractsWithStringInput;
     use ProgressBar;
 
     protected $signature = 'packager:remove {vendor} {name?}';
@@ -41,8 +42,8 @@ class RemovePackage extends Command
         // Start the progress bar
         $this->startProgressBar(4);
 
-        $vendor = $this->argument('vendor');
-        $name = $this->argument('name');
+        $vendor = $this->requiredArgument('vendor');
+        $name = $this->stringArgument('name');
 
         if (mb_strpos($vendor, '/') !== false) {
             [$vendor, $name] = explode('/', $vendor);

@@ -14,6 +14,8 @@ use Illuminate\Filesystem\Filesystem;
  **/
 class MoveTests extends Command
 {
+    use InteractsWithStringInput;
+
     protected $signature = 'packager:tests
                             {vendor? : The package for which to move the tests}
                             {name? : The package for which to move the tests}';
@@ -30,10 +32,10 @@ class MoveTests extends Command
 
     public function handle(): void
     {
-        if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
+        if (is_null($this->stringArgument('vendor')) || is_null($this->stringArgument('name'))) {
             $this->info('Moving tests for all local packages');
 
-            $composer = json_decode(file_get_contents(base_path('composer.json')), true, 512, JSON_THROW_ON_ERROR);
+            $composer = $this->files->json(base_path('composer.json'), JSON_THROW_ON_ERROR);
 
             $packages = [];
             foreach ($composer['autoload']['psr-4'] as $package => $path) {
@@ -47,14 +49,14 @@ class MoveTests extends Command
 
                 if ($this->files->exists($path)) {
                     $this->info('Moving tests for the package: '.$package[0]);
-                    $this->files->copyDirectory($path, base_path('tests/packages/'.$package[0]));
+                    $this->files->copyDirectory($path, base_path('tests/packages/'.str_replace('\\', '/', $package[0])));
                 } else {
                     $this->info('No tests found for: '.$package[0]);
                 }
             }
         } else {
-            $vendor = $this->argument('vendor');
-            $name = $this->argument('name');
+            $vendor = $this->stringArgument('vendor');
+            $name = $this->stringArgument('name');
             $path = base_path('packages/'.$vendor.'/'.$name.'/tests');
 
             if ($this->files->exists($path)) {

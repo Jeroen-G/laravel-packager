@@ -16,6 +16,7 @@ use JeroenG\Packager\ProgressBar;
  **/
 class GetPackage extends Command
 {
+    use InteractsWithStringInput;
     use ProgressBar;
 
     protected $signature = 'packager:get
@@ -46,14 +47,14 @@ class GetPackage extends Command
         $this->startProgressBar(4);
 
         // Common variables
-        $origin = mb_strtolower(rtrim($this->argument('url'), '/')).'/archive/'.$this->option('branch').'.zip';
+        $origin = mb_strtolower(rtrim($this->requiredArgument('url'), '/')).'/archive/'.$this->stringOption('branch').'.zip';
         $pieces = explode('/', $origin);
-        if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
+        if (is_null($this->stringArgument('vendor')) || is_null($this->stringArgument('name'))) {
             $this->conveyor->vendor($pieces[3]);
             $this->conveyor->package($pieces[4]);
         } else {
-            $this->conveyor->vendor($this->argument('vendor'));
-            $this->conveyor->package($this->argument('name'));
+            $this->conveyor->vendor($this->stringArgument('vendor'));
+            $this->conveyor->package($this->stringArgument('name'));
         }
 
         // Start creating the package
@@ -72,7 +73,7 @@ class GetPackage extends Command
         $this->makeProgress();
 
         $this->info('Downloading from Github...');
-        $this->conveyor->downloadFromGithub($origin, $pieces[4], $this->option('branch'));
+        $this->conveyor->downloadFromGithub($origin);
 
         $this->makeProgress();
 

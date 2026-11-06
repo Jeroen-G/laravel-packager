@@ -15,6 +15,7 @@ use JeroenG\Packager\ProgressBar;
  **/
 class DisablePackage extends Command
 {
+    use InteractsWithStringInput;
     use ProgressBar;
 
     protected $signature = 'packager:disable {vendor} {name}';
@@ -38,8 +39,8 @@ class DisablePackage extends Command
         $this->startProgressBar(2);
 
         // Defining vendor/package
-        $this->conveyor->vendor($this->argument('vendor'));
-        $this->conveyor->package($this->argument('name'));
+        $this->conveyor->vendor($this->requiredArgument('vendor'));
+        $this->conveyor->package($this->requiredArgument('name'));
 
         // Start removing the package
         $this->info('Disabling package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');

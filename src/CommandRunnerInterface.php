@@ -9,7 +9,7 @@ interface CommandRunnerInterface
     /**
      * Run a command and report whether it succeeded.
      *
-     * @param  string[]  $command
+     * @param  list<string>  $command
      * @param  string|null  $workingDirectory  Defaults to the application's base path
      */
     public function run(array $command, ?string $workingDirectory = null): bool;
@@ -17,7 +17,7 @@ interface CommandRunnerInterface
     /**
      * Run a command and return its trimmed output, or null when it failed.
      *
-     * @param  string[]  $command
+     * @param  list<string>  $command
      * @param  string|null  $workingDirectory  Defaults to the application's base path
      */
     public function output(array $command, ?string $workingDirectory = null): ?string;

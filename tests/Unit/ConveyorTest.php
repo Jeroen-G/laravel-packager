@@ -15,7 +15,7 @@ final class ConveyorTest extends UnitTestCase
 
     private Conveyor $conveyor;
 
-    private FileHandler|\Mockery\MockInterface $fileHandler;
+    private FileHandler&\Mockery\MockInterface $fileHandler;
 
     protected function setUp(): void
     {

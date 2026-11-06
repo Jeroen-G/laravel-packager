@@ -73,29 +73,12 @@ final class Conveyor
 
     public function downloadSkeleton(?string $skeletonArchiveUrl = null): void
     {
-        $skeletonArchiveUrl = $skeletonArchiveUrl ?? config('packager.skeleton');
-        $extension = $this->fileHandler->getArchiveExtension($skeletonArchiveUrl);
-
-        $this->fileHandler->download($archive = $this->fileHandler->makeFilename($extension), $skeletonArchiveUrl)
-            ->extract($archive, $this->fileHandler->tempPath($this->vendor()))
-            ->cleanUp($archive);
-
-        $firstInDirectory = scandir($this->fileHandler->tempPath($this->vendor()))[2];
-        $extractedSkeletonLocation = $this->fileHandler->tempPath($this->vendor()).'/'.$firstInDirectory;
-        rename($extractedSkeletonLocation, $this->fileHandler->packagePath($this->vendor(), $this->package()));
-
-        if (is_dir($this->fileHandler->tempPath($this->vendor()))) {
-            rmdir($this->fileHandler->tempPath($this->vendor()));
-        }
+        $this->downloadArchive($skeletonArchiveUrl ?? config('packager.skeleton'));
     }
 
-    public function downloadFromGithub(string $origin, string $piece, string $branch): void
+    public function downloadFromGithub(string $archiveUrl): void
     {
-        $this->fileHandler->download($zipFile = $this->fileHandler->makeFilename(), $origin)
-            ->extract($zipFile, $this->fileHandler->vendorPath($this->vendor()))
-            ->cleanUp($zipFile);
-
-        rename($this->fileHandler->vendorPath($this->vendor()).'/'.$piece.'-'.$branch, $this->fileHandler->packagePath($this->vendor(), $this->package()));
+        $this->downloadArchive($archiveUrl);
     }
 
     public function installPackage(): void
@@ -110,6 +93,37 @@ final class Conveyor
         $this->removePathRepository();
     }
 
+    /**
+     * Download and extract an archive, and move the directory it contains to the package path.
+     */
+    private function downloadArchive(string $archiveUrl): void
+    {
+        $tempPath = $this->fileHandler->tempPath($this->vendor());
+        $archive = $this->fileHandler->makeFilename($this->fileHandler->getArchiveExtension($archiveUrl));
+
+        $this->fileHandler->download($archive, $archiveUrl)
+            ->extract($archive, $tempPath)
+            ->cleanUp($archive);
+
+        // Archives from GitHub contain a single directory (tarballs may also hold a pax_global_header file).
+        $extracted = array_values(array_filter(
+            array_diff(scandir($tempPath) ?: [], ['.', '..']),
+            static fn (string $entry): bool => is_dir($tempPath.DIRECTORY_SEPARATOR.$entry),
+        ));
+
+        if (count($extracted) !== 1) {
+            $this->fileHandler->removeDir($tempPath);
+
+            throw new RuntimeException('The archive should contain exactly one directory');
+        }
+
+        rename($tempPath.DIRECTORY_SEPARATOR.$extracted[0], $this->fileHandler->packagePath($this->vendor(), $this->package()));
+        $this->fileHandler->removeDir($tempPath);
+    }
+
+    /**
+     * @param  list<string>  $command
+     */
     private function runProcess(array $command): bool
     {
         return $this->commandRunner->run($command);

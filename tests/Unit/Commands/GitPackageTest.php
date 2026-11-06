@@ -15,6 +15,9 @@ use ReflectionMethod;
 
 final class GitPackageTest extends UnitTestCase
 {
+    /**
+     * @return array<string, list<string>>
+     */
     public static function origins(): array
     {
         return [

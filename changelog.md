@@ -10,13 +10,15 @@ All Notable changes to Packager will be documented in this file.
 - The `FileHandler` trait is replaced by the `FileHandler` class and `FileHandlerInterface`; `vendorPath()`, `tempPath()`, `packagePath()`, `checkIfPackageExists()` and `cleanUpRules()` now take the vendor and package as arguments
 - `Conveyor` is a final class with `CommandRunnerInterface` and `FileHandlerInterface` constructor dependencies
 - `CommandRunnerInterface::run()` accepts a working directory and the interface has a new `output()` method
+- `Conveyor::downloadFromGithub()` only takes the archive url
+- `FileHandler` accepts an optional Guzzle client and its path methods have typed parameters
 - `ValidClassName` implements `ValidationRule` instead of the deprecated `Rule` contract
 - Commands no longer receive the `Wrapping` class when they do not use it
 - `git` commands respect the `timeout` config variable and `packager:publish` pushes the current branch instead of `master`
 
 ### Updated
 - Moved to GitHub actions
-- Added PHPStan (Larastan) static analysis and mutation testing annotations on pull requests
+- Added PHPStan (Larastan, level 8) static analysis and mutation testing annotations on pull requests
 
 ### Fixed
 - Class name validation accepted characters like `` ` `` and `{` and rejected multibyte names
@@ -31,6 +33,9 @@ All Notable changes to Packager will be documented in this file.
 - `packager:remove` without a package name shows an error again instead of crashing
 - `packager:publish` reports a missing package directory
 - Removing a package whose directory is already gone no longer crashes
+- `packager:get` failed for repositories with uppercase letters in their name or branches with a slash
+- `packager:list` shows `-` instead of 0 when the commits behind cannot be determined, and names its columns Vendor and Package
+- `packager:tests` copies tests of all packages to `tests/packages/Vendor/Package` instead of a directory named `Vendor\Package`
 
 ### Changed
 - All git and composer commands run through `CommandRunner`, so they respect the `timeout` config and are unit tested

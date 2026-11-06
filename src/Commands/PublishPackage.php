@@ -17,6 +17,7 @@ use JeroenG\Packager\ProgressBar;
  **/
 class PublishPackage extends Command
 {
+    use InteractsWithStringInput;
     use ProgressBar;
 
     protected $signature = 'packager:publish
@@ -49,10 +50,10 @@ class PublishPackage extends Command
         $this->startProgressBar(3);
 
         // Defining vendor/package
-        $this->conveyor->vendor($this->argument('vendor'));
-        $this->conveyor->package($this->argument('name'));
+        $this->conveyor->vendor($this->requiredArgument('vendor'));
+        $this->conveyor->package($this->requiredArgument('name'));
         $path = $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package());
-        $url = $this->argument('url');
+        $url = $this->requiredArgument('url');
 
         if (!is_dir($path)) {
             return $this->abort('The package '.$this->conveyor->vendor().'/'.$this->conveyor->package().' does not exist.');
@@ -93,6 +94,9 @@ class PublishPackage extends Command
         return self::SUCCESS;
     }
 
+    /**
+     * @param  list<string>  $arguments
+     */
     private function git(array $arguments, string $path): bool
     {
         return $this->commandRunner->run(['git', ...$arguments], $path);

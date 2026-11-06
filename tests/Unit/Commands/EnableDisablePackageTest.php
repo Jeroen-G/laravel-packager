@@ -16,13 +16,13 @@ final class EnableDisablePackageTest extends CommandTestCase
             'composer',
             'config',
             'repositories.acme/rocket',
-            json_encode(['type' => 'path', 'url' => $path, 'options' => ['symlink' => true]]),
+            json_encode(['type' => 'path', 'url' => $path, 'options' => ['symlink' => true]], JSON_THROW_ON_ERROR),
             '--file',
             'composer.json',
         ]);
         $this->commandRunner->expectRun(['composer', 'require', 'acme/rocket:@dev']);
 
-        $this->artisan('packager:enable', ['vendor' => 'acme', 'name' => 'rocket'])
+        $this->command('packager:enable', ['vendor' => 'acme', 'name' => 'rocket'])
             ->expectsOutputToContain('Enabling package acme\rocket...')
             ->assertExitCode(0);
     }
@@ -32,7 +32,7 @@ final class EnableDisablePackageTest extends CommandTestCase
         $this->commandRunner->expectRun(['composer', 'remove', 'acme/rocket']);
         $this->commandRunner->expectRun(['composer', 'config', '--unset', 'repositories.acme/rocket']);
 
-        $this->artisan('packager:disable', ['vendor' => 'acme', 'name' => 'rocket'])
+        $this->command('packager:disable', ['vendor' => 'acme', 'name' => 'rocket'])
             ->expectsOutputToContain('Disabling package acme\rocket...')
             ->assertExitCode(0);
     }

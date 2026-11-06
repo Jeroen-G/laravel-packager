@@ -35,6 +35,9 @@ final class FileHandlerTest extends UnitTestCase
         parent::tearDown();
     }
 
+    /**
+     * @return array<string, list<string>>
+     */
     public static function archives(): array
     {
         return [

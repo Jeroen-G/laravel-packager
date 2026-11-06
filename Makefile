@@ -32,6 +32,6 @@ test: ## Run PHPUnit with coverage
 
 infection: ## Run InfectionPHP with coverage
 	@echo "\n=== Running unit tests ===\n"
-	XDEBUG_MODE=coverage vendor/bin/infection --threads=4 --min-covered-msi=50 --min-msi=50
+	XDEBUG_MODE=coverage vendor/bin/infection --threads=4 --min-covered-msi=75 --min-msi=75
 	@echo "\n=== Click the link below to see the mutation coverage report ===\n"
 	@echo "report/infection.html"

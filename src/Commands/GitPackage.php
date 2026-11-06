@@ -18,6 +18,7 @@ use JeroenG\Packager\ProgressBar;
  **/
 class GitPackage extends Command
 {
+    use InteractsWithStringInput;
     use ProgressBar;
 
     protected $signature = 'packager:git
@@ -53,14 +54,14 @@ class GitPackage extends Command
         $this->startProgressBar(4);
 
         // Common variables
-        $source = $this->argument('url');
+        $source = $this->requiredArgument('url');
         $origin = mb_strtolower(rtrim($source, '/'));
 
-        if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
+        if (is_null($this->stringArgument('vendor')) || is_null($this->stringArgument('name'))) {
             $this->setGitVendorAndPackage($origin);
         } else {
-            $this->conveyor->vendor($this->argument('vendor'));
-            $this->conveyor->package($this->argument('name'));
+            $this->conveyor->vendor($this->stringArgument('vendor'));
+            $this->conveyor->package($this->stringArgument('name'));
         }
 
         // Start creating the package
@@ -107,7 +108,7 @@ class GitPackage extends Command
         return self::SUCCESS;
     }
 
-    protected function setGitVendorAndPackage($origin): void
+    protected function setGitVendorAndPackage(string $origin): void
     {
         $pieces = explode('/', $origin);
 

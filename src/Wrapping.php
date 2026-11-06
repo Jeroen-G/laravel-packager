@@ -6,21 +6,24 @@ namespace JeroenG\Packager;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RuntimeException;
 
 class Wrapping
 {
+    /** @var list<string> */
     public array $placeholders = [];
 
+    /** @var list<string> */
     public array $replacements = [];
 
     /**
      * Open haystack, find and replace needles, save haystack.
      *
-     * @param  string|array  $placeholder  String or array to look for (the needles)
-     * @param  string|array  $replacement  What to replace the needles for?
+     * @param  string|list<string>  $placeholder  String or array to look for (the needles)
+     * @param  string|null|list<string|null>  $replacement  What to replace the needles for? Null replaces with an empty string.
      * @return $this
      */
-    public function replace($placeholder, $replacement): self
+    public function replace(string|array $placeholder, string|array|null $replacement): self
     {
         if (is_array($placeholder)) {
             $this->placeholders = array_merge($this->placeholders, $placeholder);
@@ -28,9 +31,9 @@ class Wrapping
             $this->placeholders[] = $placeholder;
         }
         if (is_array($replacement)) {
-            $this->replacements = array_merge($this->replacements, $replacement);
+            $this->replacements = array_merge($this->replacements, array_map(static fn (?string $value): string => $value ?? '', $replacement));
         } else {
-            $this->replacements[] = $replacement;
+            $this->replacements[] = $replacement ?? '';
         }
 
         return $this;
@@ -65,7 +68,13 @@ class Wrapping
     {
         $destination = $destination ?? $template;
 
-        $filledFile = str_replace($this->placeholders, $this->replacements, file_get_contents($template));
+        $contents = file_get_contents($template);
+
+        if ($contents === false) {
+            throw new RuntimeException("Unable to read {$template}");
+        }
+
+        $filledFile = str_replace($this->placeholders, $this->replacements, $contents);
         file_put_contents($destination, $filledFile);
 
         return $this;

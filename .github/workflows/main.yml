@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -52,7 +52,7 @@ jobs:
         run: vendor/bin/phpunit --testsuite integration --testdox --colors=always
 
       - name: Execute mutation tests
-        run: vendor/bin/infection --threads=4 --min-covered-msi=50 --min-msi=50
+        run: vendor/bin/infection --threads=4 --min-covered-msi=75 --min-msi=75
 
       - name: PHPStan analysis
         run: vendor/bin/phpstan analyse --no-progress

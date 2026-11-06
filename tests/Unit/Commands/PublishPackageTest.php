@@ -29,7 +29,7 @@ final class PublishPackageTest extends CommandTestCase
         $this->commandRunner->expectRun(['git', 'remote', 'add', 'origin', self::URL], true, $this->path);
         $this->commandRunner->expectRun(['git', 'push', '-u', 'origin', 'HEAD'], true, $this->path);
 
-        $this->artisan('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
+        $this->command('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
             ->expectsOutputToContain('Package published successfully!')
             ->assertExitCode(0);
     }
@@ -42,7 +42,7 @@ final class PublishPackageTest extends CommandTestCase
         $this->commandRunner->expectRun(['git', 'remote', 'set-url', 'origin', self::URL], true, $this->path);
         $this->commandRunner->expectRun(['git', 'push', '-u', 'origin', 'HEAD'], true, $this->path);
 
-        $this->artisan('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
+        $this->command('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
             ->assertExitCode(0);
     }
 
@@ -52,7 +52,7 @@ final class PublishPackageTest extends CommandTestCase
         $this->commandRunner->expectRun(['git', 'add', '--all'], true, $this->path);
         $this->commandRunner->expectRun(['git', 'commit', '-m', 'Initial commit'], false, $this->path);
 
-        $this->artisan('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
+        $this->command('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
             ->expectsOutputToContain('Unable to initialise a git repository for the package.')
             ->assertExitCode(1);
     }
@@ -64,7 +64,7 @@ final class PublishPackageTest extends CommandTestCase
         $this->commandRunner->expectOutput(['git', 'remote', 'get-url', 'origin'], null, $this->path);
         $this->commandRunner->expectRun(['git', 'remote', 'add', 'origin', self::URL], false, $this->path);
 
-        $this->artisan('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
+        $this->command('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
             ->expectsOutputToContain('Unable to set the remote repository.')
             ->assertExitCode(1);
     }
@@ -77,7 +77,7 @@ final class PublishPackageTest extends CommandTestCase
         $this->commandRunner->expectRun(['git', 'remote', 'set-url', 'origin', self::URL], true, $this->path);
         $this->commandRunner->expectRun(['git', 'push', '-u', 'origin', 'HEAD'], false, $this->path);
 
-        $this->artisan('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
+        $this->command('packager:publish', ['vendor' => 'acme', 'name' => 'rocket', 'url' => self::URL])
             ->expectsOutputToContain('Unable to push to the remote repository')
             ->doesntExpectOutputToContain('Package published successfully!')
             ->assertExitCode(1);
@@ -85,7 +85,7 @@ final class PublishPackageTest extends CommandTestCase
 
     public function test_it_fails_when_the_package_does_not_exist(): void
     {
-        $this->artisan('packager:publish', ['vendor' => 'acme', 'name' => 'comet', 'url' => self::URL])
+        $this->command('packager:publish', ['vendor' => 'acme', 'name' => 'comet', 'url' => self::URL])
             ->expectsOutputToContain('The package acme/comet does not exist.')
             ->assertExitCode(1);
     }

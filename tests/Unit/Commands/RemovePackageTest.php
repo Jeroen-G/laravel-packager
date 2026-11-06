@@ -20,7 +20,7 @@ final class RemovePackageTest extends CommandTestCase
     {
         $this->expectUninstall('acme', 'rocket');
 
-        $this->artisan('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
+        $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
             ->expectsOutputToContain('Package removed successfully!')
             ->assertExitCode(0);
@@ -33,7 +33,7 @@ final class RemovePackageTest extends CommandTestCase
     {
         $this->expectUninstall('acme', 'rocket');
 
-        $this->artisan('packager:remove', ['vendor' => 'acme/rocket'])
+        $this->command('packager:remove', ['vendor' => 'acme/rocket'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
             ->assertExitCode(0);
 
@@ -44,7 +44,7 @@ final class RemovePackageTest extends CommandTestCase
     {
         $this->expectUninstall('acme', 'rocket');
 
-        $this->artisan('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
+        $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'yes')
             ->expectsOutputToContain('removing vendor directory...')
             ->assertExitCode(0);
@@ -57,7 +57,7 @@ final class RemovePackageTest extends CommandTestCase
         mkdir($this->packagePath('acme', 'anvil'), 0777, true);
         $this->expectUninstall('acme', 'rocket');
 
-        $this->artisan('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
+        $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'yes')
             ->expectsOutputToContain('vendor directory is not empty, continuing...')
             ->assertExitCode(0);
@@ -69,7 +69,7 @@ final class RemovePackageTest extends CommandTestCase
     {
         $this->expectUninstall('acme', 'comet');
 
-        $this->artisan('packager:remove', ['vendor' => 'acme', 'name' => 'comet'])
+        $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'comet'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
             ->expectsOutputToContain('Package removed successfully!')
             ->assertExitCode(0);
@@ -79,7 +79,7 @@ final class RemovePackageTest extends CommandTestCase
     {
         $this->expectExceptionMessage('Please provide a package name');
 
-        $this->artisan('packager:remove', ['vendor' => 'acme'])->run();
+        $this->command('packager:remove', ['vendor' => 'acme'])->run();
     }
 
     private function expectUninstall(string $vendor, string $package): void

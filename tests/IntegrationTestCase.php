@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Tests;
 
+use JeroenG\Packager\Tests\Support\RunsCommands;
 use Orchestra\Testbench\TestCase as TestBench;
 
 abstract class IntegrationTestCase extends TestBench
 {
+    use RunsCommands;
     use TestHelper;
 
     protected const TEST_APP_TEMPLATE = __DIR__.'/../testbench/template';

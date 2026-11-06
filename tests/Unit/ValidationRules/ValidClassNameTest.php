@@ -13,6 +13,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ValidClassNameTest extends UnitTestCase
 {
+    /**
+     * @return array<string, list<string>>
+     */
     public static function validNames(): array
     {
         return [
@@ -25,6 +28,9 @@ final class ValidClassNameTest extends UnitTestCase
         ];
     }
 
+    /**
+     * @return array<string, list<string>>
+     */
     public static function invalidNames(): array
     {
         return [

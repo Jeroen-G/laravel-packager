@@ -20,6 +20,7 @@ use JeroenG\Packager\Wrapping;
  **/
 class NewPackage extends Command
 {
+    use InteractsWithStringInput;
     use ProgressBar;
 
     protected $signature = 'packager:new {vendor?} {name?} {--i} {--skeleton=}';
@@ -51,8 +52,8 @@ class NewPackage extends Command
         // Start the progress bar
         $this->startProgressBar(6);
 
-        $vendor = $this->argument('vendor') ?? 'vendor-name';
-        $name = $this->argument('name') ?? 'package-name';
+        $vendor = $this->stringArgument('vendor') ?? 'vendor-name';
+        $name = $this->stringArgument('name') ?? 'package-name';
 
         if (mb_strpos($vendor, '/') !== false) {
             [$vendor, $name] = explode('/', $vendor);
@@ -94,9 +95,9 @@ class NewPackage extends Command
         // Get the packager package skeleton
         $this->info('Downloading skeleton...');
         if ($this->option('i')) {
-            $this->conveyor->downloadSkeleton($this->ask('What package skeleton would you like to use?', $this->option('skeleton') ?? config('packager.skeleton')));
+            $this->conveyor->downloadSkeleton($this->ask('What package skeleton would you like to use?', $this->stringOption('skeleton') ?? config('packager.skeleton')));
         } else {
-            $this->conveyor->downloadSkeleton($this->option('skeleton'));
+            $this->conveyor->downloadSkeleton($this->stringOption('skeleton'));
         }
         $manifest = (file_exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php')) ? $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php' : null;
         $this->fileHandler->renameFiles(

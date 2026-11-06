@@ -17,7 +17,7 @@ final class GitPackageHandleTest extends CommandTestCase
         $this->commandRunner->expectRun(['git', 'clone', '-q', self::URL, $path], true);
         $this->commandRunner->getMock()->allows('run')->andReturnTrue();
 
-        $this->artisan('packager:git', ['url' => self::URL])
+        $this->command('packager:git', ['url' => self::URL])
             ->expectsOutputToContain('Creating package acme\rocket...')
             ->expectsOutputToContain('Package cloned successfully!')
             ->assertExitCode(0);
@@ -30,7 +30,7 @@ final class GitPackageHandleTest extends CommandTestCase
         $this->commandRunner->expectRun(['git', 'clone', '-q', self::URL, $path], true);
         $this->commandRunner->getMock()->allows('run')->andReturnTrue();
 
-        $this->artisan('packager:git', ['url' => self::URL, 'vendor' => 'MyVendor', 'name' => 'MyPackage'])
+        $this->command('packager:git', ['url' => self::URL, 'vendor' => 'MyVendor', 'name' => 'MyPackage'])
             ->expectsOutputToContain('Creating package MyVendor\MyPackage...')
             ->assertExitCode(0);
     }
@@ -41,7 +41,7 @@ final class GitPackageHandleTest extends CommandTestCase
 
         $this->commandRunner->expectRun(['git', 'clone', '-q', self::URL, $path], false);
 
-        $this->artisan('packager:git', ['url' => self::URL])
+        $this->command('packager:git', ['url' => self::URL])
             ->expectsOutputToContain('Unable to clone repository')
             ->doesntExpectOutputToContain('Package cloned successfully!')
             ->assertExitCode(1);
