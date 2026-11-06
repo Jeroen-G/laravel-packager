@@ -41,7 +41,6 @@ final class ConveyorTest extends UnitTestCase
             'composer.json',
         ], true);
 
-        $this->expectNotToPerformAssertions();
         $this->conveyor->installPackage();
     }
 
@@ -53,7 +52,6 @@ final class ConveyorTest extends UnitTestCase
         $this->commandRunner->expectRun(['composer', 'config', '--unset', 'repositories.myvendor/mypackage'], true);
         $this->commandRunner->expectRun(['composer', 'remove', 'myVendor/myPackage'], true);
 
-        $this->expectNotToPerformAssertions();
         $this->conveyor->uninstallPackage();
     }
 }

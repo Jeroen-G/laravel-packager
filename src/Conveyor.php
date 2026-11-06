@@ -8,9 +8,9 @@ use Illuminate\Support\Str;
 
 final class Conveyor
 {
-    protected string $vendor;
+    private string $vendor;
 
-    protected string $package;
+    private string $package;
 
     private CommandRunnerInterface $commandRunner;
 
@@ -101,7 +101,7 @@ final class Conveyor
         $this->removePathRepository();
     }
 
-    protected function runProcess(array $command): bool
+    private function runProcess(array $command): bool
     {
         return $this->commandRunner->run($command);
     }

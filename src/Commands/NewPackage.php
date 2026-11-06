@@ -194,8 +194,8 @@ class NewPackage extends Command
     private function validateInput(string $vendor, string $name): ValidatorInterface
     {
         return Validator::make(compact('vendor', 'name'), [
-            'vendor' => new ValidClassName,
-            'name' => new ValidClassName,
+            'vendor' => new ValidClassName(),
+            'name' => new ValidClassName(),
         ]);
     }
 

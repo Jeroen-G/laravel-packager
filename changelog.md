@@ -5,10 +5,25 @@ All Notable changes to Packager will be documented in this file.
 ## Version 3
 
 ### Updated
-- Bump PHP version to 8
-- Dropped support of old Laravel versions
+- Bump PHP version to 8.2
+- Dropped support of Laravel versions older than 11
 - Dropped check command because the security checker package is deprecated
 - Moved to GitHub actions
+
+## Version 2.12
+
+### Added
+- Laravel Boost AI guidelines and skill
+
+## Version 2.11
+
+### Added
+- Laravel 12 support
+
+## Version 2.10
+
+### Added
+- Laravel 11 support
 
 ## Version 2.7
 

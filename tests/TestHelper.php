@@ -13,8 +13,11 @@ trait TestHelper
     protected function seeInConsoleOutput($expectedText): void
     {
         $consoleOutput = $this->app[Kernel::class]->output();
-        $this->assertStringContainsString($expectedText, $consoleOutput,
-            "Did not see `{$expectedText}` in console output: `$consoleOutput`");
+        $this->assertStringContainsString(
+            $expectedText,
+            $consoleOutput,
+            "Did not see `{$expectedText}` in console output: `$consoleOutput`"
+        );
     }
 
     protected function installTestApp(): void
@@ -47,8 +50,6 @@ trait TestHelper
         $composer = json_decode($files->get(self::TEST_APP_TEMPLATE.'/composer.json'), true);
         // Remove "tests/IntegrationTestCase.php" from autoload (it doesn't exist)
         unset($composer['autoload']['classmap'][1]);
-        // Pre-install illuminate/support
-        $composer['require'] = ['illuminate/support' => '~5'];
         // Install stable version
         $composer['minimum-stability'] = 'stable';
         $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT));

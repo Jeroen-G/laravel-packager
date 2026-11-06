@@ -19,17 +19,17 @@ class FileHandler implements FileHandlerInterface
 
     public function vendorPath(string $vendor): string
     {
-        return $this->packagesPath().'/'.$vendor;
+        return $this->packagesPath().DIRECTORY_SEPARATOR.$vendor;
     }
 
     public function tempPath($vendor): string
     {
-        return $this->vendorPath($vendor).'/temp';
+        return $this->vendorPath($vendor).DIRECTORY_SEPARATOR.'temp';
     }
 
     public function packagePath($vendor, $package): string
     {
-        return $this->vendorPath($vendor).'/'.$package;
+        return $this->vendorPath($vendor).DIRECTORY_SEPARATOR.$package;
     }
 
     public function makeFilename($extension = 'zip'): string
@@ -46,7 +46,7 @@ class FileHandler implements FileHandlerInterface
 
     public function makeDir(string $path): bool
     {
-        if (! is_dir($path)) {
+        if (!is_dir($path)) {
             return mkdir($path, 0777, true);
         }
 
@@ -108,7 +108,7 @@ class FileHandler implements FileHandlerInterface
 
         $files = new RecursiveDirectoryIterator($this->packagePath($vendor, $package));
         foreach (new RecursiveIteratorIterator($files) as $file) {
-            if (! $file->isFile()) {
+            if (!$file->isFile()) {
                 continue;
             }
             $replaced = str_replace($bindings[0], $bindings[1], $file->getFilename());

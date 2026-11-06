@@ -46,7 +46,7 @@ class Wrapping
     {
         $files = new RecursiveDirectoryIterator($path);
         foreach (new RecursiveIteratorIterator($files) as $file) {
-            if (! $file->isFile()) {
+            if (!$file->isFile()) {
                 continue;
             }
 

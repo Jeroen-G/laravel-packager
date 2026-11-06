@@ -10,7 +10,7 @@ use InvalidArgumentException;
 final class Manager
 {
     /** @var Extractor[] */
-    protected array $extractorsMap = [];
+    private array $extractorsMap = [];
 
     public function __construct()
     {
@@ -29,7 +29,7 @@ final class Manager
     {
         $extractor = Arr::get($this->extractorsMap, $archiveExtension);
 
-        if (! $extractor) {
+        if (!$extractor) {
             throw new InvalidArgumentException("There are no extractors for extension '{$archiveExtension}'!");
         }
 

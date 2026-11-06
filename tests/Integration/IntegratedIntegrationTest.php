@@ -27,7 +27,7 @@ class IntegratedIntegrationTest extends IntegrationTestCase
         // 'php artisan packager:new MyVendor MyPackage' from root, but it is NOT created
         // when that's run as part of the tests. So this IS working for packager users,
         // but the test cannot confirm that.
-        $this->markAsRisky();
+        $this->markTestIncomplete('The vendor symlink cannot be verified from within the test environment.');
     }
 
     public function test_new_package_is_installed(): void
@@ -99,16 +99,20 @@ class IntegratedIntegrationTest extends IntegrationTestCase
 
     public function test_get_package(): void
     {
-        Artisan::call('packager:get',
-            ['url' => 'https://github.com/Jeroen-G/packager-skeleton', 'vendor' => 'MyVendor', 'name' => 'MyPackage']);
+        Artisan::call(
+            'packager:get',
+            ['url' => 'https://github.com/Jeroen-G/packager-skeleton', 'vendor' => 'MyVendor', 'name' => 'MyPackage']
+        );
 
         $this->seeInConsoleOutput('Package downloaded successfully!');
     }
 
     public function test_get_existing_package_with_git(): void
     {
-        Artisan::call('packager:git',
-            ['url' => 'https://github.com/Seldaek/monolog', 'vendor' => 'monolog', 'name' => 'monolog']);
+        Artisan::call(
+            'packager:git',
+            ['url' => 'https://github.com/Seldaek/monolog', 'vendor' => 'monolog', 'name' => 'monolog']
+        );
 
         $this->seeInConsoleOutput('Package cloned successfully!');
         $this->assertTrue(is_link(base_path('vendor/monolog/monolog')));
@@ -116,8 +120,10 @@ class IntegratedIntegrationTest extends IntegrationTestCase
 
     public function test_get_existing_package_with_get(): void
     {
-        Artisan::call('packager:get',
-            ['url' => 'https://github.com/Seldaek/monolog', 'vendor' => 'monolog', 'name' => 'monolog', '--branch' => 'main']);
+        Artisan::call(
+            'packager:get',
+            ['url' => 'https://github.com/Seldaek/monolog', 'vendor' => 'monolog', 'name' => 'monolog', '--branch' => 'main']
+        );
 
         $this->seeInConsoleOutput('Package downloaded successfully!');
         $this->assertTrue(is_link(base_path('vendor/monolog/monolog')));

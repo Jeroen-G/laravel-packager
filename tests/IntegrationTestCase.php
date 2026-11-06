@@ -16,7 +16,7 @@ abstract class IntegrationTestCase extends TestBench
 
     public static function setUpBeforeClass(): void
     {
-        if (! file_exists(self::TEST_APP_TEMPLATE)) {
+        if (!file_exists(self::TEST_APP_TEMPLATE)) {
             self::setUpLocalTestbench();
         }
         parent::setUpBeforeClass();
@@ -34,7 +34,7 @@ abstract class IntegrationTestCase extends TestBench
         parent::tearDown();
     }
 
-    protected function getBasePath(): string
+    public static function applicationBasePath(): string
     {
         return self::TEST_APP;
     }

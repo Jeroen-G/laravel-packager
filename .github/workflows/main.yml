@@ -13,17 +13,17 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.0, 8.1, 8.2]
+        php: [8.2, 8.3, 8.4]
         experimental: [ false ]
         include:
-          - php: 8.3
+          - php: 8.5
             experimental: true
 
     name: PHP${{ matrix.php }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -32,11 +32,11 @@ jobs:
           coverage: xdebug
 
       - name: Install dependencies
-        run: composer update --prefer-dist --no-suggest --no-interaction --no-scripts
+        run: composer update --prefer-dist --no-interaction --no-scripts
         if: ${{ matrix.experimental == false }}
 
       - name: Install experimental dependencies
-        run: composer update --prefer-dist --no-suggest --no-interaction --no-scripts --ignore-platform-reqs
+        run: composer update --prefer-dist --no-interaction --no-scripts --ignore-platform-reqs
         if: ${{ matrix.experimental == true }}
 
       - name: Check codestyle
