@@ -118,7 +118,7 @@ class ListPackages extends Command
                 $commitDifference = str_replace(["\n", "\r"], '', $buffer);
             });
 
-        return $commitDifference;
+        return (int) $commitDifference;
     }
 
     /**

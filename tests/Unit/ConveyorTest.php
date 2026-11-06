@@ -54,4 +54,35 @@ final class ConveyorTest extends UnitTestCase
 
         $this->conveyor->uninstallPackage();
     }
+
+    public function test_it_remembers_vendor_and_package(): void
+    {
+        $this->assertSame('my-vendor', $this->conveyor->vendor('my-vendor'));
+        $this->assertSame('my-package', $this->conveyor->package('my-package'));
+
+        $this->assertSame('my-vendor', $this->conveyor->vendor());
+        $this->assertSame('my-package', $this->conveyor->package());
+    }
+
+    public function test_it_formats_vendor_and_package_names(): void
+    {
+        $this->conveyor->vendor('my-vendor');
+        $this->conveyor->package('MyPackage');
+
+        $this->assertSame('MyVendor', $this->conveyor->vendorStudly());
+        $this->assertSame('my-vendor', $this->conveyor->vendorKebab());
+        $this->assertSame('MyPackage', $this->conveyor->packageStudly());
+        $this->assertSame('my-package', $this->conveyor->packageKebab());
+    }
+
+    public function test_it_slugs_the_repository_name(): void
+    {
+        $this->conveyor->vendor('My Vendor');
+        $this->conveyor->package('My Package');
+
+        $this->commandRunner->expectRun(['composer', 'config', '--unset', 'repositories.my-vendor/my-package'], true);
+        $this->commandRunner->expectRun(['composer', 'remove', 'My Vendor/My Package'], true);
+
+        $this->conveyor->uninstallPackage();
+    }
 }

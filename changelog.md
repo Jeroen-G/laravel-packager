@@ -11,6 +11,16 @@ All Notable changes to Packager will be documented in this file.
 - Moved to GitHub actions
 - Added PHPStan (Larastan) static analysis and mutation testing annotations on pull requests
 
+### Fixed
+- Class name validation accepted characters like `` ` `` and `{` and rejected multibyte names
+- `packager:git` cut off package names ending in `.`, `g`, `i` or `t` when stripping `.git`
+- `packager:git` now escapes the repository url and path passed to `git clone`
+- `packager:list` threw a TypeError when showing the commit difference of a git package
+- `packager:new` returned a failure exit code on success
+
+### Removed
+- Unused `Downloader` classes and the legacy composer/provider helpers in `Wrapping`
+
 ## Version 2.12
 
 ### Added

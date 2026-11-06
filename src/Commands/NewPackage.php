@@ -160,7 +160,7 @@ class NewPackage extends Command
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package created successfully!');
 
-        return 1;
+        return 0;
     }
 
     /**

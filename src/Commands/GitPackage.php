@@ -74,7 +74,7 @@ class GitPackage extends Command
 
         // Clone the repository
         $this->info('Cloning repository...');
-        exec("git clone -q $source ".$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()), $output, $exit_code);
+        exec('git clone -q '.escapeshellarg($source).' '.escapeshellarg($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package())), $output, $exit_code);
 
         if ($exit_code !== 0) {
             $this->error('Unable to clone repository');
@@ -107,8 +107,10 @@ class GitPackage extends Command
             $package = $pieces[4];
         } else {
             $vendor = explode(':', $pieces[0])[1];
-            $package = rtrim($pieces[1], '.git');
+            $package = $pieces[1];
         }
+
+        $package = Str::replaceEnd('.git', '', $package);
 
         $this->conveyor->vendor($vendor);
         $this->conveyor->package($package);

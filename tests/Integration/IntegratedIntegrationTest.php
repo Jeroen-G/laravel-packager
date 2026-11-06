@@ -48,7 +48,7 @@ class IntegratedIntegrationTest extends IntegrationTestCase
         $this->assertTrue(is_file(base_path('packages/my-vendor/my-package/src/MyPackageServiceProvider.php')));
     }
 
-    public function test_new_package_name_should_bgetpace_valid(): void
+    public function test_new_package_name_should_be_valid(): void
     {
         Artisan::call('packager:new', ['vendor' => 'my-vendor', 'name' => '1234-Invalid']);
         $this->seeInConsoleOutput('Package was not created. Please choose a valid name.');
