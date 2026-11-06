@@ -39,8 +39,11 @@ jobs:
         run: composer update --prefer-dist --no-interaction --no-scripts --ignore-platform-reqs
         if: ${{ matrix.experimental == true }}
 
+      # Run on the lowest supported PHP version only: on newer versions ECS suggests
+      # functions (e.g. mb_rtrim) that do not exist on PHP 8.2.
       - name: Check codestyle
         run: vendor/bin/ecs check --config=easy-coding-standard.php --no-progress-bar .
+        if: ${{ matrix.php == '8.2' }}
 
       - name: Execute unit tests
         run: vendor/bin/phpunit --testsuite unit --testdox --colors=always
