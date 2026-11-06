@@ -17,7 +17,6 @@
         "@conditional_negotiation": true,
         "@equal": true,
         "@function_signature": true,
-        "IdenticalEqual": false,
         "@number": true,
         "@operator": true,
         "@regex": true,
