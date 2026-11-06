@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
+use JeroenG\Packager\CommandRunnerInterface;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 
 /**
- * Get an existing package from a remote Github repository with its git repository.
+ * Publish a local package to a remote Github repository with git.
  *
  * @author JeroenG
  **/
@@ -32,38 +33,72 @@ class PublishPackage extends Command
 
     protected FileHandlerInterface $fileHandler;
 
-    public function __construct(Conveyor $conveyor, FileHandlerInterface $fileHandler)
+    protected CommandRunnerInterface $commandRunner;
+
+    public function __construct(Conveyor $conveyor, FileHandlerInterface $fileHandler, CommandRunnerInterface $commandRunner)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->fileHandler = $fileHandler;
+        $this->commandRunner = $commandRunner;
     }
 
-    public function handle(): void
+    public function handle(): int
     {
         // Start the progress bar
-        $this->startProgressBar(5);
+        $this->startProgressBar(3);
 
         // Defining vendor/package
         $this->conveyor->vendor($this->argument('vendor'));
         $this->conveyor->package($this->argument('name'));
+        $path = $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package());
+        $url = $this->argument('url');
 
         $this->info('Initialising Git if not already done so...');
-        if (!file_exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/.git/')) {
-            exec('cd '.$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).' && git init && git add --all && git commit -m "Initial commit"');
+        if (!file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
+            $initialised = $this->git(['init'], $path)
+                && $this->git(['add', '--all'], $path)
+                && $this->git(['commit', '-m', 'Initial commit'], $path);
+
+            if (!$initialised) {
+                return $this->abort('Unable to initialise a git repository for the package.');
+            }
         }
         $this->makeProgress();
 
         $this->info('Git is set up, adding the remote repository...');
-        exec('cd '.$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).' && git remote add origin '.$this->argument('url'));
+        $remote = $this->commandRunner->output(['git', 'remote', 'get-url', 'origin'], $path) === null
+            ? ['remote', 'add', 'origin', $url]
+            : ['remote', 'set-url', 'origin', $url];
+
+        if (!$this->git($remote, $path)) {
+            return $this->abort('Unable to set the remote repository.');
+        }
         $this->makeProgress();
 
         $this->info('Pushing to Github...');
-        exec('cd '.$this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).' && git push -u origin master');
+        if (!$this->git(['push', '-u', 'origin', 'HEAD'], $path)) {
+            return $this->abort('Unable to push to the remote repository, please check your credentials and try again.');
+        }
         $this->makeProgress();
 
         // Finished publishing the package, end of the progress bar
-        $this->finishProgress('Package created successfully!');
+        $this->finishProgress('Package published successfully!');
         $this->info('Go ahead and submit it to Packagist: https://packagist.org/packages/submit');
+
+        return self::SUCCESS;
+    }
+
+    private function git(array $arguments, string $path): bool
+    {
+        return $this->commandRunner->run(['git', ...$arguments], $path);
+    }
+
+    private function abort(string $message): int
+    {
+        $this->abortProgress();
+        $this->error($message);
+
+        return self::FAILURE;
     }
 }

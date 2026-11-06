@@ -34,7 +34,12 @@ final class GitPackageTest extends UnitTestCase
             Mockery::mock(CommandRunnerInterface::class),
             Mockery::mock(FileHandlerInterface::class),
         );
-        $command = new GitPackage($conveyor, new Wrapping(), Mockery::mock(FileHandlerInterface::class));
+        $command = new GitPackage(
+            $conveyor,
+            new Wrapping(),
+            Mockery::mock(FileHandlerInterface::class),
+            Mockery::mock(CommandRunnerInterface::class),
+        );
 
         (new ReflectionMethod($command, 'setGitVendorAndPackage'))->invoke($command, $origin);
 

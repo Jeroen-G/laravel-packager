@@ -48,6 +48,17 @@ trait ProgressBar
     }
 
     /**
+     * Remove the progress bar without finishing it, e.g. when a step failed.
+     *
+     * @return void
+     */
+    public function abortProgress(): void
+    {
+        $this->bar?->clear();
+        $this->bar = null;
+    }
+
+    /**
      * Finalise the progress, output the (last) message.
      *
      * @param  string  $message

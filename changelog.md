@@ -17,6 +17,12 @@ All Notable changes to Packager will be documented in this file.
 - `packager:git` now escapes the repository url and path passed to `git clone`
 - `packager:list` threw a TypeError when showing the commit difference of a git package
 - `packager:new` returned a failure exit code on success
+- `packager:publish` and `packager:git` now report failures and return a failure exit code
+- `packager:publish` pushes the current branch instead of `master`, and updates an existing `origin` remote
+- `packager:tests` resolves paths from the application base path instead of the current working directory
+
+### Changed
+- All git and composer commands run through `CommandRunner`, so they respect the `timeout` config and are unit tested
 
 ### Removed
 - Unused `Downloader` classes and the legacy composer/provider helpers in `Wrapping`

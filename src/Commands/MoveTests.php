@@ -33,7 +33,7 @@ class MoveTests extends Command
         if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
             $this->info('Moving tests for all local packages');
 
-            $composer = json_decode(file_get_contents('composer.json'), true, 512, JSON_THROW_ON_ERROR);
+            $composer = json_decode(file_get_contents(base_path('composer.json')), true, 512, JSON_THROW_ON_ERROR);
 
             $packages = [];
             foreach ($composer['autoload']['psr-4'] as $package => $path) {
@@ -43,7 +43,7 @@ class MoveTests extends Command
             }
 
             foreach ($packages as $package) {
-                $path = dirname(getcwd().'/'.$package[1]).'/tests';
+                $path = dirname(base_path($package[1])).'/tests';
 
                 if ($this->files->exists($path)) {
                     $this->info('Moving tests for the package: '.$package[0]);

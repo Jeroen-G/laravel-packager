@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
-use Symfony\Component\Process\Process;
+use JeroenG\Packager\CommandRunnerInterface;
+use JeroenG\Packager\FileHandlerInterface;
 
 /**
  * List all locally installed packages.
@@ -20,6 +20,17 @@ class ListPackages extends Command
 
     protected $description = 'List all locally installed packages.';
 
+    protected FileHandlerInterface $fileHandler;
+
+    protected CommandRunnerInterface $commandRunner;
+
+    public function __construct(FileHandlerInterface $fileHandler, CommandRunnerInterface $commandRunner)
+    {
+        parent::__construct();
+        $this->fileHandler = $fileHandler;
+        $this->commandRunner = $commandRunner;
+    }
+
     public function handle(): void
     {
         $packages = $this->getPackagesList();
@@ -32,114 +43,67 @@ class ListPackages extends Command
     }
 
     /**
-     * Get all of the packages installed with Packager.
+     * Get all of the packages installed with Packager, as [vendor, package] pairs.
      *
-     * @return array
+     * @return array<int, array{0: string, 1: string}>
      */
     private function getPackagesList(): array
     {
         $composerFile = json_decode(file_get_contents(base_path('composer.json')), true, 512, JSON_THROW_ON_ERROR);
-        $packagesPath = base_path('packages/');
-        $repositories = $composerFile['repositories'] ?? [];
+        $pattern = '{^'.preg_quote($this->fileHandler->packagesPath().DIRECTORY_SEPARATOR, '{').'([^'.preg_quote(DIRECTORY_SEPARATOR, '{').']+)'.preg_quote(DIRECTORY_SEPARATOR, '{').'(.+)$}';
         $packages = [];
-        foreach ($repositories as $name => $info) {
-            $path = $info['url'];
-            $pattern = '{'.addslashes($packagesPath).'(.*)$}';
-            if (preg_match($pattern, $path, $match)) {
-                $packages[] = explode(DIRECTORY_SEPARATOR, $match[1]);
+
+        foreach ($composerFile['repositories'] ?? [] as $info) {
+            if (preg_match($pattern, $info['url'] ?? '', $match)) {
+                $packages[] = [$match[1], $match[2]];
             }
         }
 
         return $packages;
     }
 
-    /**
-     * Render the list as a simple table.
-     *
-     * @param  array  $packages
-     */
     private function renderBasicTable(array $packages): void
     {
-        $headers = ['Package', 'Path'];
-        $this->table($headers, $packages);
+        $this->table(['Package', 'Path'], $packages);
     }
 
     /**
      * Render the list, but with git status if the package has git initialised.
-     *
-     * @param $packages
      */
-    private function renderGitTable($packages): void
+    private function renderGitTable(array $packages): void
     {
         $gitPackages = [];
         foreach ($packages as $package) {
-            $gitPackages[] = array_merge($package, $this->getGitStatus('packages/'.$package[0].'/'.$package[1]));
+            $gitPackages[] = array_merge($package, $this->getGitStatus($this->fileHandler->packagePath($package[0], $package[1])));
         }
 
-        $headers = ['Package', 'Path', 'Commits behind', 'Branch'];
-
-        $this->table($headers, $gitPackages);
+        $this->table(['Package', 'Path', 'Commits behind', 'Branch'], $gitPackages);
     }
 
     /**
      * If a package has a git history, add its status.
-     *
-     * @param  string  $path
-     * @return array
      */
     private function getGitStatus(string $path): array
     {
-        if (file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
-            (new Process(['git', 'fetch'], $path))->disableOutput()->run();
-
-            $commitDifference = $this->getCommitDifference($path);
-            $branch = $this->getCurrentBranchForPackage($path);
-
-            return [$commitDifference, $branch];
+        if (!file_exists($path.DIRECTORY_SEPARATOR.'.git')) {
+            return ['-', '-'];
         }
 
-        return ['-', '-'];
+        $this->commandRunner->run(['git', 'fetch'], $path);
+
+        return [$this->getCommitDifference($path), $this->getCurrentBranch($path) ?? '-'];
     }
 
     /**
-     * Compare the local git history with the origin remote.
-     * It returns the difference in commits as a positive or negative integer.
-     * A positive number means the local package is behind. Otherwise it is ahead.
-     *
-     * @param  string  $path
-     * @return int
+     * The number of commits the local package is behind on the origin remote.
      */
     private function getCommitDifference(string $path): int
     {
-        $commitDifference = 0;
-
-        (new Process(['git', 'rev-list', 'HEAD..origin', '--count'], $path))
-            ->run(function ($type, $buffer) use (&$commitDifference) {
-                $commitDifference = str_replace(["\n", "\r"], '', $buffer);
-            });
-
-        return (int) $commitDifference;
+        return (int) $this->commandRunner->output(['git', 'rev-list', 'HEAD..origin', '--count'], $path);
     }
 
-    /**
-     * Gets the branch name for a package.
-     *
-     * @param $path
-     * @return string|null
-     */
-    private function getCurrentBranchForPackage($path): ?string
+    private function getCurrentBranch(string $path): ?string
     {
-        $branch = null;
-
-        // This command lists all branches
-        (new Process(['git', 'branch'], $path))
-            ->run(function ($type, $buffer) use (&$branch) {
-                // The current branch is prefixed with an asterisk
-                if (Str::startsWith($buffer, '*')) {
-                    $branch = str_replace(["\n", "\r", ' ', '*'], '', $buffer);
-                }
-            });
-
-        return $branch;
+        return $this->commandRunner->output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], $path);
     }
 }

@@ -6,6 +6,7 @@ namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use JeroenG\Packager\CommandRunnerInterface;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
@@ -39,15 +40,22 @@ class GitPackage extends Command
 
     protected FileHandlerInterface $fileHandler;
 
-    public function __construct(Conveyor $conveyor, Wrapping $wrapping, FileHandlerInterface $fileHandler)
-    {
+    protected CommandRunnerInterface $commandRunner;
+
+    public function __construct(
+        Conveyor $conveyor,
+        Wrapping $wrapping,
+        FileHandlerInterface $fileHandler,
+        CommandRunnerInterface $commandRunner,
+    ) {
         parent::__construct();
         $this->conveyor = $conveyor;
         $this->wrapping = $wrapping;
         $this->fileHandler = $fileHandler;
+        $this->commandRunner = $commandRunner;
     }
 
-    public function handle(): void
+    public function handle(): int
     {
         // Start the progress bar
         $this->startProgressBar(4);
@@ -74,13 +82,20 @@ class GitPackage extends Command
 
         // Clone the repository
         $this->info('Cloning repository...');
-        exec('git clone -q '.escapeshellarg($source).' '.escapeshellarg($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package())), $output, $exit_code);
+        $cloned = $this->commandRunner->run([
+            'git',
+            'clone',
+            '-q',
+            $source,
+            $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()),
+        ]);
 
-        if ($exit_code !== 0) {
+        if (!$cloned) {
+            $this->abortProgress();
             $this->error('Unable to clone repository');
             $this->warn('Please check credentials and try again');
 
-            return;
+            return self::FAILURE;
         }
 
         $this->makeProgress();
@@ -96,6 +111,8 @@ class GitPackage extends Command
 
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package cloned successfully!');
+
+        return self::SUCCESS;
     }
 
     protected function setGitVendorAndPackage($origin): void

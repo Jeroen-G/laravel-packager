@@ -28,11 +28,21 @@ final class CommandRunnerExpectation
         return $this->mock;
     }
 
-    public function expectRun(array $commandInput, bool $success = true): ExpectationInterface
+    public function expectRun(array $commandInput, bool $success = true, ?string $workingDirectory = null): ExpectationInterface
     {
+        $arguments = $workingDirectory === null ? [$commandInput] : [$commandInput, $workingDirectory];
+
         return $this->mock
             ->expects('run')
-            ->with($commandInput)
+            ->with(...$arguments)
             ->andReturn($success);
+    }
+
+    public function expectOutput(array $commandInput, ?string $output, string $workingDirectory): ExpectationInterface
+    {
+        return $this->mock
+            ->expects('output')
+            ->with($commandInput, $workingDirectory)
+            ->andReturn($output);
     }
 }
