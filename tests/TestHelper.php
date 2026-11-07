@@ -46,7 +46,7 @@ trait TestHelper
         $files->makeDirectory(self::TEST_APP_TEMPLATE, 0755, true);
         $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel';
         // Testbench may symlink its skeleton's vendor directory to ours, which must not be copied.
-        foreach (array_diff(scandir($original), ['.', '..', 'vendor']) as $item) {
+        foreach (array_diff(scandir($original) ?: [], ['.', '..', 'vendor']) as $item) {
             if (is_dir($original.'/'.$item)) {
                 $files->copyDirectory($original.'/'.$item, self::TEST_APP_TEMPLATE.'/'.$item);
             } else {

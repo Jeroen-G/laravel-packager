@@ -67,7 +67,7 @@ class FileHandler implements FileHandlerInterface
             return false;
         }
 
-        $files = array_diff(scandir($path), ['.', '..']);
+        $files = array_diff(scandir($path) ?: [], ['.', '..']);
         foreach ($files as $file) {
             if (is_dir("$path/$file")) {
                 $this->removeDir("$path/$file");

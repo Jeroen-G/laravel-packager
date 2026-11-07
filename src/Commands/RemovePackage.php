@@ -78,7 +78,7 @@ class RemovePackage extends Command
 
             if (!is_dir($vendorPath)) {
                 $this->info('vendor directory does not exist, continuing...');
-            } elseif (count(scandir($vendorPath)) !== 2) {
+            } elseif (count(scandir($vendorPath) ?: []) !== 2) {
                 $this->warn('vendor directory is not empty, continuing...');
             } else {
                 $this->info('removing vendor directory...');
