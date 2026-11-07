@@ -15,11 +15,16 @@ jobs:
       matrix:
         php: [8.2, 8.3, 8.4]
         experimental: [ false ]
+        dependencies: [ highest ]
         include:
+          - php: 8.2
+            experimental: false
+            dependencies: lowest
           - php: 8.5
             experimental: true
+            dependencies: highest
 
-    name: PHP${{ matrix.php }}
+    name: PHP${{ matrix.php }}${{ matrix.dependencies == 'lowest' && ' (lowest dependencies)' || '' }}
 
     steps:
       - name: Checkout code
@@ -32,7 +37,7 @@ jobs:
           coverage: xdebug
 
       - name: Install dependencies
-        run: composer update --prefer-dist --no-interaction --no-scripts
+        run: composer update --prefer-dist --no-interaction --no-scripts ${{ matrix.dependencies == 'lowest' && '--prefer-lowest --prefer-stable' || '' }}
         if: ${{ matrix.experimental == false }}
 
       - name: Install experimental dependencies
@@ -43,7 +48,7 @@ jobs:
       # functions (e.g. mb_rtrim) that do not exist on PHP 8.2.
       - name: Check codestyle
         run: vendor/bin/ecs check --config=easy-coding-standard.php --no-progress-bar .
-        if: ${{ matrix.php == '8.2' }}
+        if: ${{ matrix.php == '8.2' && matrix.dependencies == 'highest' }}
 
       - name: Execute unit tests
         run: vendor/bin/phpunit --testsuite unit --testdox --colors=always
@@ -53,7 +58,8 @@ jobs:
 
       - name: Execute mutation tests
         run: vendor/bin/infection --threads=4 --min-covered-msi=75 --min-msi=75
+        if: ${{ matrix.dependencies == 'highest' }}
 
       - name: PHPStan analysis
         run: vendor/bin/phpstan analyse --no-progress
-        if: ${{ matrix.experimental == false }}
+        if: ${{ matrix.experimental == false && matrix.dependencies == 'highest' }}

@@ -21,6 +21,7 @@ All Notable changes to Packager will be documented in this file.
 ### Updated
 - Moved to GitHub actions
 - Added PHPStan (Larastan, level 8) static analysis and mutation testing annotations on pull requests
+- CI also tests against the lowest allowed dependency versions
 
 ### Fixed
 - Class name validation accepted characters like `` ` `` and `{` and rejected multibyte names

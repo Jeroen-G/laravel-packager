@@ -53,6 +53,10 @@ trait TestHelper
                 $files->copy($original.'/'.$item, self::TEST_APP_TEMPLATE.'/'.$item);
             }
         }
+        // Without its bootstrap file, Testbench builds the application with our base path. Some
+        // Testbench versions' bootstrap file ignores that path and falls back to the default
+        // skeleton, whose vendor directory is a symlink to ours: composer would then rewrite it.
+        $files->delete(self::TEST_APP_TEMPLATE.'/bootstrap/app.php');
         // Modify the composer.json file
         $composer = json_decode($files->get(self::TEST_APP_TEMPLATE.'/composer.json'), true);
         // Remove "tests/IntegrationTestCase.php" from autoload (it doesn't exist)
