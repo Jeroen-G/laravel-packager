@@ -50,6 +50,17 @@ final class GetPackageTest extends CommandTestCase
         $this->assertFileExists($this->packagePath('MyVendor', 'MyPackage').'/src/Rocket.php');
     }
 
+    public function test_it_downloads_with_the_configured_certificate_verification(): void
+    {
+        config(['packager.curl_verify_cert' => false]);
+        $this->fakeDownloads($this->makeZip('rocket.zip', ['rocket-HEAD/src/Rocket.php' => '<?php']));
+        $this->commandRunner->getMock()->allows('run')->andReturnTrue();
+
+        $this->command('packager:get', ['url' => 'https://github.com/acme/rocket'])->assertExitCode(0);
+
+        $this->assertFalse($this->downloads[0]['options']['verify']);
+    }
+
     public function test_it_refuses_an_archive_without_a_single_directory(): void
     {
         $this->fakeDownloads($this->makeZip('rocket.zip', ['a/one.php' => '<?php', 'b/two.php' => '<?php']));

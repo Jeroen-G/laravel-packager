@@ -79,9 +79,9 @@ class RemovePackage extends Command
         if ($this->confirm('Do you want to remove the vendor directory? [y|N]')) {
             $vendorPath = $this->fileHandler->vendorPath($this->conveyor->vendor());
 
-            if (!is_dir($vendorPath)) {
+            if (!$this->fileHandler->exists($vendorPath)) {
                 $this->info('vendor directory does not exist, continuing...');
-            } elseif (count(scandir($vendorPath) ?: []) !== 2) {
+            } elseif (!$this->fileHandler->isEmptyDir($vendorPath)) {
                 $this->warn('vendor directory is not empty, continuing...');
             } else {
                 $this->info('removing vendor directory...');

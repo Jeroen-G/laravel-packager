@@ -163,7 +163,7 @@ All `composer` and `git` commands that Packager runs (for example installing a p
 - `packager:publish` pushes the current branch instead of `master`.
 - `packager:get` downloads the default branch of the repository instead of `master` when no `--branch` is given.
 - Bitbucket is no longer supported: the `--host` option of `packager:get` has been removed.
-- If you extended Packager's classes: the `FileHandler` trait is now a `FileHandler` class implementing `FileHandlerInterface`, its path methods take the vendor and package as arguments, and `Conveyor` is a final class that is resolved from the container. See the [changelog](changelog.md) for all changes.
+- If you extended Packager's classes: the `FileHandler` trait is now a `FileHandler` class implementing `FileHandlerInterface`, its path methods take the vendor and package as arguments, the interface has new methods that your own implementation must provide, and `Conveyor` is a final class that is resolved from the container. See the [changelog](changelog.md) for all changes.
 
 ## Changelog
 

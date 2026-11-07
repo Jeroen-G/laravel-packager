@@ -4,64 +4,126 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Tests\Unit\Commands;
 
+use GuzzleHttp\Exception\TransferException;
 use JeroenG\Packager\CommandRunnerInterface;
-use JeroenG\Packager\Tests\CommandTestCase;
+use JeroenG\Packager\Tests\PackagerTestCase;
 use JeroenG\Packager\Tests\Support\CommandRunnerExpectation;
+use JeroenG\Packager\Tests\Support\MocksFileHandler;
+use JeroenG\Packager\Wrapping;
 use Mockery;
+use Mockery\MockInterface;
+use RuntimeException;
 
-final class NewPackageTest extends CommandTestCase
+final class NewPackageTest extends PackagerTestCase
 {
+    use MocksFileHandler;
+
+    private const TEMP = '/app/packages/Acme/.packager-temp-0123456789abcdef';
+
+    private const ARCHIVE = '/app/package0123.zip';
+
+    /** Replaces placeholders like the real Wrapping, but never fills files. */
+    private Wrapping&MockInterface $wrapping;
+
+    /** @var list<string> */
+    private array $downloads = [];
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->fakeDownloads($this->makeZip('skeleton.zip', [
-            'packager-skeleton-master/composer.json' => '{"name": ":lc:vendor/:lc:package", "author": ":author_name"}',
-            'packager-skeleton-master/readme.md' => ':author_name <:author_email> :author_homepage - :package_description (:license)',
-            'packager-skeleton-master/src/MyPackage.php' => 'namespace :uc:vendor\\:uc:package; // :kc:package',
-            'packager-skeleton-master/rewriteRules.php' => '<?php',
-        ]));
+        $this->mockFileHandler();
+        $this->files->allows('checkIfPackageExists')->byDefault();
+        $this->files->allows('makeDir')->andReturnTrue()->byDefault();
+        $this->files->allows('tempPath')->andReturn(self::TEMP)->byDefault();
+        $this->files->allows('getArchiveExtension')->andReturn('zip')->byDefault();
+        $this->files->allows('makeFilename')->andReturn(self::ARCHIVE)->byDefault();
+        $this->files->allows('download')->andReturnUsing(function (string $archive, string $url): MockInterface {
+            $this->downloads[] = $url;
 
-        $this->commandRunner->getMock()->allows('run')->andReturnTrue();
+            return $this->files;
+        })->byDefault();
+        $this->files->allows('extract')->andReturnSelf()->byDefault();
+        $this->files->allows('directories')->with(self::TEMP)->andReturn(['packager-skeleton-master'])->byDefault();
+        $this->files->allows('move')->andReturnTrue()->byDefault();
+        $this->files->allows('exists')->andReturnTrue()->byDefault();
+        $this->files->allows('renameFiles')->byDefault();
+        $this->files->allows('cleanUpRules')->byDefault();
+        $this->files->allows('cleanUp')->andReturnSelf()->byDefault();
+        $this->files->allows('removeDir')->with(self::TEMP)->andReturnTrue()->byDefault();
+
+        $this->wrapping = Mockery::mock(Wrapping::class)->makePartial();
+        $this->wrapping->allows('fill')->byDefault();
+        app()->instance(Wrapping::class, $this->wrapping);
+
+        $this->commandRunner->getMock()->allows('run')->andReturnTrue()->byDefault();
     }
 
     public function test_it_creates_a_package_from_the_skeleton(): void
     {
-        config(['packager.author_name' => 'Wile E. Coyote']);
-        $path = $this->packagePath('Acme', 'RocketSkates');
+        config(['packager.author_name' => 'Wile E. Coyote', 'packager.license' => 'MIT']);
+        $path = '/app/packages/Acme/RocketSkates';
+
+        $this->files->expects('checkIfPackageExists')->with('Acme', 'RocketSkates');
+        $this->files->expects('makeDir')->with('/app/packages')->andReturnTrue();
+        $this->files->expects('makeDir')->with('/app/packages/Acme')->andReturnTrue();
+        $this->files->expects('getArchiveExtension')->with(config('packager.skeleton'))->andReturn('zip');
+        $this->files->expects('makeFilename')->with('zip')->andReturn(self::ARCHIVE);
+        $this->files->expects('extract')->with(self::ARCHIVE, self::TEMP)->andReturnSelf();
+        $this->files->expects('move')->with(self::TEMP.'/packager-skeleton-master', $path)->andReturnTrue();
+        $this->files->expects('exists')->with($path.'/rewriteRules.php')->andReturnTrue();
+        $this->files->expects('renameFiles')->with('Acme', 'RocketSkates', 'Acme', 'RocketSkates');
+        $this->files->expects('cleanUpRules')->with('Acme', 'RocketSkates');
+        $this->files->expects('cleanUp')->with(self::ARCHIVE)->andReturnSelf();
+        // Only its own temporary directory is removed, never other directories of the vendor.
+        $this->files->expects('removeDir')->with(self::TEMP)->andReturnTrue();
+        $this->wrapping->expects('fill')->with($path);
+        $this->commandRunner = CommandRunnerExpectation::create();
+        app()->instance(CommandRunnerInterface::class, $this->commandRunner->getMock());
+        $this->commandRunner->expectRun([
+            'composer',
+            'config',
+            'repositories.acme/rocketskates',
+            json_encode(['type' => 'path', 'url' => $path, 'options' => ['symlink' => true]], JSON_THROW_ON_ERROR),
+            '--file',
+            'composer.json',
+        ]);
+        $this->commandRunner->expectRun(['composer', 'require', 'acme/rocketskates:@dev']);
 
         $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'RocketSkates'])
             ->expectsOutputToContain('Package created successfully!')
             ->assertExitCode(0);
 
-        $this->assertSame([config('packager.skeleton')], $this->downloadedUrls());
-        $this->assertSame(
-            '{"name": "acme/rocketskates", "author": "Wile E. Coyote"}',
-            file_get_contents($path.'/composer.json')
-        );
-        $this->assertSame(
-            'namespace Acme\\RocketSkates; // rocket-skates',
-            file_get_contents($path.'/src/RocketSkates.php')
-        );
-        $this->assertFileDoesNotExist($path.'/rewriteRules.php');
-        $this->assertNoTemporaryDirectories('Acme');
+        $this->assertSame([config('packager.skeleton')], $this->downloads);
+        $this->assertReplacements([
+            ':uc:vendor' => 'Acme',
+            ':uc:package' => 'RocketSkates',
+            ':lc:vendor' => 'acme',
+            ':lc:package' => 'rocketskates',
+            ':kc:vendor' => 'acme',
+            ':kc:package' => 'rocket-skates',
+            ':author_name' => 'Wile E. Coyote',
+            ':license' => 'MIT',
+        ]);
     }
 
-    public function test_it_downloads_with_the_configured_certificate_verification(): void
+    public function test_it_skips_cleaning_up_rule_files_when_the_skeleton_has_none(): void
     {
-        config(['packager.curl_verify_cert' => false]);
+        $this->files->expects('exists')->with('/app/packages/Acme/Rocket/rewriteRules.php')->andReturnFalse();
+        $this->files->shouldNotReceive('cleanUpRules');
 
-        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])->assertExitCode(0);
-
-        $this->assertFalse($this->downloads[0]['options']['verify']);
+        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])
+            ->expectsOutputToContain('Package created successfully!')
+            ->assertExitCode(0);
     }
 
     public function test_it_accepts_vendor_and_name_separated_by_a_slash(): void
     {
+        $this->files->expects('checkIfPackageExists')->with('Acme', 'RocketSkates');
+        $this->files->expects('move')->with(self::TEMP.'/packager-skeleton-master', '/app/packages/Acme/RocketSkates')->andReturnTrue();
+
         $this->command('packager:new', ['vendor' => 'Acme/RocketSkates'])
             ->assertExitCode(0);
-
-        $this->assertDirectoryExists($this->packagePath('Acme', 'RocketSkates'));
     }
 
     public function test_it_uses_a_custom_skeleton(): void
@@ -69,22 +131,29 @@ final class NewPackageTest extends CommandTestCase
         $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket', '--skeleton' => 'https://example.com/skeleton.zip'])
             ->assertExitCode(0);
 
-        $this->assertSame(['https://example.com/skeleton.zip'], $this->downloadedUrls());
+        $this->assertSame(['https://example.com/skeleton.zip'], $this->downloads);
     }
 
     public function test_it_rejects_invalid_names(): void
     {
+        $this->files->shouldNotReceive('checkIfPackageExists', 'makeDir', 'download');
+
         $this->command('packager:new', ['vendor' => '1234-invalid', 'name' => 'Rocket'])
             ->expectsOutputToContain('The package vendor must conform to a valid PHP classname.')
             ->assertExitCode(1);
+    }
 
-        $this->assertSame([], $this->downloads);
-        $this->assertDirectoryDoesNotExist($this->basePath.'/packages');
+    public function test_it_does_not_start_the_progress_bar_for_invalid_names(): void
+    {
+        $this->command('packager:new', ['vendor' => 'Acme', 'name' => '1-invalid'])
+            ->doesntExpectOutputToContain('0/6')
+            ->assertExitCode(1);
     }
 
     public function test_it_refuses_to_overwrite_an_existing_package(): void
     {
-        mkdir($this->packagePath('Acme', 'Rocket'), 0777, true);
+        $this->files->expects('checkIfPackageExists')->with('Acme', 'Rocket')->andThrow(new RuntimeException('Package already exists'));
+        $this->files->shouldNotReceive('makeDir', 'download');
 
         $this->expectExceptionMessage('Package already exists');
 
@@ -107,28 +176,14 @@ final class NewPackageTest extends CommandTestCase
             ->expectsOutputToContain('Package created successfully!')
             ->assertExitCode(0);
 
-        $this->assertSame(['https://example.com/custom.zip'], $this->downloadedUrls());
-        $this->assertSame(
-            'Wile E. Coyote <wile@acme.test> https://acme.test - Rocket powered roller skates (MIT)',
-            file_get_contents($this->packagePath('Acme', 'Rocket').'/readme.md')
-        );
-    }
-
-    public function test_it_leaves_other_directories_of_the_vendor_alone(): void
-    {
-        // A package that happens to be called "temp", and leftovers of an interrupted run.
-        mkdir($this->packagePath('Acme', 'temp').'/src', 0777, true);
-        mkdir($this->basePath.'/packages/Acme/.packager-temp-0123456789abcdef/stale', 0777, true);
-
-        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])
-            ->assertExitCode(0);
-
-        $this->assertFileExists($this->packagePath('Acme', 'Rocket').'/composer.json');
-        $this->assertDirectoryExists($this->packagePath('Acme', 'temp').'/src');
-        $this->assertSame(
-            ['.packager-temp-0123456789abcdef', 'Rocket', 'temp'],
-            array_values(array_diff(scandir($this->basePath.'/packages/Acme') ?: [], ['.', '..']))
-        );
+        $this->assertSame(['https://example.com/custom.zip'], $this->downloads);
+        $this->assertReplacements([
+            ':author_name' => 'Wile E. Coyote',
+            ':author_email' => 'wile@acme.test',
+            ':author_homepage' => 'https://acme.test',
+            ':package_description' => 'Rocket powered roller skates',
+            ':license' => 'MIT',
+        ]);
     }
 
     public function test_it_reports_a_failing_composer_install(): void
@@ -140,45 +195,81 @@ final class NewPackageTest extends CommandTestCase
         $this->commandRunner->getMock()->allows('run')->with(Mockery::on(static fn (array $command): bool => $command[1] === 'require'))->andReturnFalse();
 
         $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])
-            ->expectsOutputToContain('Composer could not install the package. Its files are kept in '.$this->packagePath('Acme', 'Rocket').', run `php artisan packager:enable Acme Rocket`')
+            ->expectsOutputToContain('Composer could not install the package. Its files are kept in /app/packages/Acme/Rocket, run `php artisan packager:enable Acme Rocket`')
             ->expectsOutputToContain('Run the composer command yourself')
             ->doesntExpectOutputToContain('Package created successfully!')
             ->assertExitCode(1);
-
-        $this->assertDirectoryExists($this->packagePath('Acme', 'Rocket'));
     }
 
-    public function test_it_does_not_start_the_progress_bar_for_invalid_names(): void
+    public function test_it_moves_the_only_directory_of_the_archive(): void
     {
-        $this->command('packager:new', ['vendor' => 'Acme', 'name' => '1-invalid'])
-            ->doesntExpectOutputToContain('0/6')
-            ->assertExitCode(1);
-    }
-
-    public function test_it_ignores_the_pax_header_of_a_github_tarball(): void
-    {
-        $this->fakeDownloads($this->makeTarGz('rocket.tar.gz', [
-            'pax_global_header' => 'comment=abc',
-            'rocket-master/src/Rocket.php' => '<?php',
-        ]));
+        // GitHub tarballs also hold a pax_global_header file, which directories() leaves out.
+        $this->files->expects('getArchiveExtension')->with('https://github.com/acme/rocket/archive/master.tar.gz')->andReturn('tar.gz');
+        $this->files->expects('makeFilename')->with('tar.gz')->andReturn(self::ARCHIVE);
+        $this->files->expects('directories')->with(self::TEMP)->andReturn(['rocket-master']);
+        $this->files->expects('move')->with(self::TEMP.'/rocket-master', '/app/packages/Acme/Rocket')->andReturnTrue();
 
         $this->command('packager:new', [
-            'vendor' => 'acme',
-            'name' => 'rocket',
+            'vendor' => 'Acme',
+            'name' => 'Rocket',
             '--skeleton' => 'https://github.com/acme/rocket/archive/master.tar.gz',
         ])->assertExitCode(0);
+    }
 
-        $this->assertFileExists($this->packagePath('acme', 'rocket').'/src/Rocket.php');
-        $this->assertFileDoesNotExist($this->packagePath('acme', 'rocket').'/pax_global_header');
+    public function test_it_rejects_an_archive_without_exactly_one_directory(): void
+    {
+        $this->files->expects('directories')->with(self::TEMP)->andReturn(['one', 'two']);
+        $this->files->shouldNotReceive('move');
+        $this->expectCleanUp();
+
+        $this->expectExceptionMessage('The archive should contain exactly one directory');
+
+        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])->run();
+    }
+
+    public function test_it_fails_when_the_package_cannot_be_moved_into_place(): void
+    {
+        $this->files->expects('move')->andReturnFalse();
+        $this->files->shouldNotReceive('renameFiles');
+        $this->expectCleanUp();
+
+        $this->expectExceptionMessage('Unable to move the downloaded package to /app/packages/Acme/Rocket');
+
+        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])->run();
     }
 
     public function test_it_reports_a_failing_skeleton_download(): void
     {
-        $this->fakeFailedDownload(404);
+        $this->files->expects('download')->andThrow(new TransferException("Client error: 404 Not Found\nresponse body"));
+        $this->files->shouldNotReceive('extract', 'move');
+        $this->expectCleanUp();
 
         $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket', '--skeleton' => 'https://example.com/missing.zip'])
             ->expectsOutputToContain('Unable to download https://example.com/missing.zip')
+            ->expectsOutputToContain('Client error: 404 Not Found')
+            ->doesntExpectOutputToContain('response body')
             ->doesntExpectOutputToContain('Package created successfully!')
             ->assertExitCode(1);
+    }
+
+    /**
+     * The downloaded archive and the temporary directory are removed, whatever happened.
+     */
+    private function expectCleanUp(): void
+    {
+        $this->files->expects('cleanUp')->with(self::ARCHIVE)->andReturnSelf();
+        $this->files->expects('removeDir')->with(self::TEMP)->andReturnTrue();
+    }
+
+    /**
+     * @param  array<string, string>  $expected  Replacements keyed by their placeholder
+     */
+    private function assertReplacements(array $expected): void
+    {
+        $actual = array_combine($this->wrapping->placeholders, $this->wrapping->replacements);
+
+        foreach ($expected as $placeholder => $replacement) {
+            $this->assertSame($replacement, $actual[$placeholder] ?? null, "Replacement of {$placeholder}");
+        }
     }
 }

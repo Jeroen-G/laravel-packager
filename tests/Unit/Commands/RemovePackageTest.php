@@ -4,70 +4,102 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Tests\Unit\Commands;
 
-use JeroenG\Packager\Tests\CommandTestCase;
+use JeroenG\Packager\Tests\PackagerTestCase;
+use JeroenG\Packager\Tests\Support\MocksFileHandler;
 
-final class RemovePackageTest extends CommandTestCase
+final class RemovePackageTest extends PackagerTestCase
 {
+    use MocksFileHandler;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        mkdir($this->packagePath('acme', 'rocket').'/src', 0777, true);
-        file_put_contents($this->packagePath('acme', 'rocket').'/src/Rocket.php', '<?php');
+        $this->mockFileHandler();
     }
 
     public function test_it_uninstalls_and_removes_the_package(): void
     {
         $this->expectUninstall('acme', 'rocket');
+        $this->files->expects('removeDir')->with('/app/packages/acme/rocket')->andReturnTrue();
+        $this->files->shouldNotReceive('exists', 'isEmptyDir');
 
         $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
+            ->expectsOutputToContain('Continuing...')
             ->expectsOutputToContain('Package removed successfully!')
             ->assertExitCode(0);
+    }
 
-        $this->assertDirectoryDoesNotExist($this->packagePath('acme', 'rocket'));
-        $this->assertDirectoryExists(dirname($this->packagePath('acme', 'rocket')));
+    public function test_it_removes_the_package_by_the_name_in_its_composer_json(): void
+    {
+        $this->files->expects('read')->with('/app/packages/acme/rocket/composer.json')->andReturn('{"name": "wile/rocket"}');
+        $this->commandRunner->expectRun(['composer', 'remove', 'wile/rocket']);
+        $this->commandRunner->expectRun(['composer', 'config', '--unset', 'repositories.acme/rocket']);
+        $this->files->expects('removeDir')->with('/app/packages/acme/rocket')->andReturnTrue();
+
+        $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
+            ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
+            ->assertExitCode(0);
     }
 
     public function test_it_accepts_vendor_and_name_separated_by_a_slash(): void
     {
         $this->expectUninstall('acme', 'rocket');
+        $this->files->expects('removeDir')->with('/app/packages/acme/rocket')->andReturnTrue();
 
         $this->command('packager:remove', ['vendor' => 'acme/rocket'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
             ->assertExitCode(0);
-
-        $this->assertDirectoryDoesNotExist($this->packagePath('acme', 'rocket'));
     }
 
     public function test_it_removes_an_empty_vendor_directory_when_confirmed(): void
     {
         $this->expectUninstall('acme', 'rocket');
+        $this->files->expects('removeDir')->with('/app/packages/acme/rocket')->andReturnTrue();
+        $this->files->expects('exists')->with('/app/packages/acme')->andReturnTrue();
+        $this->files->expects('isEmptyDir')->with('/app/packages/acme')->andReturnTrue();
+        $this->files->expects('removeDir')->with('/app/packages/acme')->andReturnTrue();
 
         $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'yes')
             ->expectsOutputToContain('removing vendor directory...')
+            ->expectsOutputToContain('Package removed successfully!')
             ->assertExitCode(0);
-
-        $this->assertDirectoryDoesNotExist(dirname($this->packagePath('acme', 'rocket')));
     }
 
     public function test_it_keeps_a_vendor_directory_with_other_packages(): void
     {
-        mkdir($this->packagePath('acme', 'anvil'), 0777, true);
         $this->expectUninstall('acme', 'rocket');
+        $this->files->expects('removeDir')->with('/app/packages/acme/rocket')->andReturnTrue();
+        $this->files->expects('exists')->with('/app/packages/acme')->andReturnTrue();
+        $this->files->expects('isEmptyDir')->with('/app/packages/acme')->andReturnFalse();
 
         $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'yes')
             ->expectsOutputToContain('vendor directory is not empty, continuing...')
+            ->doesntExpectOutputToContain('removing vendor directory...')
             ->assertExitCode(0);
+    }
 
-        $this->assertDirectoryExists($this->packagePath('acme', 'anvil'));
+    public function test_it_continues_when_the_vendor_directory_is_already_gone(): void
+    {
+        $this->expectUninstall('acme', 'rocket');
+        $this->files->expects('removeDir')->with('/app/packages/acme/rocket')->andReturnTrue();
+        $this->files->expects('exists')->with('/app/packages/acme')->andReturnFalse();
+        $this->files->shouldNotReceive('isEmptyDir');
+
+        $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
+            ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'yes')
+            ->expectsOutputToContain('vendor directory does not exist, continuing...')
+            ->expectsOutputToContain('Package removed successfully!')
+            ->assertExitCode(0);
     }
 
     public function test_it_does_not_crash_when_the_package_directory_is_already_gone(): void
     {
         $this->expectUninstall('acme', 'comet');
+        $this->files->expects('removeDir')->with('/app/packages/acme/comet')->andReturnFalse();
 
         $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'comet'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
@@ -77,15 +109,17 @@ final class RemovePackageTest extends CommandTestCase
 
     public function test_it_requires_a_package_name(): void
     {
+        $this->files->shouldNotReceive('removeDir');
+
         $this->command('packager:remove', ['vendor' => 'acme'])
             ->expectsOutputToContain('Please provide a package name')
             ->assertExitCode(1);
-
-        $this->assertDirectoryExists($this->packagePath('acme', 'rocket'));
     }
 
     public function test_it_requires_a_package_name_after_the_slash(): void
     {
+        $this->files->shouldNotReceive('removeDir');
+
         $this->command('packager:remove', ['vendor' => 'acme/'])
             ->expectsOutputToContain('Please provide a package name')
             ->assertExitCode(1);
@@ -94,24 +128,23 @@ final class RemovePackageTest extends CommandTestCase
     public function test_it_keeps_the_package_when_composer_cannot_remove_it(): void
     {
         $this->commandRunner->expectRun(['composer', 'remove', 'acme/rocket'], false);
+        $this->files->shouldNotReceive('removeDir');
 
         $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
             ->expectsOutputToContain('Composer could not remove the package from composer.json, so its files were kept.')
             ->doesntExpectOutputToContain('Package removed successfully!')
             ->assertExitCode(1);
-
-        $this->assertFileExists($this->packagePath('acme', 'rocket').'/src/Rocket.php');
     }
 
-    public function test_it_never_removes_the_packages_directory_itself(): void
+    public function test_it_leaves_guarding_the_packages_directory_to_the_file_handler(): void
     {
+        // FileHandler::removeDir() refuses paths outside packages/, see FileHandlerTest.
         $this->commandRunner->getMock()->allows('run')->andReturnTrue();
+        $this->files->expects('removeDir')->with('/app/packages/acme/..')->andReturnFalse();
 
         $this->command('packager:remove', ['vendor' => 'acme', 'name' => '..'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
             ->assertExitCode(0);
-
-        $this->assertFileExists($this->packagePath('acme', 'rocket').'/src/Rocket.php');
     }
 
     private function expectUninstall(string $vendor, string $package): void

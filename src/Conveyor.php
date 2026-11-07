@@ -111,16 +111,16 @@ final class Conveyor
                 ->extract($archive, $tempPath);
 
             // Archives from GitHub contain a single directory (tarballs may also hold a pax_global_header file).
-            $extracted = array_values(array_filter(
-                array_diff(scandir($tempPath) ?: [], ['.', '..']),
-                static fn (string $entry): bool => is_dir($tempPath.DIRECTORY_SEPARATOR.$entry),
-            ));
+            $extracted = $this->fileHandler->directories($tempPath);
 
             if (count($extracted) !== 1) {
                 throw new RuntimeException('The archive should contain exactly one directory');
             }
 
-            rename($tempPath.DIRECTORY_SEPARATOR.$extracted[0], $this->fileHandler->packagePath($this->vendor(), $this->package()));
+            $packagePath = $this->fileHandler->packagePath($this->vendor(), $this->package());
+            if (!$this->fileHandler->move($tempPath.DIRECTORY_SEPARATOR.$extracted[0], $packagePath)) {
+                throw new RuntimeException("Unable to move the downloaded package to {$packagePath}");
+            }
         } finally {
             $this->fileHandler->cleanUp($archive);
             $this->fileHandler->removeDir($tempPath);
@@ -135,7 +135,8 @@ final class Conveyor
     private function composerName(): string
     {
         $composerFile = $this->fileHandler->packagePath($this->vendor(), $this->package()).DIRECTORY_SEPARATOR.'composer.json';
-        $composer = is_file($composerFile) ? json_decode((string) file_get_contents($composerFile), true) : null;
+        $contents = $this->fileHandler->read($composerFile);
+        $composer = $contents === null ? null : json_decode($contents, true);
         $name = is_array($composer) ? ($composer['name'] ?? null) : null;
 
         if (is_string($name) && preg_match('{^[a-z0-9]([_.-]?[a-z0-9]+)*/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$}', $name) === 1) {

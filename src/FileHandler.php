@@ -53,6 +53,44 @@ class FileHandler implements FileHandlerInterface
         }
     }
 
+    public function exists(string $path): bool
+    {
+        return file_exists($path);
+    }
+
+    public function isEmptyDir(string $path): bool
+    {
+        $entries = is_dir($path) ? scandir($path) : false;
+
+        return $entries !== false && array_diff($entries, ['.', '..']) === [];
+    }
+
+    public function directories(string $path): array
+    {
+        $entries = is_dir($path) ? scandir($path) : false;
+
+        if ($entries === false) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            array_diff($entries, ['.', '..']),
+            static fn (string $entry): bool => is_dir($path.DIRECTORY_SEPARATOR.$entry),
+        ));
+    }
+
+    public function read(string $path): ?string
+    {
+        $contents = is_file($path) ? file_get_contents($path) : false;
+
+        return $contents === false ? null : $contents;
+    }
+
+    public function move(string $from, string $to): bool
+    {
+        return rename($from, $to);
+    }
+
     public function makeDir(string $path): bool
     {
         if (!is_dir($path)) {

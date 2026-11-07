@@ -9,6 +9,7 @@ All Notable changes to Packager will be documented in this file.
 - Removed the `packager:check` command, use `composer audit` instead
 - Removed the `--host` option of `packager:get`, Bitbucket is no longer supported
 - The `FileHandler` trait is replaced by the `FileHandler` class and `FileHandlerInterface`; `vendorPath()`, `tempPath()`, `packagePath()`, `checkIfPackageExists()` and `cleanUpRules()` now take the vendor and package as arguments
+- `FileHandlerInterface` has the new methods `exists()`, `isEmptyDir()`, `directories()`, `read()` and `move()`; `Conveyor`, `packager:new` and `packager:remove` no longer access the filesystem directly
 - `Conveyor` is a final class with `CommandRunnerInterface` and `FileHandlerInterface` constructor dependencies
 - `CommandRunnerInterface::run()` accepts a working directory and the interface has a new `output()` method
 - `Conveyor::downloadFromGithub()` only takes the archive url

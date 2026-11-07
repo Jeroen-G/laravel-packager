@@ -9,29 +9,19 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Filesystem\Filesystem;
-use JeroenG\Packager\CommandRunnerInterface;
 use JeroenG\Packager\FileHandler;
 use JeroenG\Packager\FileHandlerInterface;
-use JeroenG\Packager\PackagerServiceProvider;
-use JeroenG\Packager\Tests\Support\CommandRunnerExpectation;
-use JeroenG\Packager\Tests\Support\RunsCommands;
-use Orchestra\Testbench\TestCase as TestBench;
 use Phar;
 use PharData;
 use Psr\Http\Message\RequestInterface;
 use ZipArchive;
 
 /**
- * Runs Packager commands in a lightweight application whose base path is a temporary
- * directory and whose external commands (git, composer) are mocked.
+ * Runs Packager commands against the real filesystem, in an application whose base path is a temporary directory.
  */
-abstract class CommandTestCase extends TestBench
+abstract class CommandTestCase extends PackagerTestCase
 {
-    use RunsCommands;
-
     protected string $basePath;
-
-    protected CommandRunnerExpectation $commandRunner;
 
     /**
      * The HTTP requests made through faked downloads, each with 'request' and 'options' keys.
@@ -47,9 +37,6 @@ abstract class CommandTestCase extends TestBench
         $this->basePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'packager-'.uniqid('', true);
         mkdir($this->basePath);
         app()->setBasePath($this->basePath);
-
-        $this->commandRunner = CommandRunnerExpectation::create();
-        app()->instance(CommandRunnerInterface::class, $this->commandRunner->getMock());
     }
 
     protected function tearDown(): void
@@ -57,11 +44,6 @@ abstract class CommandTestCase extends TestBench
         (new Filesystem())->deleteDirectory($this->basePath);
 
         parent::tearDown();
-    }
-
-    protected function getPackageProviders($app): array
-    {
-        return [PackagerServiceProvider::class];
     }
 
     protected function packagePath(string $vendor, string $package): string

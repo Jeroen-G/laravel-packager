@@ -106,7 +106,7 @@ class NewPackage extends Command
         } catch (TransferException $exception) {
             return $this->downloadFailed($skeleton, $exception);
         }
-        $manifest = (file_exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php')) ? $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php' : null;
+        $hasRules = $this->fileHandler->exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php');
         $this->fileHandler->renameFiles(
             $this->conveyor->vendorStudly(),
             $this->conveyor->packageStudly(),
@@ -153,7 +153,7 @@ class NewPackage extends Command
         $this->wrapping->fill($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()));
 
         // Make sure to remove the rule files to avoid clutter.
-        if ($manifest !== null) {
+        if ($hasRules) {
             $this->fileHandler->cleanUpRules($this->conveyor->vendor(), $this->conveyor->package());
         }
 

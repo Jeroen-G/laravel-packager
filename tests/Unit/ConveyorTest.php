@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JeroenG\Packager\Tests\Unit;
 
 use JeroenG\Packager\Conveyor;
-use JeroenG\Packager\FileHandler;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\Tests\Support\CommandRunnerExpectation;
 use JeroenG\Packager\Tests\UnitTestCase;
 
@@ -15,15 +15,16 @@ final class ConveyorTest extends UnitTestCase
 
     private Conveyor $conveyor;
 
-    private FileHandler&\Mockery\MockInterface $fileHandler;
+    private FileHandlerInterface&\Mockery\MockInterface $fileHandler;
 
     protected function setUp(): void
     {
         $this->commandRunner = CommandRunnerExpectation::create();
-        $this->fileHandler = \Mockery::mock(FileHandler::class);
+        $this->fileHandler = \Mockery::mock(FileHandlerInterface::class);
 
         // A package without composer.json, so the vendor and package names are used.
         $this->fileHandler->allows('packagePath')->andReturn('packages/myvendor/mypackage');
+        $this->fileHandler->allows('read')->with('packages/myvendor/mypackage/composer.json')->andReturnNull();
 
         $this->conveyor = new Conveyor($this->commandRunner->getMock(), $this->fileHandler);
     }

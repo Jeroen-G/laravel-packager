@@ -16,7 +16,6 @@ Before sending a pull request, run:
 ## Things To Do
 If you want to contribute but do not know where to start, this list provides some starting points.
 - Raise the mutation score and the minimum MSI in CI.
-- Make `NewPackage` and `RemovePackage` independent of the real filesystem, so their tests need no temporary directories.
 
 ## Pull Requests
 

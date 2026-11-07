@@ -8,6 +8,8 @@ use Illuminate\Filesystem\Filesystem;
 use JeroenG\Packager\FileHandler;
 use JeroenG\Packager\Tests\UnitTestCase;
 use Mockery;
+use Phar;
+use PharData;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 
@@ -215,5 +217,79 @@ final class FileHandlerTest extends UnitTestCase
         $this->assertFileDoesNotExist($package.'/rules.php');
         $this->assertFileDoesNotExist($package.'/rewriteRules.php');
         $this->assertFileExists($package.'/composer.json');
+    }
+
+    public function test_it_checks_whether_a_path_exists(): void
+    {
+        file_put_contents($this->workDir.'/file.txt', 'x');
+
+        $this->assertTrue($this->fileHandler->exists($this->workDir));
+        $this->assertTrue($this->fileHandler->exists($this->workDir.'/file.txt'));
+        $this->assertFalse($this->fileHandler->exists($this->workDir.'/missing'));
+    }
+
+    public function test_it_checks_whether_a_directory_is_empty(): void
+    {
+        mkdir($this->workDir.'/empty');
+        mkdir($this->workDir.'/with-directory/nested', 0777, true);
+        file_put_contents($this->workDir.'/with-file', 'x');
+        mkdir($this->workDir.'/with-hidden-file');
+        file_put_contents($this->workDir.'/with-hidden-file/.gitkeep', '');
+
+        $this->assertTrue($this->fileHandler->isEmptyDir($this->workDir.'/empty'));
+        $this->assertFalse($this->fileHandler->isEmptyDir($this->workDir.'/with-directory'));
+        $this->assertFalse($this->fileHandler->isEmptyDir($this->workDir.'/with-hidden-file'));
+        $this->assertFalse($this->fileHandler->isEmptyDir($this->workDir.'/with-file'));
+        $this->assertFalse($this->fileHandler->isEmptyDir($this->workDir.'/missing'));
+    }
+
+    public function test_it_lists_only_the_directories_inside_a_path(): void
+    {
+        mkdir($this->workDir.'/b-directory/nested', 0777, true);
+        mkdir($this->workDir.'/a-directory');
+        file_put_contents($this->workDir.'/file.txt', 'x');
+
+        $this->assertSame(['a-directory', 'b-directory'], $this->fileHandler->directories($this->workDir));
+        $this->assertSame([], $this->fileHandler->directories($this->workDir.'/a-directory'));
+        $this->assertSame([], $this->fileHandler->directories($this->workDir.'/file.txt'));
+        $this->assertSame([], $this->fileHandler->directories($this->workDir.'/missing'));
+    }
+
+    public function test_it_lists_the_directory_of_a_github_tarball_without_its_pax_header(): void
+    {
+        $tar = $this->workDir.'/built.tar';
+        $archive = new PharData($tar);
+        $archive->addFromString('pax_global_header', 'comment=abc');
+        $archive->addFromString('rocket-master/src/Rocket.php', '<?php');
+        $archive->compress(Phar::GZ);
+        unset($archive);
+        unlink($tar);
+        // Like a download, under another name than the archive was built with, which Phar still remembers.
+        rename($tar.'.gz', $this->workDir.'/download.tar.gz');
+
+        $this->fileHandler->extract($this->workDir.'/download.tar.gz', $this->workDir.'/extracted');
+
+        $this->assertSame(['rocket-master'], $this->fileHandler->directories($this->workDir.'/extracted'));
+    }
+
+    public function test_it_reads_files(): void
+    {
+        file_put_contents($this->workDir.'/composer.json', '{"name": "acme/rocket"}');
+        file_put_contents($this->workDir.'/empty.txt', '');
+
+        $this->assertSame('{"name": "acme/rocket"}', $this->fileHandler->read($this->workDir.'/composer.json'));
+        $this->assertSame('', $this->fileHandler->read($this->workDir.'/empty.txt'));
+        $this->assertNull($this->fileHandler->read($this->workDir.'/missing.json'));
+        $this->assertNull($this->fileHandler->read($this->workDir));
+    }
+
+    public function test_it_moves_a_directory(): void
+    {
+        mkdir($this->workDir.'/from/src', 0777, true);
+        file_put_contents($this->workDir.'/from/src/Rocket.php', '<?php');
+
+        $this->assertTrue($this->fileHandler->move($this->workDir.'/from', $this->workDir.'/to'));
+        $this->assertDirectoryDoesNotExist($this->workDir.'/from');
+        $this->assertFileExists($this->workDir.'/to/src/Rocket.php');
     }
 }
