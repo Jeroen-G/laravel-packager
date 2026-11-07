@@ -62,15 +62,27 @@ class FileHandler implements FileHandlerInterface
         return false;
     }
 
+    /**
+     * Recursively remove a directory, but only one inside the packages directory.
+     */
     public function removeDir(string $path): bool
     {
-        if (!is_dir($path) || in_array(rtrim($path, '/\\'), ['', $this->packagesPath()], true)) {
+        $realPath = realpath($path);
+        $packagesPath = realpath($this->packagesPath());
+
+        if (
+            !is_dir($path)
+            || $realPath === false
+            || $packagesPath === false
+            || !str_starts_with($realPath, $packagesPath.DIRECTORY_SEPARATOR)
+        ) {
             return false;
         }
 
         $files = array_diff(scandir($path) ?: [], ['.', '..']);
         foreach ($files as $file) {
-            if (is_dir("$path/$file")) {
+            // Never follow symlinks: remove the link itself, not what it points to.
+            if (is_dir("$path/$file") && !is_link("$path/$file")) {
                 $this->removeDir("$path/$file");
             } else {
                 @chmod("$path/$file", 0777);

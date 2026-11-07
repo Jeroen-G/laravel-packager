@@ -78,7 +78,7 @@ php artisan packager:get https://github.com/author/repository --branch=develop
 php artisan packager:get https://github.com/author/repository my-vendor my-package
 php artisan packager:git https://github.com/author/repository my-vendor my-package
 ```
-It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url.
+It is possible to specify a branch with the `--branch` option; `packager:get` downloads the default branch of the repository otherwise. If you specify a vendor and name directly after the url, those will be used for the directory in `packages/` instead of the pieces of the url. Composer installs the package by the `name` in its `composer.json`.
 
 ### Tests
 **Command:**
@@ -161,6 +161,7 @@ All `composer` and `git` commands that Packager runs (for example installing a p
 - The `packager:check` command has been removed, because the SensioLabs security checker it relied on is abandoned. Run `composer audit` in the package directory instead.
 - `git` commands of `packager:git` and `packager:publish` now respect the `timeout` config variable.
 - `packager:publish` pushes the current branch instead of `master`.
+- `packager:get` downloads the default branch of the repository instead of `master` when no `--branch` is given.
 - Bitbucket is no longer supported: the `--host` option of `packager:get` has been removed.
 - If you extended Packager's classes: the `FileHandler` trait is now a `FileHandler` class implementing `FileHandlerInterface`, its path methods take the vendor and package as arguments, and `Conveyor` is a final class that is resolved from the container. See the [changelog](changelog.md) for all changes.
 

@@ -53,7 +53,7 @@ Clone it with its git history:
 {{ $assist->artisanCommand('packager:git https://github.com/username/repository my-vendor my-package') }}
 ```
 
-Or download it from GitHub without git history (`--branch` defaults to `master`):
+Or download it from GitHub without git history (`--branch` defaults to the repository's default branch):
 
 ```bash
 {{ $assist->artisanCommand('packager:get https://github.com/username/repository my-vendor my-package --branch=main') }}

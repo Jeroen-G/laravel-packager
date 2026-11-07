@@ -116,6 +116,39 @@ final class FileHandlerTest extends UnitTestCase
         $this->assertDirectoryExists($this->workDir);
     }
 
+    public function test_it_refuses_to_remove_directories_outside_the_packages_directory(): void
+    {
+        mkdir($this->workDir.'/MyVendor', 0777, true);
+        $outside = sys_get_temp_dir().DIRECTORY_SEPARATOR.'packager-outside-'.uniqid('', true);
+        mkdir($outside);
+
+        try {
+            $this->assertFalse($this->fileHandler->removeDir($this->workDir.'/MyVendor/..'));
+            $this->assertFalse($this->fileHandler->removeDir($outside));
+            $this->assertDirectoryExists($this->workDir.'/MyVendor');
+            $this->assertDirectoryExists($outside);
+        } finally {
+            rmdir($outside);
+        }
+    }
+
+    public function test_it_removes_symlinks_without_following_them(): void
+    {
+        $target = sys_get_temp_dir().DIRECTORY_SEPARATOR.'packager-target-'.uniqid('', true);
+        mkdir($target);
+        file_put_contents($target.'/keep.txt', 'x');
+        mkdir($this->workDir.'/MyVendor/MyPackage', 0777, true);
+        symlink($target, $this->workDir.'/MyVendor/MyPackage/linked');
+
+        try {
+            $this->assertTrue($this->fileHandler->removeDir($this->workDir.'/MyVendor/MyPackage'));
+            $this->assertFileExists($target.'/keep.txt');
+        } finally {
+            unlink($target.'/keep.txt');
+            rmdir($target);
+        }
+    }
+
     public function test_it_does_not_fail_on_a_missing_directory(): void
     {
         $this->assertFalse($this->fileHandler->removeDir($this->workDir.'/missing'));

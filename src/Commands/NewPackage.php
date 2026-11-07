@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Commands;
 
+use GuzzleHttp\Exception\TransferException;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Validation\Validator as ValidatorInterface;
 use Illuminate\Support\Facades\Validator;
@@ -95,10 +96,15 @@ class NewPackage extends Command
 
         // Get the packager package skeleton
         $this->info('Downloading skeleton...');
-        if ($this->option('i')) {
-            $this->conveyor->downloadSkeleton($this->ask('What package skeleton would you like to use?', $this->stringOption('skeleton') ?? config('packager.skeleton')));
-        } else {
-            $this->conveyor->downloadSkeleton($this->stringOption('skeleton'));
+        $skeleton = $this->option('i')
+            ? $this->ask('What package skeleton would you like to use?', $this->stringOption('skeleton') ?? config('packager.skeleton'))
+            : $this->stringOption('skeleton');
+        $skeleton = is_string($skeleton) && $skeleton !== '' ? $skeleton : config('packager.skeleton');
+
+        try {
+            $this->conveyor->downloadSkeleton($skeleton);
+        } catch (TransferException $exception) {
+            return $this->downloadFailed($skeleton, $exception);
         }
         $manifest = (file_exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php')) ? $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php' : null;
         $this->fileHandler->renameFiles(

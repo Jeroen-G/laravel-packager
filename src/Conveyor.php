@@ -128,10 +128,20 @@ final class Conveyor
     }
 
     /**
-     * Composer only accepts lowercase package names; the skeleton names packages :lc:vendor/:lc:package.
+     * The name composer knows the package by: the name in its composer.json, so composer installs it
+     * from the path repository even when it differs from the vendor and package given to Packager.
+     * Otherwise the lowercase vendor/package, as composer only accepts lowercase names.
      */
     private function composerName(): string
     {
+        $composerFile = $this->fileHandler->packagePath($this->vendor(), $this->package()).DIRECTORY_SEPARATOR.'composer.json';
+        $composer = is_file($composerFile) ? json_decode((string) file_get_contents($composerFile), true) : null;
+        $name = is_array($composer) ? ($composer['name'] ?? null) : null;
+
+        if (is_string($name) && preg_match('{^[a-z0-9]([_.-]?[a-z0-9]+)*/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$}', $name) === 1) {
+            return $name;
+        }
+
         return mb_strtolower($this->vendor().'/'.$this->package());
     }
 

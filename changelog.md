@@ -19,6 +19,8 @@ All Notable changes to Packager will be documented in this file.
 - `ValidClassName` implements `ValidationRule` instead of the deprecated `Rule` contract
 - Commands no longer receive the `Wrapping` class when they do not use it
 - `git` commands respect the `timeout` config variable and `packager:publish` pushes the current branch instead of `master`
+- `packager:get` downloads the default branch (`HEAD`) instead of `master` when no `--branch` is given
+- Packages are required and removed by the `name` in their `composer.json`, falling back to the lowercase vendor/package
 
 ### Updated
 - Moved to GitHub actions
@@ -43,6 +45,9 @@ All Notable changes to Packager will be documented in this file.
 - Composer failures were reported as success; commands now stop with an error and a failure exit code, and `packager:remove` keeps the package files when composer could not remove it
 - Packages with uppercase letters in their vendor or name could not be installed, because composer requires lowercase package names
 - Downloading no longer uses `packages/<vendor>/temp`, which could clash with a package named `temp`
+- `packager:get` and `packager:git` with a vendor/name that differs from the package's composer `name` installed the package with that name from Packagist instead of the local one
+- A failed download is reported instead of crashing with an exception
+- Removing a package only ever deletes directories inside `packages/` and does not follow symlinks
 - `packager:list` shows `-` instead of 0 when the commits behind cannot be determined, and names its columns Vendor and Package
 - `packager:tests` copies tests of all packages to `tests/packages/Vendor/Package` instead of a directory named `Vendor\Package`
 

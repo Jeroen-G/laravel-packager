@@ -92,6 +92,16 @@ abstract class CommandTestCase extends TestBench
     }
 
     /**
+     * Answer the next download with an HTTP error.
+     */
+    protected function fakeFailedDownload(int $status): void
+    {
+        $handler = HandlerStack::create(new MockHandler([new Response($status)]));
+
+        app()->instance(FileHandlerInterface::class, new FileHandler(new Client(['handler' => $handler])));
+    }
+
+    /**
      * Create a zip archive in the base path with the given files.
      *
      * @param  array<string, string>  $files  Contents keyed by their path inside the archive

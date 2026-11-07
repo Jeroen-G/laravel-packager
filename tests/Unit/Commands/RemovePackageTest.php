@@ -103,6 +103,17 @@ final class RemovePackageTest extends CommandTestCase
         $this->assertFileExists($this->packagePath('acme', 'rocket').'/src/Rocket.php');
     }
 
+    public function test_it_never_removes_the_packages_directory_itself(): void
+    {
+        $this->commandRunner->getMock()->allows('run')->andReturnTrue();
+
+        $this->command('packager:remove', ['vendor' => 'acme', 'name' => '..'])
+            ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
+            ->assertExitCode(0);
+
+        $this->assertFileExists($this->packagePath('acme', 'rocket').'/src/Rocket.php');
+    }
+
     private function expectUninstall(string $vendor, string $package): void
     {
         $this->commandRunner->expectRun(['composer', 'remove', $vendor.'/'.$package]);

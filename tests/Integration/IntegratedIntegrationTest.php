@@ -100,12 +100,12 @@ class IntegratedIntegrationTest extends IntegrationTestCase
 
     public function test_get_package(): void
     {
-        Artisan::call(
-            'packager:get',
-            ['url' => 'https://github.com/Jeroen-G/packager-skeleton', 'vendor' => 'MyVendor', 'name' => 'MyPackage']
-        );
+        // Downloads the default branch and installs the package by the name in its composer.json.
+        Artisan::call('packager:get', ['url' => 'https://github.com/Seldaek/monolog']);
 
         $this->seeInConsoleOutput('Package downloaded successfully!');
+        $this->assertDirectoryExists(base_path('packages/seldaek/monolog/src'));
+        $this->assertTrue(is_link(base_path('vendor/monolog/monolog')));
     }
 
     public function test_get_existing_package_with_git(): void

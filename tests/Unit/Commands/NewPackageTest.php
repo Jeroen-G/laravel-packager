@@ -171,4 +171,14 @@ final class NewPackageTest extends CommandTestCase
         $this->assertFileExists($this->packagePath('acme', 'rocket').'/src/Rocket.php');
         $this->assertFileDoesNotExist($this->packagePath('acme', 'rocket').'/pax_global_header');
     }
+
+    public function test_it_reports_a_failing_skeleton_download(): void
+    {
+        $this->fakeFailedDownload(404);
+
+        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket', '--skeleton' => 'https://example.com/missing.zip'])
+            ->expectsOutputToContain('Unable to download https://example.com/missing.zip')
+            ->doesntExpectOutputToContain('Package created successfully!')
+            ->assertExitCode(1);
+    }
 }

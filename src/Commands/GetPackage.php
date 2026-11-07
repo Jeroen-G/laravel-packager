@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Commands;
 
+use GuzzleHttp\Exception\TransferException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use JeroenG\Packager\Conveyor;
@@ -25,7 +26,7 @@ class GetPackage extends Command
                             {url : The url of the repository}
                             {vendor? : The vendor part of the namespace}
                             {name? : The name of package for the namespace}
-                            {--branch=master : The branch to download}';
+                            {--branch=HEAD : The branch to download, defaults to the default branch of the repository}';
 
     protected $description = 'Retrieve an existing package from Github.';
 
@@ -76,7 +77,11 @@ class GetPackage extends Command
         $this->makeProgress();
 
         $this->info('Downloading from Github...');
-        $this->conveyor->downloadFromGithub($origin);
+        try {
+            $this->conveyor->downloadFromGithub($origin);
+        } catch (TransferException $exception) {
+            return $this->downloadFailed($origin, $exception);
+        }
 
         $this->makeProgress();
 

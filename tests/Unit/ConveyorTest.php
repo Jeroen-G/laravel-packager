@@ -22,6 +22,9 @@ final class ConveyorTest extends UnitTestCase
         $this->commandRunner = CommandRunnerExpectation::create();
         $this->fileHandler = \Mockery::mock(FileHandler::class);
 
+        // A package without composer.json, so the vendor and package names are used.
+        $this->fileHandler->allows('packagePath')->andReturn('packages/myvendor/mypackage');
+
         $this->conveyor = new Conveyor($this->commandRunner->getMock(), $this->fileHandler);
     }
 
@@ -30,7 +33,6 @@ final class ConveyorTest extends UnitTestCase
         $this->conveyor->vendor('myVendor');
         $this->conveyor->package('myPackage');
 
-        $this->fileHandler->expects('packagePath')->andReturn('packages/myvendor/mypackage');
         $this->commandRunner->expectRun(['composer', 'require', 'myvendor/mypackage:@dev'], true);
         $this->commandRunner->expectRun([
             'composer',
