@@ -72,7 +72,13 @@ class RemovePackage extends Command
 
         // remove the package directory
         $this->info('Removing packages directory...');
-        $this->fileHandler->removeDir($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()));
+        $packagePath = $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package());
+        if (!$this->fileHandler->removeDir($packagePath) && $this->fileHandler->exists($packagePath)) {
+            $this->abortProgress();
+            $this->error("The package was uninstalled, but its directory {$packagePath} could not be removed.");
+
+            return self::FAILURE;
+        }
         $this->makeProgress();
 
         // Remove the vendor directory, if agreed to

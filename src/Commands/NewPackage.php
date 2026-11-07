@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Commands;
 
-use GuzzleHttp\Exception\TransferException;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Validation\Validator as ValidatorInterface;
 use Illuminate\Support\Facades\Validator;
@@ -13,6 +12,7 @@ use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 use JeroenG\Packager\ValidationRules\ValidClassName;
 use JeroenG\Packager\Wrapping;
+use RuntimeException;
 
 /**
  * Create a brand new package.
@@ -103,7 +103,7 @@ class NewPackage extends Command
 
         try {
             $this->conveyor->downloadSkeleton($skeleton);
-        } catch (TransferException $exception) {
+        } catch (RuntimeException $exception) {
             return $this->downloadFailed($skeleton, $exception);
         }
         $hasRules = $this->fileHandler->exists($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()).'/rewriteRules.php');

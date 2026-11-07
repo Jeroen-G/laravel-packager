@@ -33,7 +33,6 @@ All Notable changes to Packager will be documented in this file.
 - `packager:git` cut off package names ending in `.`, `g`, `i` or `t` when stripping `.git`
 - `packager:git` no longer passes the repository url through a shell
 - `packager:list` threw a TypeError when showing the commit difference of a git package
-- `packager:new` returned a failure exit code on success
 - `packager:publish` and `packager:git` now report failures and return a failure exit code
 - `packager:publish` updates an existing `origin` remote instead of failing silently
 - `packager:tests` resolves paths from the application base path instead of the current working directory
@@ -47,8 +46,8 @@ All Notable changes to Packager will be documented in this file.
 - Packages with uppercase letters in their vendor or name could not be installed, because composer requires lowercase package names
 - Downloading no longer uses `packages/<vendor>/temp`, which could clash with a package named `temp`
 - `packager:get` and `packager:git` with a vendor/name that differs from the package's composer `name` installed the package with that name from Packagist instead of the local one
-- A failed download is reported instead of crashing with an exception
-- Removing a package only ever deletes directories inside `packages/` and does not follow symlinks
+- A failed download, or an archive that does not contain a single directory, is reported instead of crashing with an exception
+- Removing a package only ever deletes directories inside `packages/` and does not follow symlinks; `packager:remove` reports a package directory it could not remove
 - `packager:list` shows `-` instead of 0 when the commits behind cannot be determined, and names its columns Vendor and Package
 - `packager:tests` copies tests of all packages to `tests/packages/Vendor/Package` instead of a directory named `Vendor\Package`
 

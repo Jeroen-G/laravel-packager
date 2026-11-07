@@ -88,7 +88,8 @@ class FileHandler implements FileHandlerInterface
 
     public function move(string $from, string $to): bool
     {
-        return rename($from, $to);
+        // Silenced, so a failure is returned instead of turned into an exception by Laravel.
+        return @rename($from, $to);
     }
 
     public function makeDir(string $path): bool

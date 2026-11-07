@@ -100,6 +100,7 @@ final class RemovePackageTest extends PackagerTestCase
     {
         $this->expectUninstall('acme', 'comet');
         $this->files->expects('removeDir')->with('/app/packages/acme/comet')->andReturnFalse();
+        $this->files->expects('exists')->with('/app/packages/acme/comet')->andReturnFalse();
 
         $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'comet'])
             ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
@@ -136,15 +137,18 @@ final class RemovePackageTest extends PackagerTestCase
             ->assertExitCode(1);
     }
 
-    public function test_it_leaves_guarding_the_packages_directory_to_the_file_handler(): void
+    public function test_it_reports_a_package_directory_it_could_not_remove(): void
     {
-        // FileHandler::removeDir() refuses paths outside packages/, see FileHandlerTest.
+        // FileHandler::removeDir() refuses paths outside packages/ (see FileHandlerTest), like the vendor directory here.
         $this->commandRunner->getMock()->allows('run')->andReturnTrue();
         $this->files->expects('removeDir')->with('/app/packages/acme/..')->andReturnFalse();
+        $this->files->expects('exists')->with('/app/packages/acme/..')->andReturnTrue();
 
         $this->command('packager:remove', ['vendor' => 'acme', 'name' => '..'])
-            ->expectsConfirmation('Do you want to remove the vendor directory? [y|N]', 'no')
-            ->assertExitCode(0);
+            ->expectsOutputToContain('The package was uninstalled, but its directory /app/packages/acme/.. could not be removed.')
+            ->doesntExpectOutputToContain('Do you want to remove the vendor directory?')
+            ->doesntExpectOutputToContain('Package removed successfully!')
+            ->assertExitCode(1);
     }
 
     private function expectUninstall(string $vendor, string $package): void

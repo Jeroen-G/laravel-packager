@@ -65,14 +65,13 @@ final class GetPackageTest extends CommandTestCase
     {
         $this->fakeDownloads($this->makeZip('rocket.zip', ['a/one.php' => '<?php', 'b/two.php' => '<?php']));
 
-        $this->expectExceptionMessage('The archive should contain exactly one directory');
+        $this->command('packager:get', ['url' => 'https://github.com/acme/rocket'])
+            ->expectsOutputToContain('Unable to download https://github.com/acme/rocket/archive/HEAD.zip')
+            ->expectsOutputToContain('The archive should contain exactly one directory')
+            ->assertExitCode(1);
 
-        try {
-            $this->command('packager:get', ['url' => 'https://github.com/acme/rocket'])->run();
-        } finally {
-            $this->assertNoTemporaryDirectories('acme');
-            $this->assertDirectoryDoesNotExist($this->packagePath('acme', 'rocket'));
-        }
+        $this->assertNoTemporaryDirectories('acme');
+        $this->assertDirectoryDoesNotExist($this->packagePath('acme', 'rocket'));
     }
 
     public function test_it_refuses_to_overwrite_an_existing_package(): void

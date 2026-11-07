@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Commands;
 
-use GuzzleHttp\Exception\TransferException;
+use RuntimeException;
 
 /**
  * Stop a command with a clear message when a download or composer command failed.
@@ -23,9 +23,9 @@ trait ReportsComposerFailures
     }
 
     /**
-     * Stop the progress after a failed download and explain what happened.
+     * Stop the progress after a failed download, or an unusable archive, and explain what happened.
      */
-    protected function downloadFailed(string $url, TransferException $exception): int
+    protected function downloadFailed(string $url, RuntimeException $exception): int
     {
         $this->abortProgress();
         $this->error("Unable to download {$url}");

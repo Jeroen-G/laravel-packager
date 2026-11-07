@@ -19,7 +19,7 @@ return [
     'curl_verify_cert' => env('CURL_VERIFY', true),
 
     /**
-     * On slow connections, setting a larger timeout might help to finish downloading package files.
+     * The timeout in seconds of git and composer commands. On slow connections a larger timeout might help.
      * Default: 60.
      */
     'timeout' => '60',

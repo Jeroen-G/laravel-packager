@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Commands;
 
-use GuzzleHttp\Exception\TransferException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
+use RuntimeException;
 
 /**
  * Get an existing package from a remote git repository.
@@ -79,7 +79,7 @@ class GetPackage extends Command
         $this->info('Downloading from Github...');
         try {
             $this->conveyor->downloadFromGithub($origin);
-        } catch (TransferException $exception) {
+        } catch (RuntimeException $exception) {
             return $this->downloadFailed($origin, $exception);
         }
 

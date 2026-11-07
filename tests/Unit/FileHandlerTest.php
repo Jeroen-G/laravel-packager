@@ -292,4 +292,10 @@ final class FileHandlerTest extends UnitTestCase
         $this->assertDirectoryDoesNotExist($this->workDir.'/from');
         $this->assertFileExists($this->workDir.'/to/src/Rocket.php');
     }
+
+    public function test_it_returns_false_when_moving_fails(): void
+    {
+        $this->assertFalse($this->fileHandler->move($this->workDir.'/missing', $this->workDir.'/to'));
+        $this->assertFileDoesNotExist($this->workDir.'/to');
+    }
 }

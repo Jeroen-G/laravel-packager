@@ -222,9 +222,11 @@ final class NewPackageTest extends PackagerTestCase
         $this->files->shouldNotReceive('move');
         $this->expectCleanUp();
 
-        $this->expectExceptionMessage('The archive should contain exactly one directory');
-
-        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])->run();
+        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])
+            ->expectsOutputToContain('Unable to download '.config('packager.skeleton'))
+            ->expectsOutputToContain('The archive should contain exactly one directory')
+            ->doesntExpectOutputToContain('Package created successfully!')
+            ->assertExitCode(1);
     }
 
     public function test_it_fails_when_the_package_cannot_be_moved_into_place(): void
@@ -233,9 +235,10 @@ final class NewPackageTest extends PackagerTestCase
         $this->files->shouldNotReceive('renameFiles');
         $this->expectCleanUp();
 
-        $this->expectExceptionMessage('Unable to move the downloaded package to /app/packages/Acme/Rocket');
-
-        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])->run();
+        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])
+            ->expectsOutputToContain('Unable to move the downloaded package to /app/packages/Acme/Rocket')
+            ->doesntExpectOutputToContain('Package created successfully!')
+            ->assertExitCode(1);
     }
 
     public function test_it_reports_a_failing_skeleton_download(): void
