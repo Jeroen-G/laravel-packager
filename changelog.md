@@ -6,60 +6,26 @@ All Notable changes to Packager will be documented in this file.
 
 ### Breaking changes
 - Requires PHP 8.2+ and Laravel 11, 12 or 13
-- Removed the `packager:check` command, use `composer audit` instead
-- Removed the `--host` option of `packager:get`, Bitbucket is no longer supported
-- The `FileHandler` trait is replaced by the `FileHandler` class and `FileHandlerInterface`; `vendorPath()`, `tempPath()`, `packagePath()`, `checkIfPackageExists()` and `cleanUpRules()` now take the vendor and package as arguments
-- `FileHandlerInterface` has the new methods `exists()`, `isEmptyDir()`, `directories()`, `read()` and `move()`; `Conveyor`, `packager:new` and `packager:remove` no longer access the filesystem directly
-- `Conveyor` is a final class with `CommandRunnerInterface` and `FileHandlerInterface` constructor dependencies
-- `CommandRunnerInterface::run()` accepts a working directory and the interface has a new `output()` method
-- `Conveyor::downloadFromGithub()` only takes the archive url
-- `Conveyor::installPackage()` and `uninstallPackage()` return whether composer succeeded
-- `FileHandler::tempPath()` returns a new, hidden temporary directory on every call instead of `<vendor>/temp`
-- `Conveyor::addPathRepository()`, `removePathRepository()`, `requirePackage()` and `removePackage()` are private, use `installPackage()` and `uninstallPackage()`; `dumpAutoloads()` is removed
-- `FileHandler` accepts an optional Guzzle client and its path methods have typed parameters
-- `ValidClassName` implements `ValidationRule` instead of the deprecated `Rule` contract
-- Commands no longer receive the `Wrapping` class when they do not use it
-- `git` commands respect the `timeout` config variable and `packager:publish` pushes the current branch instead of `master`
-- `packager:get` downloads the default branch (`HEAD`) instead of `master` when no `--branch` is given
-- Packages are required and removed by the `name` in their `composer.json`, falling back to the lowercase vendor/package
+- Removed the `packager:check` command (use `composer audit`) and Bitbucket support (the `--host` option of `packager:get`)
+- `packager:get` downloads the default branch instead of `master`, and `packager:publish` pushes the current branch instead of `master`
+- `git` commands respect the `timeout` config variable
+- Packages are installed by the `name` in their `composer.json`, falling back to the lowercase vendor/package
+- For code that extends Packager: the `FileHandler` trait is now a class implementing `FileHandlerInterface`, `Conveyor` is a final class resolved from the container, and several method signatures changed
 
-### Updated
-- Supports Guzzle 7 and 8, so Packager installs in a new Laravel application
-- Moved to GitHub actions
-- Added PHPStan (Larastan, level 8) static analysis and mutation testing annotations on pull requests
-- CI also tests against the lowest allowed dependency versions
+### Added
+- Support for Guzzle 8
+- `packager:git` accepts any git url, such as `ssh://` and `file://`
 
 ### Fixed
-- Class name validation accepted characters like `` ` `` and `{` and rejected multibyte names
-- `packager:git` cut off package names ending in `.`, `g`, `i` or `t` when stripping `.git`
-- `packager:git` no longer passes the repository url through a shell
-- `packager:git` takes the vendor and package from the last two parts of any git url (such as `http://`, `ssh://` and `file://`) and asks for them when the url has none, instead of failing with "Package already exists"
-- `packager:list` threw a TypeError when showing the commit difference of a git package
-- `packager:publish` and `packager:git` now report failures and return a failure exit code
-- `packager:publish` updates an existing `origin` remote instead of failing silently
-- `packager:tests` resolves paths from the application base path instead of the current working directory
-- A command that times out is reported as a failure instead of crashing with an exception
-- `packager:remove` without a package name shows an error and returns a failure exit code
-- `packager:publish` reports a missing package directory
-- `packager:enable` refuses a package directory that does not exist, instead of adding a path repository that makes every composer command fail
-- Removing a package whose directory is already gone no longer crashes
-- `packager:get` failed for repositories with uppercase letters in their name or branches with a slash
-- `packager:get` with a url ending in `.git` created a package named `<name>.git`
-- Composer failures were reported as success; commands now stop with an error and a failure exit code, and `packager:remove` keeps the package files when composer could not remove it
-- Packages with uppercase letters in their vendor or name could not be installed, because composer requires lowercase package names
-- Downloading no longer uses `packages/<vendor>/temp`, which could clash with a package named `temp`
-- `packager:get` and `packager:git` with a vendor/name that differs from the package's composer `name` installed the package with that name from Packagist instead of the local one
-- A failed download, or an archive that does not contain a single directory, is reported instead of crashing with an exception
-- Removing a package only ever deletes directories inside `packages/` and does not follow symlinks; `packager:remove` reports a package directory it could not remove
-- `packager:list` shows `-` instead of 0 when the commits behind cannot be determined, and names its columns Vendor and Package
-- `packager:tests` copies tests of all packages to `tests/packages/Vendor/Package` instead of a directory named `Vendor\Package`
+- Failures of composer, git and downloads are reported with a clear message and a failure exit code, instead of being reported as success or crashing
+- Packages with uppercase letters in their vendor or name can be installed
+- Removing a package only deletes directories inside `packages/` and never follows symlinks
+- Many smaller bugs in `packager:get`, `packager:git`, `packager:list`, `packager:publish` and `packager:tests`
 
 ### Changed
-- All git and composer commands run through `CommandRunner`, so they respect the `timeout` config and are unit tested
+- Unit and integration tests, PHPStan (level 8) and mutation testing run in GitHub Actions; StyleCI is replaced by ECS
 
-### Removed
-- Unused `Downloader` classes and the legacy composer/provider helpers in `Wrapping`
-- StyleCI, code style is checked by ECS in GitHub Actions
+All changes are listed in [pull request #152](https://github.com/Jeroen-G/laravel-packager/pull/152).
 
 ## Version 2.12
 
