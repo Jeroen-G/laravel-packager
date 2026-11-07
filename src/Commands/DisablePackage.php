@@ -17,6 +17,7 @@ class DisablePackage extends Command
 {
     use InteractsWithStringInput;
     use ProgressBar;
+    use ReportsComposerFailures;
 
     protected $signature = 'packager:disable {vendor} {name}';
 
@@ -33,7 +34,7 @@ class DisablePackage extends Command
         $this->conveyor = $conveyor;
     }
 
-    public function handle(): void
+    public function handle(): int
     {
         // Start the progress bar
         $this->startProgressBar(2);
@@ -48,10 +49,14 @@ class DisablePackage extends Command
 
         // Uninstall the package
         $this->info('Uninstalling package...');
-        $this->conveyor->uninstallPackage();
+        if (!$this->conveyor->uninstallPackage()) {
+            return $this->composerFailed('Composer could not remove the package from composer.json.');
+        }
         $this->makeProgress();
 
         // Finished removing the package, end of the progress bar
         $this->finishProgress('Package disabled successfully!');
+
+        return self::SUCCESS;
     }
 }

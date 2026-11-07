@@ -91,6 +91,18 @@ final class RemovePackageTest extends CommandTestCase
             ->assertExitCode(1);
     }
 
+    public function test_it_keeps_the_package_when_composer_cannot_remove_it(): void
+    {
+        $this->commandRunner->expectRun(['composer', 'remove', 'acme/rocket'], false);
+
+        $this->command('packager:remove', ['vendor' => 'acme', 'name' => 'rocket'])
+            ->expectsOutputToContain('Composer could not remove the package from composer.json, so its files were kept.')
+            ->doesntExpectOutputToContain('Package removed successfully!')
+            ->assertExitCode(1);
+
+        $this->assertFileExists($this->packagePath('acme', 'rocket').'/src/Rocket.php');
+    }
+
     private function expectUninstall(string $vendor, string $package): void
     {
         $this->commandRunner->expectRun(['composer', 'remove', $vendor.'/'.$package]);

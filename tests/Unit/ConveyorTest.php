@@ -31,7 +31,7 @@ final class ConveyorTest extends UnitTestCase
         $this->conveyor->package('myPackage');
 
         $this->fileHandler->expects('packagePath')->andReturn('packages/myvendor/mypackage');
-        $this->commandRunner->expectRun(['composer', 'require', 'myVendor/myPackage:@dev'], true);
+        $this->commandRunner->expectRun(['composer', 'require', 'myvendor/mypackage:@dev'], true);
         $this->commandRunner->expectRun([
             'composer',
             'config',
@@ -50,7 +50,7 @@ final class ConveyorTest extends UnitTestCase
         $this->conveyor->package('myPackage');
 
         $this->commandRunner->expectRun(['composer', 'config', '--unset', 'repositories.myvendor/mypackage'], true);
-        $this->commandRunner->expectRun(['composer', 'remove', 'myVendor/myPackage'], true);
+        $this->commandRunner->expectRun(['composer', 'remove', 'myvendor/mypackage'], true);
 
         $this->conveyor->uninstallPackage();
     }
@@ -81,7 +81,7 @@ final class ConveyorTest extends UnitTestCase
         $this->conveyor->package('My Package');
 
         $this->commandRunner->expectRun(['composer', 'config', '--unset', 'repositories.my-vendor/my-package'], true);
-        $this->commandRunner->expectRun(['composer', 'remove', 'My Vendor/My Package'], true);
+        $this->commandRunner->expectRun(['composer', 'remove', 'my vendor/my package'], true);
 
         $this->conveyor->uninstallPackage();
     }

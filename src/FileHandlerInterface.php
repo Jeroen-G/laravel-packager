@@ -10,6 +10,9 @@ interface FileHandlerInterface
 
     public function vendorPath(string $vendor): string;
 
+    /**
+     * A new, unique temporary directory path inside the vendor directory on every call.
+     */
     public function tempPath(string $vendor): string;
 
     public function packagePath(string $vendor, string $package): string;

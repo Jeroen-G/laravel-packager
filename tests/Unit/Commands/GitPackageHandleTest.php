@@ -46,4 +46,17 @@ final class GitPackageHandleTest extends CommandTestCase
             ->doesntExpectOutputToContain('Package cloned successfully!')
             ->assertExitCode(1);
     }
+
+    public function test_it_reports_a_failing_composer_install(): void
+    {
+        $path = $this->packagePath('acme', 'rocket');
+
+        $this->commandRunner->expectRun(['git', 'clone', '-q', self::URL, $path], true);
+        $this->commandRunner->getMock()->allows('run')->andReturnFalse();
+
+        $this->command('packager:git', ['url' => self::URL])
+            ->expectsOutputToContain('Composer could not install the package.')
+            ->doesntExpectOutputToContain('Package cloned successfully!')
+            ->assertExitCode(1);
+    }
 }

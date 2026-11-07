@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use JeroenG\Packager\Conveyor;
 use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
@@ -18,6 +19,7 @@ class GetPackage extends Command
 {
     use InteractsWithStringInput;
     use ProgressBar;
+    use ReportsComposerFailures;
 
     protected $signature = 'packager:get
                             {url : The url of the repository}
@@ -41,13 +43,14 @@ class GetPackage extends Command
         $this->fileHandler = $fileHandler;
     }
 
-    public function handle(): void
+    public function handle(): int
     {
         // Start the progress bar
         $this->startProgressBar(5);
 
         // Common variables
-        $origin = mb_strtolower(rtrim($this->requiredArgument('url'), '/')).'/archive/'.$this->stringOption('branch').'.zip';
+        $repository = Str::replaceEnd('.git', '', mb_strtolower(rtrim($this->requiredArgument('url'), '/')));
+        $origin = $repository.'/archive/'.$this->stringOption('branch').'.zip';
         $pieces = explode('/', $origin);
         if (is_null($this->stringArgument('vendor')) || is_null($this->stringArgument('name'))) {
             $this->conveyor->vendor($pieces[3]);
@@ -79,10 +82,14 @@ class GetPackage extends Command
 
         // Install the package
         $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        if (!$this->conveyor->installPackage()) {
+            return $this->installFailed($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()));
+        }
         $this->makeProgress();
 
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package downloaded successfully!');
+
+        return self::SUCCESS;
     }
 }

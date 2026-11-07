@@ -31,7 +31,7 @@ final class GetPackageTest extends CommandTestCase
 
         $this->assertSame(['https://github.com/acme/rocket/archive/master.zip'], $this->downloadedUrls());
         $this->assertFileExists($path.'/src/Rocket.php');
-        $this->assertDirectoryDoesNotExist($this->basePath.'/packages/acme/temp');
+        $this->assertNoTemporaryDirectories('acme');
     }
 
     public function test_it_downloads_a_branch_with_the_given_vendor_and_name(): void
@@ -59,7 +59,7 @@ final class GetPackageTest extends CommandTestCase
         try {
             $this->command('packager:get', ['url' => 'https://github.com/acme/rocket'])->run();
         } finally {
-            $this->assertDirectoryDoesNotExist($this->basePath.'/packages/acme/temp');
+            $this->assertNoTemporaryDirectories('acme');
             $this->assertDirectoryDoesNotExist($this->packagePath('acme', 'rocket'));
         }
     }
@@ -71,5 +71,31 @@ final class GetPackageTest extends CommandTestCase
         $this->expectExceptionMessage('Package already exists');
 
         $this->command('packager:get', ['url' => 'https://github.com/acme/rocket'])->run();
+    }
+
+    public function test_it_strips_the_git_suffix_from_the_url(): void
+    {
+        $this->fakeDownloads($this->makeZip('rocket.zip', ['rocket-master/src/Rocket.php' => '<?php']));
+        $this->commandRunner->getMock()->allows('run')->andReturnTrue();
+
+        $this->command('packager:get', ['url' => 'https://github.com/acme/rocket.git'])
+            ->expectsOutputToContain('Creating package acme\rocket...')
+            ->assertExitCode(0);
+
+        $this->assertSame(['https://github.com/acme/rocket/archive/master.zip'], $this->downloadedUrls());
+        $this->assertFileExists($this->packagePath('acme', 'rocket').'/src/Rocket.php');
+    }
+
+    public function test_it_reports_a_failing_composer_install(): void
+    {
+        $this->fakeDownloads($this->makeZip('rocket.zip', ['rocket-master/src/Rocket.php' => '<?php']));
+        $this->commandRunner->getMock()->allows('run')->andReturnFalse();
+
+        $this->command('packager:get', ['url' => 'https://github.com/acme/rocket'])
+            ->expectsOutputToContain('Composer could not install the package.')
+            ->doesntExpectOutputToContain('Package downloaded successfully!')
+            ->assertExitCode(1);
+
+        $this->assertFileExists($this->packagePath('acme', 'rocket').'/src/Rocket.php');
     }
 }

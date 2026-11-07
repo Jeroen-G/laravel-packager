@@ -18,6 +18,7 @@ class RemovePackage extends Command
 {
     use InteractsWithStringInput;
     use ProgressBar;
+    use ReportsComposerFailures;
 
     protected $signature = 'packager:remove {vendor} {name?}';
 
@@ -64,7 +65,9 @@ class RemovePackage extends Command
 
         // Uninstall the package
         $this->info('Uninstalling package...');
-        $this->conveyor->uninstallPackage();
+        if (!$this->conveyor->uninstallPackage()) {
+            return $this->composerFailed('Composer could not remove the package from composer.json, so its files were kept.');
+        }
         $this->makeProgress();
 
         // remove the package directory

@@ -12,6 +12,8 @@ All Notable changes to Packager will be documented in this file.
 - `Conveyor` is a final class with `CommandRunnerInterface` and `FileHandlerInterface` constructor dependencies
 - `CommandRunnerInterface::run()` accepts a working directory and the interface has a new `output()` method
 - `Conveyor::downloadFromGithub()` only takes the archive url
+- `Conveyor::installPackage()` and `uninstallPackage()` return whether composer succeeded
+- `FileHandler::tempPath()` returns a new, hidden temporary directory on every call instead of `<vendor>/temp`
 - `Conveyor::addPathRepository()`, `removePathRepository()`, `requirePackage()` and `removePackage()` are private, use `installPackage()` and `uninstallPackage()`; `dumpAutoloads()` is removed
 - `FileHandler` accepts an optional Guzzle client and its path methods have typed parameters
 - `ValidClassName` implements `ValidationRule` instead of the deprecated `Rule` contract
@@ -37,6 +39,10 @@ All Notable changes to Packager will be documented in this file.
 - `packager:publish` reports a missing package directory
 - Removing a package whose directory is already gone no longer crashes
 - `packager:get` failed for repositories with uppercase letters in their name or branches with a slash
+- `packager:get` with a url ending in `.git` created a package named `<name>.git`
+- Composer failures were reported as success; commands now stop with an error and a failure exit code, and `packager:remove` keeps the package files when composer could not remove it
+- Packages with uppercase letters in their vendor or name could not be installed, because composer requires lowercase package names
+- Downloading no longer uses `packages/<vendor>/temp`, which could clash with a package named `temp`
 - `packager:list` shows `-` instead of 0 when the commits behind cannot be determined, and names its columns Vendor and Package
 - `packager:tests` copies tests of all packages to `tests/packages/Vendor/Package` instead of a directory named `Vendor\Package`
 

@@ -61,7 +61,11 @@ final class FileHandlerTest extends UnitTestCase
         $ds = DIRECTORY_SEPARATOR;
 
         $this->assertSame($this->workDir.$ds.'MyVendor', $this->fileHandler->vendorPath('MyVendor'));
-        $this->assertSame($this->workDir.$ds.'MyVendor'.$ds.'temp', $this->fileHandler->tempPath('MyVendor'));
+        $this->assertMatchesRegularExpression(
+            '{^'.preg_quote($this->workDir.$ds.'MyVendor'.$ds.'.packager-temp-', '{').'[0-9a-f]{16}$}',
+            $this->fileHandler->tempPath('MyVendor')
+        );
+        $this->assertNotSame($this->fileHandler->tempPath('MyVendor'), $this->fileHandler->tempPath('MyVendor'));
         $this->assertSame($this->workDir.$ds.'MyVendor'.$ds.'MyPackage', $this->fileHandler->packagePath('MyVendor', 'MyPackage'));
     }
 

@@ -20,6 +20,7 @@ class GitPackage extends Command
 {
     use InteractsWithStringInput;
     use ProgressBar;
+    use ReportsComposerFailures;
 
     protected $signature = 'packager:git
                             {url : The url of the git repository}
@@ -99,7 +100,9 @@ class GitPackage extends Command
         $this->makeProgress();
 
         $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        if (!$this->conveyor->installPackage()) {
+            return $this->installFailed($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()));
+        }
         $this->makeProgress();
 
         // Finished creating the package, end of the progress bar

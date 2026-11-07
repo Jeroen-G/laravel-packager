@@ -36,4 +36,33 @@ final class EnableDisablePackageTest extends CommandTestCase
             ->expectsOutputToContain('Disabling package acme\rocket...')
             ->assertExitCode(0);
     }
+
+    public function test_it_reports_a_failing_enable(): void
+    {
+        $this->commandRunner->getMock()->allows('run')->andReturnFalse();
+
+        $this->command('packager:enable', ['vendor' => 'acme', 'name' => 'rocket'])
+            ->expectsOutputToContain('Composer could not install the package.')
+            ->doesntExpectOutputToContain('Package enabled successfully!')
+            ->assertExitCode(1);
+    }
+
+    public function test_it_reports_a_failing_disable(): void
+    {
+        $this->commandRunner->getMock()->allows('run')->andReturnFalse();
+
+        $this->command('packager:disable', ['vendor' => 'acme', 'name' => 'rocket'])
+            ->expectsOutputToContain('Composer could not remove the package from composer.json.')
+            ->doesntExpectOutputToContain('Package disabled successfully!')
+            ->assertExitCode(1);
+    }
+
+    public function test_it_uses_a_lowercase_composer_package_name(): void
+    {
+        $this->commandRunner->getMock()->allows('run')->with(\Mockery::on(static fn (array $command): bool => $command[1] === 'config'))->andReturnTrue();
+        $this->commandRunner->expectRun(['composer', 'require', 'myvendor/mypackage:@dev']);
+
+        $this->command('packager:enable', ['vendor' => 'MyVendor', 'name' => 'MyPackage'])
+            ->assertExitCode(0);
+    }
 }

@@ -22,6 +22,7 @@ class NewPackage extends Command
 {
     use InteractsWithStringInput;
     use ProgressBar;
+    use ReportsComposerFailures;
 
     protected $signature = 'packager:new {vendor?} {name?} {--i} {--skeleton=}';
 
@@ -49,9 +50,6 @@ class NewPackage extends Command
 
     public function handle(): int
     {
-        // Start the progress bar
-        $this->startProgressBar(6);
-
         $vendor = $this->stringArgument('vendor') ?? 'vendor-name';
         $name = $this->stringArgument('name') ?? 'package-name';
 
@@ -74,8 +72,11 @@ class NewPackage extends Command
         if ($validator->fails()) {
             $this->showErrors($validator);
 
-            return 1;
+            return self::FAILURE;
         }
+
+        // Start the progress bar
+        $this->startProgressBar(6);
 
         // Start creating the package
         $this->info('Creating package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');
@@ -154,14 +155,16 @@ class NewPackage extends Command
 
         // Add path repository to composer.json and install package
         $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        if (!$this->conveyor->installPackage()) {
+            return $this->installFailed($this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package()));
+        }
 
         $this->makeProgress();
 
         // Finished creating the package, end of the progress bar
         $this->finishProgress('Package created successfully!');
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**

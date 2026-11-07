@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Tests\Unit\Commands;
 
+use JeroenG\Packager\CommandRunnerInterface;
 use JeroenG\Packager\Tests\CommandTestCase;
+use JeroenG\Packager\Tests\Support\CommandRunnerExpectation;
+use Mockery;
 
 final class NewPackageTest extends CommandTestCase
 {
@@ -41,7 +44,7 @@ final class NewPackageTest extends CommandTestCase
             file_get_contents($path.'/src/RocketSkates.php')
         );
         $this->assertFileDoesNotExist($path.'/rewriteRules.php');
-        $this->assertDirectoryDoesNotExist($this->basePath.'/packages/Acme/temp');
+        $this->assertNoTemporaryDirectories('Acme');
     }
 
     public function test_it_downloads_with_the_configured_certificate_verification(): void
@@ -111,15 +114,45 @@ final class NewPackageTest extends CommandTestCase
         );
     }
 
-    public function test_it_ignores_leftovers_of_an_interrupted_download(): void
+    public function test_it_leaves_other_directories_of_the_vendor_alone(): void
     {
-        mkdir($this->basePath.'/packages/Acme/temp/stale-skeleton', 0777, true);
+        // A package that happens to be called "temp", and leftovers of an interrupted run.
+        mkdir($this->packagePath('Acme', 'temp').'/src', 0777, true);
+        mkdir($this->basePath.'/packages/Acme/.packager-temp-0123456789abcdef/stale', 0777, true);
 
         $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])
             ->assertExitCode(0);
 
         $this->assertFileExists($this->packagePath('Acme', 'Rocket').'/composer.json');
-        $this->assertDirectoryDoesNotExist($this->basePath.'/packages/Acme/temp');
+        $this->assertDirectoryExists($this->packagePath('Acme', 'temp').'/src');
+        $this->assertSame(
+            ['.packager-temp-0123456789abcdef', 'Rocket', 'temp'],
+            array_values(array_diff(scandir($this->basePath.'/packages/Acme') ?: [], ['.', '..']))
+        );
+    }
+
+    public function test_it_reports_a_failing_composer_install(): void
+    {
+        // Replace the runner from setUp(), which lets every command succeed.
+        $this->commandRunner = CommandRunnerExpectation::create();
+        app()->instance(CommandRunnerInterface::class, $this->commandRunner->getMock());
+        $this->commandRunner->getMock()->allows('run')->with(Mockery::on(static fn (array $command): bool => $command[1] === 'config'))->andReturnTrue();
+        $this->commandRunner->getMock()->allows('run')->with(Mockery::on(static fn (array $command): bool => $command[1] === 'require'))->andReturnFalse();
+
+        $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket'])
+            ->expectsOutputToContain('Composer could not install the package. Its files are kept in '.$this->packagePath('Acme', 'Rocket').', run `php artisan packager:enable Acme Rocket`')
+            ->expectsOutputToContain('Run the composer command yourself')
+            ->doesntExpectOutputToContain('Package created successfully!')
+            ->assertExitCode(1);
+
+        $this->assertDirectoryExists($this->packagePath('Acme', 'Rocket'));
+    }
+
+    public function test_it_does_not_start_the_progress_bar_for_invalid_names(): void
+    {
+        $this->command('packager:new', ['vendor' => 'Acme', 'name' => '1-invalid'])
+            ->doesntExpectOutputToContain('0/6')
+            ->assertExitCode(1);
     }
 
     public function test_it_ignores_the_pax_header_of_a_github_tarball(): void

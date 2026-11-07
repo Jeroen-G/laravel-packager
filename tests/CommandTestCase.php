@@ -128,6 +128,11 @@ abstract class CommandTestCase extends TestBench
         return $tar.'.gz';
     }
 
+    protected function assertNoTemporaryDirectories(string $vendor): void
+    {
+        $this->assertSame([], glob($this->basePath.'/packages/'.$vendor.'/.packager-temp-*', GLOB_ONLYDIR) ?: []);
+    }
+
     /**
      * @return string[]
      */

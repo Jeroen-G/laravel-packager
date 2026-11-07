@@ -81,16 +81,20 @@ final class Conveyor
         $this->downloadArchive($archiveUrl);
     }
 
-    public function installPackage(): void
+    /**
+     * Register the package as a path repository and require it. Returns false when composer failed.
+     */
+    public function installPackage(): bool
     {
-        $this->addPathRepository();
-        $this->requirePackage();
+        return $this->addPathRepository() && $this->requirePackage();
     }
 
-    public function uninstallPackage(): void
+    /**
+     * Remove the package and its path repository. Returns false when composer failed.
+     */
+    public function uninstallPackage(): bool
     {
-        $this->removePackage();
-        $this->removePathRepository();
+        return $this->removePackage() && $this->removePathRepository();
     }
 
     /**
@@ -98,30 +102,37 @@ final class Conveyor
      */
     private function downloadArchive(string $archiveUrl): void
     {
+        // A temporary directory of its own, so leftovers of an interrupted run never get in the way.
         $tempPath = $this->fileHandler->tempPath($this->vendor());
         $archive = $this->fileHandler->makeFilename($this->fileHandler->getArchiveExtension($archiveUrl));
 
-        // Remove leftovers of an interrupted run, which would otherwise end up in this package.
-        $this->fileHandler->removeDir($tempPath);
+        try {
+            $this->fileHandler->download($archive, $archiveUrl)
+                ->extract($archive, $tempPath);
 
-        $this->fileHandler->download($archive, $archiveUrl)
-            ->extract($archive, $tempPath)
-            ->cleanUp($archive);
+            // Archives from GitHub contain a single directory (tarballs may also hold a pax_global_header file).
+            $extracted = array_values(array_filter(
+                array_diff(scandir($tempPath) ?: [], ['.', '..']),
+                static fn (string $entry): bool => is_dir($tempPath.DIRECTORY_SEPARATOR.$entry),
+            ));
 
-        // Archives from GitHub contain a single directory (tarballs may also hold a pax_global_header file).
-        $extracted = array_values(array_filter(
-            array_diff(scandir($tempPath) ?: [], ['.', '..']),
-            static fn (string $entry): bool => is_dir($tempPath.DIRECTORY_SEPARATOR.$entry),
-        ));
+            if (count($extracted) !== 1) {
+                throw new RuntimeException('The archive should contain exactly one directory');
+            }
 
-        if (count($extracted) !== 1) {
+            rename($tempPath.DIRECTORY_SEPARATOR.$extracted[0], $this->fileHandler->packagePath($this->vendor(), $this->package()));
+        } finally {
+            $this->fileHandler->cleanUp($archive);
             $this->fileHandler->removeDir($tempPath);
-
-            throw new RuntimeException('The archive should contain exactly one directory');
         }
+    }
 
-        rename($tempPath.DIRECTORY_SEPARATOR.$extracted[0], $this->fileHandler->packagePath($this->vendor(), $this->package()));
-        $this->fileHandler->removeDir($tempPath);
+    /**
+     * Composer only accepts lowercase package names; the skeleton names packages :lc:vendor/:lc:package.
+     */
+    private function composerName(): string
+    {
+        return mb_strtolower($this->vendor().'/'.$this->package());
     }
 
     /**
@@ -132,7 +143,7 @@ final class Conveyor
         return $this->commandRunner->run($command);
     }
 
-    private function addPathRepository(): void
+    private function addPathRepository(): bool
     {
         $params = json_encode([
             'type' => 'path',
@@ -150,12 +161,12 @@ final class Conveyor
             'composer.json',
         ];
 
-        $this->runProcess($command);
+        return $this->runProcess($command);
     }
 
-    private function removePathRepository(): void
+    private function removePathRepository(): bool
     {
-        $this->runProcess([
+        return $this->runProcess([
             'composer',
             'config',
             '--unset',
@@ -163,21 +174,21 @@ final class Conveyor
         ]);
     }
 
-    private function requirePackage(): void
+    private function requirePackage(): bool
     {
-        $this->runProcess([
+        return $this->runProcess([
             'composer',
             'require',
-            $this->vendor.'/'.$this->package.':@dev',
+            $this->composerName().':@dev',
         ]);
     }
 
-    private function removePackage(): void
+    private function removePackage(): bool
     {
-        $this->runProcess([
+        return $this->runProcess([
             'composer',
             'remove',
-            $this->vendor.'/'.$this->package,
+            $this->composerName(),
         ]);
     }
 }

@@ -17,6 +17,7 @@ class EnablePackage extends Command
 {
     use InteractsWithStringInput;
     use ProgressBar;
+    use ReportsComposerFailures;
 
     protected $signature = 'packager:enable {vendor} {name}';
 
@@ -33,7 +34,7 @@ class EnablePackage extends Command
         $this->conveyor = $conveyor;
     }
 
-    public function handle(): void
+    public function handle(): int
     {
         // Start the progress bar
         $this->startProgressBar(2);
@@ -48,10 +49,14 @@ class EnablePackage extends Command
 
         // Install the package
         $this->info('Installing package...');
-        $this->conveyor->installPackage();
+        if (!$this->conveyor->installPackage()) {
+            return $this->composerFailed('Composer could not install the package.');
+        }
         $this->makeProgress();
 
         // Finished removing the package, end of the progress bar
         $this->finishProgress('Package enabled successfully!');
+
+        return self::SUCCESS;
     }
 }

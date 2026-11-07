@@ -32,7 +32,8 @@ class FileHandler implements FileHandlerInterface
 
     public function tempPath(string $vendor): string
     {
-        return $this->vendorPath($vendor).DIRECTORY_SEPARATOR.'temp';
+        // Hidden and unique, so it never clashes with a package or a previous run.
+        return $this->vendorPath($vendor).DIRECTORY_SEPARATOR.'.packager-temp-'.bin2hex(random_bytes(8));
     }
 
     public function packagePath(string $vendor, string $package): string
