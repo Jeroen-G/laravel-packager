@@ -25,7 +25,7 @@ class GetPackage extends Command
                             {name? : The name of package for the namespace}
                             {--branch=master : The branch to download}';
 
-    protected $description = 'Retrieve an existing package from Github or Bitbucket.';
+    protected $description = 'Retrieve an existing package from Github.';
 
     /**
      * Packages roll off of the conveyor.
@@ -44,7 +44,7 @@ class GetPackage extends Command
     public function handle(): void
     {
         // Start the progress bar
-        $this->startProgressBar(4);
+        $this->startProgressBar(5);
 
         // Common variables
         $origin = mb_strtolower(rtrim($this->requiredArgument('url'), '/')).'/archive/'.$this->stringOption('branch').'.zip';

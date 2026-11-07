@@ -7,10 +7,12 @@ All Notable changes to Packager will be documented in this file.
 ### Breaking changes
 - Requires PHP 8.2+ and Laravel 11, 12 or 13
 - Removed the `packager:check` command, use `composer audit` instead
+- Removed the `--host` option of `packager:get`, Bitbucket is no longer supported
 - The `FileHandler` trait is replaced by the `FileHandler` class and `FileHandlerInterface`; `vendorPath()`, `tempPath()`, `packagePath()`, `checkIfPackageExists()` and `cleanUpRules()` now take the vendor and package as arguments
 - `Conveyor` is a final class with `CommandRunnerInterface` and `FileHandlerInterface` constructor dependencies
 - `CommandRunnerInterface::run()` accepts a working directory and the interface has a new `output()` method
 - `Conveyor::downloadFromGithub()` only takes the archive url
+- `Conveyor::addPathRepository()`, `removePathRepository()`, `requirePackage()` and `removePackage()` are private, use `installPackage()` and `uninstallPackage()`; `dumpAutoloads()` is removed
 - `FileHandler` accepts an optional Guzzle client and its path methods have typed parameters
 - `ValidClassName` implements `ValidationRule` instead of the deprecated `Rule` contract
 - Commands no longer receive the `Wrapping` class when they do not use it
@@ -30,7 +32,7 @@ All Notable changes to Packager will be documented in this file.
 - `packager:publish` updates an existing `origin` remote instead of failing silently
 - `packager:tests` resolves paths from the application base path instead of the current working directory
 - A command that times out is reported as a failure instead of crashing with an exception
-- `packager:remove` without a package name shows an error again instead of crashing
+- `packager:remove` without a package name shows an error and returns a failure exit code
 - `packager:publish` reports a missing package directory
 - Removing a package whose directory is already gone no longer crashes
 - `packager:get` failed for repositories with uppercase letters in their name or branches with a slash

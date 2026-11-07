@@ -70,7 +70,7 @@ php artisan packager:git https://github.com/author/repository
 
 **Result:**
 This will register the package in the app's `composer.json` file.
-If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository. This also works with Bitbucket repositories, but you have to provide the flag `--host=bitbucket` for the `packager:get` command.
+If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository.
 
 **Options:**
 ```bash
@@ -125,7 +125,17 @@ php artisan packager:remove my-vendor my-package
 ```
 
 **Result:**
-The `my-vendor\my-package` package is deleted, including its references in `composer.json` and `config/app.php`.
+The `my-vendor\my-package` package is removed from the app's `composer.json` (with `composer remove`) and its directory is deleted. You will be asked whether the vendor directory should be removed as well, which only happens when it is empty.
+
+### Enable & Disable
+**Command:**
+```bash
+php artisan packager:disable my-vendor my-package
+php artisan packager:enable my-vendor my-package
+```
+
+**Result:**
+`packager:disable` removes the package from the app's `composer.json` without deleting its files, so you can temporarily work without it. `packager:enable` registers it again as a path repository and requires it.
 
 ### Publish
 **Command:**
@@ -151,6 +161,7 @@ All `composer` and `git` commands that Packager runs (for example installing a p
 - The `packager:check` command has been removed, because the SensioLabs security checker it relied on is abandoned. Run `composer audit` in the package directory instead.
 - `git` commands of `packager:git` and `packager:publish` now respect the `timeout` config variable.
 - `packager:publish` pushes the current branch instead of `master`.
+- Bitbucket is no longer supported: the `--host` option of `packager:get` has been removed.
 - If you extended Packager's classes: the `FileHandler` trait is now a `FileHandler` class implementing `FileHandlerInterface`, its path methods take the vendor and package as arguments, and `Conveyor` is a final class that is resolved from the container. See the [changelog](changelog.md) for all changes.
 
 ## Changelog

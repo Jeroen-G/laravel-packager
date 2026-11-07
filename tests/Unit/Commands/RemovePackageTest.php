@@ -77,9 +77,18 @@ final class RemovePackageTest extends CommandTestCase
 
     public function test_it_requires_a_package_name(): void
     {
-        $this->expectExceptionMessage('Please provide a package name');
+        $this->command('packager:remove', ['vendor' => 'acme'])
+            ->expectsOutputToContain('Please provide a package name')
+            ->assertExitCode(1);
 
-        $this->command('packager:remove', ['vendor' => 'acme'])->run();
+        $this->assertDirectoryExists($this->packagePath('acme', 'rocket'));
+    }
+
+    public function test_it_requires_a_package_name_after_the_slash(): void
+    {
+        $this->command('packager:remove', ['vendor' => 'acme/'])
+            ->expectsOutputToContain('Please provide a package name')
+            ->assertExitCode(1);
     }
 
     private function expectUninstall(string $vendor, string $package): void

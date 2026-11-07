@@ -16,6 +16,8 @@ use JeroenG\Packager\PackagerServiceProvider;
 use JeroenG\Packager\Tests\Support\CommandRunnerExpectation;
 use JeroenG\Packager\Tests\Support\RunsCommands;
 use Orchestra\Testbench\TestCase as TestBench;
+use Phar;
+use PharData;
 use Psr\Http\Message\RequestInterface;
 use ZipArchive;
 
@@ -105,6 +107,25 @@ abstract class CommandTestCase extends TestBench
         $zip->close();
 
         return $path;
+    }
+
+    /**
+     * Create a tar.gz archive in the base path with the given files.
+     *
+     * @param  array<string, string>  $files  Contents keyed by their path inside the archive
+     */
+    protected function makeTarGz(string $name, array $files): string
+    {
+        $tar = $this->basePath.DIRECTORY_SEPARATOR.basename($name, '.gz');
+        $archive = new PharData($tar);
+        foreach ($files as $file => $contents) {
+            $archive->addFromString($file, $contents);
+        }
+        $archive->compress(Phar::GZ);
+        unset($archive);
+        unlink($tar);
+
+        return $tar.'.gz';
     }
 
     /**

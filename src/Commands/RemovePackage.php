@@ -37,17 +37,23 @@ class RemovePackage extends Command
         $this->fileHandler = $fileHandler;
     }
 
-    public function handle(): void
+    public function handle(): int
     {
-        // Start the progress bar
-        $this->startProgressBar(4);
-
         $vendor = $this->requiredArgument('vendor');
         $name = $this->stringArgument('name');
 
         if (mb_strpos($vendor, '/') !== false) {
-            [$vendor, $name] = explode('/', $vendor);
+            [$vendor, $name] = explode('/', $vendor, 2);
         }
+
+        if ($name === null || $name === '') {
+            $this->error('Please provide a package name, e.g. packager:remove my-vendor my-package');
+
+            return self::FAILURE;
+        }
+
+        // Start the progress bar
+        $this->startProgressBar(4);
 
         $this->conveyor->vendor($vendor);
         $this->conveyor->package($name);
@@ -85,5 +91,7 @@ class RemovePackage extends Command
 
         // Finished removing the package, end of the progress bar
         $this->finishProgress('Package removed successfully!');
+
+        return self::SUCCESS;
     }
 }

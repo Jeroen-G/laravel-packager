@@ -101,6 +101,9 @@ final class Conveyor
         $tempPath = $this->fileHandler->tempPath($this->vendor());
         $archive = $this->fileHandler->makeFilename($this->fileHandler->getArchiveExtension($archiveUrl));
 
+        // Remove leftovers of an interrupted run, which would otherwise end up in this package.
+        $this->fileHandler->removeDir($tempPath);
+
         $this->fileHandler->download($archive, $archiveUrl)
             ->extract($archive, $tempPath)
             ->cleanUp($archive);

@@ -12,7 +12,7 @@ description: Use this skill when working with jeroen-g/laravel-packager to creat
 Activate whenever referencing Packager, local packages or `jeroen-g/laravel-packager`.
 
 - Use this skill for `packager:*` workflows and local package lifecycle tasks.
-- Use this skill when creating, importing, listing, testing, removing, or publishing managed packages.
+- Use this skill when creating, importing, listing, testing, enabling, disabling, removing, or publishing managed packages.
 - Use this skill when changing skeleton behavior or packager configuration.
 - Do not use this skill for generic Laravel app features unrelated to package management.
 - For framework-level package architecture questions, defer to Laravel package documentation first.
@@ -47,9 +47,26 @@ Notes:
 
 ### Import existing package
 
+Clone it with its git history:
+
 ```bash
 {{ $assist->artisanCommand('packager:git https://github.com/username/repository my-vendor my-package') }}
 ```
+
+Or download it from GitHub without git history (`--branch` defaults to `master`):
+
+```bash
+{{ $assist->artisanCommand('packager:get https://github.com/username/repository my-vendor my-package --branch=main') }}
+```
+
+### Temporarily disable or re-enable a package
+
+```bash
+{{ $assist->artisanCommand('packager:disable my-vendor my-package') }}
+{{ $assist->artisanCommand('packager:enable my-vendor my-package') }}
+```
+
+`packager:disable` removes the package from app `composer.json` but keeps its files.
 
 ### Publish package tests
 
@@ -79,7 +96,8 @@ Add in `phpunit.xml`:
 
 Expected behavior:
 - Deletes package directory.
-- Removes references from app `composer.json` (and `config/app.php` in legacy setups).
+- Removes the package from app `composer.json` with `composer remove`.
+- Optionally removes the vendor directory when it is empty.
 
 ### Publish package repository
 
