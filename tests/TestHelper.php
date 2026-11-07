@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Tests;
 
 use Illuminate\Contracts\Console\Kernel;
@@ -8,59 +10,64 @@ use Symfony\Component\Process\Process;
 
 trait TestHelper
 {
-    protected function seeInConsoleOutput($expectedText)
+    protected function seeInConsoleOutput(string $expectedText): void
     {
-        $consoleOutput = $this->app[Kernel::class]->output();
-        $this->assertStringContainsString($expectedText, $consoleOutput,
-            "Did not see `{$expectedText}` in console output: `$consoleOutput`");
+        $consoleOutput = app(Kernel::class)->output();
+        $this->assertStringContainsString(
+            $expectedText,
+            $consoleOutput,
+            "Did not see `{$expectedText}` in console output: `$consoleOutput`"
+        );
     }
 
-    protected function doNotSeeInConsoleOutput($unExpectedText)
+    protected function installTestApp(): void
     {
-        $consoleOutput = $this->app[Kernel::class]->output();
-        $this->assertStringNotContainsString($unExpectedText, $consoleOutput,
-            "Did not expect to see `{$unExpectedText}` in console output: `$consoleOutput`");
+        $this->uninstallTestApp();
+        $files = new Filesystem();
+        $files->copyDirectory(self::TEST_APP_TEMPLATE, static::testApp());
+    }
+
+    protected function uninstallTestApp(): void
+    {
+        $files = new Filesystem();
+        if ($files->exists(static::testApp())) {
+            $files->deleteDirectory(static::testApp());
+        }
     }
 
     /**
      * Create a modified copy of testbench to be used as a template.
      * Before each test, a fresh copy of the template is created.
      */
-    private static function setUpLocalTestbench()
+    private static function setUpLocalTestbench(): void
     {
         fwrite(STDOUT, "Setting up test environment for first use.\n");
         $files = new Filesystem();
         $files->makeDirectory(self::TEST_APP_TEMPLATE, 0755, true);
-        $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel/';
-        $files->copyDirectory($original, self::TEST_APP_TEMPLATE);
+        $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel';
+        // Testbench may symlink its skeleton's vendor directory to ours, which must not be copied.
+        foreach (array_diff(scandir($original) ?: [], ['.', '..', 'vendor']) as $item) {
+            if (is_dir($original.'/'.$item)) {
+                $files->copyDirectory($original.'/'.$item, self::TEST_APP_TEMPLATE.'/'.$item);
+            } else {
+                $files->copy($original.'/'.$item, self::TEST_APP_TEMPLATE.'/'.$item);
+            }
+        }
+        // Without its bootstrap file, Testbench builds the application with our base path. Some
+        // Testbench versions' bootstrap file ignores that path and falls back to the default
+        // skeleton, whose vendor directory is a symlink to ours: composer would then rewrite it.
+        $files->delete(self::TEST_APP_TEMPLATE.'/bootstrap/app.php');
         // Modify the composer.json file
         $composer = json_decode($files->get(self::TEST_APP_TEMPLATE.'/composer.json'), true);
-        // Remove "tests/TestCase.php" from autoload (it doesn't exist)
+        // Remove "tests/IntegrationTestCase.php" from autoload (it doesn't exist)
         unset($composer['autoload']['classmap'][1]);
-        // Pre-install illuminate/support
-        $composer['require'] = ['illuminate/support' => '~5'];
         // Install stable version
         $composer['minimum-stability'] = 'stable';
-        $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT));
+        $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
         // Install dependencies
         fwrite(STDOUT, "Installing test environment dependencies\n");
         (new Process(['composer', 'install', '--no-dev'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
             fwrite(STDOUT, $buffer);
         });
-    }
-
-    protected function installTestApp()
-    {
-        $this->uninstallTestApp();
-        $files = new Filesystem();
-        $files->copyDirectory(self::TEST_APP_TEMPLATE, self::TEST_APP);
-    }
-
-    protected function uninstallTestApp()
-    {
-        $files = new Filesystem();
-        if ($files->exists(self::TEST_APP)) {
-            $files->deleteDirectory(self::TEST_APP);
-        }
     }
 }

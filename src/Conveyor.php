@@ -1,169 +1,168 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager;
 
 use Illuminate\Support\Str;
 use RuntimeException;
 
-class Conveyor
+final class Conveyor
 {
-    use FileHandler;
+    private string $vendor;
 
-    /**
-     * Package vendor namespace.
-     *
-     * @var string
-     */
-    protected $vendor;
+    private string $package;
 
-    /**
-     * Package name.
-     *
-     * @var string
-     */
-    protected $package;
+    private CommandRunnerInterface $commandRunner;
 
-    /**
-     * Set or get the package vendor namespace.
-     *
-     * @param  string  $vendor
-     * @return string|RuntimeException
-     */
-    public function vendor($vendor = null)
+    private FileHandlerInterface $fileHandler;
+
+    public function __construct(
+        CommandRunnerInterface $commandRunner,
+        FileHandlerInterface $fileHandler,
+    ) {
+        $this->commandRunner = $commandRunner;
+        $this->fileHandler = $fileHandler;
+    }
+
+    public function vendor(?string $vendor = null): string
     {
         if ($vendor !== null) {
             return $this->vendor = $vendor;
         }
-        if ($this->vendor === null) {
-            throw new RuntimeException('Please provide a vendor');
+
+        if (!isset($this->vendor)) {
+            throw new RuntimeException('Please provide a vendor name');
         }
 
         return $this->vendor;
     }
 
-    /**
-     * Get the vendor name converted to StudlyCase.
-     *
-     * @return string|RuntimeException
-     */
-    public function vendorStudly()
+    public function vendorStudly(): string
     {
         return Str::studly($this->vendor());
     }
 
-    /**
-     * Get the vendor name converted to kebab-case.
-     *
-     * @return string|RuntimeException
-     */
-    public function vendorKebab()
+    public function vendorKebab(): string
     {
         return Str::kebab($this->vendor());
     }
 
-    /**
-     * Set or get the package name.
-     *
-     * @param  string  $package
-     * @return string|RuntimeException
-     */
-    public function package($package = null)
+    public function package(?string $package = null): string
     {
         if ($package !== null) {
             return $this->package = $package;
         }
-        if ($this->package === null) {
+
+        if (!isset($this->package)) {
             throw new RuntimeException('Please provide a package name');
         }
 
         return $this->package;
     }
 
-    /**
-     * Get the package name converted to StudlyCase.
-     *
-     * @return string|RuntimeException
-     */
-    public function packageStudly()
+    public function packageStudly(): string
     {
         return Str::studly($this->package());
     }
 
-    /**
-     * Get the package name converted to kebab-case.
-     *
-     * @return string|RuntimeException
-     */
-    public function packageKebab()
+    public function packageKebab(): string
     {
         return Str::kebab($this->package());
     }
 
-    /**
-     * Download the skeleton package.
-     */
-    public function downloadSkeleton($skeletonArchiveUrl = null)
+    public function downloadSkeleton(?string $skeletonArchiveUrl = null): void
     {
-        $skeletonArchiveUrl = $skeletonArchiveUrl ?? config('packager.skeleton');
-        $extension = $this->getArchiveExtension($skeletonArchiveUrl);
+        $this->downloadArchive($skeletonArchiveUrl ?? config('packager.skeleton'));
+    }
 
-        $this->download($archive = $this->makeFilename($extension), $skeletonArchiveUrl)
-            ->extract($archive, $this->tempPath())
-            ->cleanUp($archive);
+    public function downloadFromGithub(string $archiveUrl): void
+    {
+        $this->downloadArchive($archiveUrl);
+    }
 
-        $firstInDirectory = scandir($this->tempPath())[2];
-        $extractedSkeletonLocation = $this->tempPath().'/'.$firstInDirectory;
-        rename($extractedSkeletonLocation, $this->packagePath());
+    /**
+     * Register the package as a path repository and require it. Returns false when composer failed.
+     */
+    public function installPackage(): bool
+    {
+        return $this->addPathRepository() && $this->requirePackage();
+    }
 
-        if (is_dir($this->tempPath())) {
-            rmdir($this->tempPath());
+    /**
+     * Remove the package and its path repository. Returns false when composer failed.
+     */
+    public function uninstallPackage(): bool
+    {
+        return $this->removePackage() && $this->removePathRepository();
+    }
+
+    /**
+     * Download and extract an archive, and move the directory it contains to the package path.
+     */
+    private function downloadArchive(string $archiveUrl): void
+    {
+        // A temporary directory of its own, so leftovers of an interrupted run never get in the way.
+        $tempPath = $this->fileHandler->tempPath($this->vendor());
+        $archive = $this->fileHandler->makeFilename($this->fileHandler->getArchiveExtension($archiveUrl));
+
+        try {
+            $this->fileHandler->download($archive, $archiveUrl)
+                ->extract($archive, $tempPath);
+
+            // Archives from GitHub contain a single directory (tarballs may also hold a pax_global_header file).
+            $extracted = $this->fileHandler->directories($tempPath);
+
+            if (count($extracted) !== 1) {
+                throw new RuntimeException('The archive should contain exactly one directory');
+            }
+
+            $packagePath = $this->fileHandler->packagePath($this->vendor(), $this->package());
+            if (!$this->fileHandler->move($tempPath.DIRECTORY_SEPARATOR.$extracted[0], $packagePath)) {
+                throw new RuntimeException("Unable to move the downloaded package to {$packagePath}");
+            }
+        } finally {
+            $this->fileHandler->cleanUp($archive);
+            $this->fileHandler->removeDir($tempPath);
         }
     }
 
     /**
-     * Download the package from Github.
-     *
-     * @param  string  $origin  The Github URL
-     * @param  string  $branch  The branch to download
+     * The name composer knows the package by: the name in its composer.json, so composer installs it
+     * from the path repository even when it differs from the vendor and package given to Packager.
+     * Otherwise the lowercase vendor/package, as composer only accepts lowercase names.
      */
-    public function downloadFromGithub($origin, $piece, $branch)
+    private function composerName(): string
     {
-        $this->download($zipFile = $this->makeFilename(), $origin)
-            ->extract($zipFile, $this->vendorPath())
-            ->cleanUp($zipFile);
+        $composerFile = $this->fileHandler->packagePath($this->vendor(), $this->package()).DIRECTORY_SEPARATOR.'composer.json';
+        $contents = $this->fileHandler->read($composerFile);
+        $composer = $contents === null ? null : json_decode($contents, true);
+        $name = is_array($composer) ? ($composer['name'] ?? null) : null;
 
-        rename($this->vendorPath().'/'.$piece.'-'.$branch, $this->packagePath());
+        if (is_string($name) && preg_match('{^[a-z0-9]([_.-]?[a-z0-9]+)*/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*$}', $name) === 1) {
+            return $name;
+        }
+
+        return mb_strtolower($this->vendor().'/'.$this->package());
     }
 
     /**
-     * Dump Composer's autoloads.
+     * @param  list<string>  $command
      */
-    public function dumpAutoloads()
+    private function runProcess(array $command): bool
     {
-        shell_exec('composer dump-autoload');
+        return $this->commandRunner->run($command);
     }
 
-    public function installPackage()
-    {
-        $this->addPathRepository();
-        $this->requirePackage();
-    }
-
-    public function uninstallPackage()
-    {
-        $this->removePackage();
-        $this->removePathRepository();
-    }
-
-    public function addPathRepository()
+    private function addPathRepository(): bool
     {
         $params = json_encode([
             'type' => 'path',
-            'url' => $this->packagePath(),
+            'url' => $this->fileHandler->packagePath($this->vendor(), $this->package()),
             'options' => [
                 'symlink' => true,
             ],
-        ]);
+        ], JSON_THROW_ON_ERROR);
         $command = [
             'composer',
             'config',
@@ -176,7 +175,7 @@ class Conveyor
         return $this->runProcess($command);
     }
 
-    public function removePathRepository()
+    private function removePathRepository(): bool
     {
         return $this->runProcess([
             'composer',
@@ -186,33 +185,21 @@ class Conveyor
         ]);
     }
 
-    public function requirePackage()
+    private function requirePackage(): bool
     {
         return $this->runProcess([
             'composer',
             'require',
-            $this->vendor.'/'.$this->package.':@dev',
+            $this->composerName().':@dev',
         ]);
     }
 
-    public function removePackage()
+    private function removePackage(): bool
     {
         return $this->runProcess([
             'composer',
             'remove',
-            $this->vendor.'/'.$this->package,
+            $this->composerName(),
         ]);
-    }
-
-    /**
-     * @return bool
-     */
-    protected function runProcess(array $command)
-    {
-        $process = new \Symfony\Component\Process\Process($command, base_path());
-        $process->setTimeout(config('packager.timeout'));
-        $process->run();
-
-        return $process->getExitCode() === 0;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
@@ -12,49 +14,28 @@ use Illuminate\Filesystem\Filesystem;
  **/
 class MoveTests extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    use InteractsWithStringInput;
+
     protected $signature = 'packager:tests
                             {vendor? : The package for which to move the tests}
                             {name? : The package for which to move the tests}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Move test files to the Laravel app tests folder';
 
-    /**
-     * The filesystem handler.
-     *
-     * @var object
-     */
-    protected $files;
+    protected Filesystem $files;
 
-    /**
-     * Create a new instance.
-     */
     public function __construct(Filesystem $files)
     {
         parent::__construct();
         $this->files = $files;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): void
     {
-        if (is_null($this->argument('vendor')) || is_null($this->argument('name'))) {
+        if (is_null($this->stringArgument('vendor')) || is_null($this->stringArgument('name'))) {
             $this->info('Moving tests for all local packages');
 
-            $composer = json_decode(file_get_contents('composer.json'), true);
+            $composer = $this->files->json(base_path('composer.json'), JSON_THROW_ON_ERROR);
 
             $packages = [];
             foreach ($composer['autoload']['psr-4'] as $package => $path) {
@@ -64,18 +45,18 @@ class MoveTests extends Command
             }
 
             foreach ($packages as $package) {
-                $path = dirname(getcwd().'/'.$package[1]).'/tests';
+                $path = dirname(base_path($package[1])).'/tests';
 
                 if ($this->files->exists($path)) {
                     $this->info('Moving tests for the package: '.$package[0]);
-                    $this->files->copyDirectory($path, base_path('tests/packages/'.$package[0]));
+                    $this->files->copyDirectory($path, base_path('tests/packages/'.str_replace('\\', '/', $package[0])));
                 } else {
                     $this->info('No tests found for: '.$package[0]);
                 }
             }
         } else {
-            $vendor = $this->argument('vendor');
-            $name = $this->argument('name');
+            $vendor = $this->stringArgument('vendor');
+            $name = $this->stringArgument('name');
             $path = base_path('packages/'.$vendor.'/'.$name.'/tests');
 
             if ($this->files->exists($path)) {

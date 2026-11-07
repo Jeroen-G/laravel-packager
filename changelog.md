@@ -2,6 +2,31 @@
 
 All Notable changes to Packager will be documented in this file.
 
+## Version 3
+
+### Breaking changes
+- Requires PHP 8.2+ and Laravel 11, 12 or 13
+- Removed the `packager:check` command (use `composer audit`) and Bitbucket support (the `--host` option of `packager:get`)
+- `packager:get` downloads the default branch instead of `master`, and `packager:publish` pushes the current branch instead of `master`
+- `git` commands respect the `timeout` config variable
+- Packages are installed by the `name` in their `composer.json`, falling back to the lowercase vendor/package
+- For code that extends Packager: the `FileHandler` trait is now a class implementing `FileHandlerInterface`, `Conveyor` is a final class resolved from the container, and several method signatures changed
+
+### Added
+- Support for Guzzle 8
+- `packager:git` accepts any git url, such as `ssh://` and `file://`
+
+### Fixed
+- Failures of composer, git and downloads are reported with a clear message and a failure exit code, instead of being reported as success or crashing
+- Packages with uppercase letters in their vendor or name can be installed
+- Removing a package only deletes directories inside `packages/` and never follows symlinks
+- Many smaller bugs in `packager:get`, `packager:git`, `packager:list`, `packager:publish` and `packager:tests`
+
+### Changed
+- Unit and integration tests, PHPStan (level 8) and mutation testing run in GitHub Actions; StyleCI is replaced by ECS
+
+All changes are listed in [pull request #152](https://github.com/Jeroen-G/laravel-packager/pull/152).
+
 ## Version 2.12
 
 ### Added

@@ -2,10 +2,13 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
-[![Build Status][ico-travis]][link-travis]
-[![StyleCI][ico-styleci]][link-styleci]
+[![Build Status][ico-actions]][link-actions]
 
 This package provides you with a simple tool to set up a new package and it will let you focus on the development of the package instead of the boilerplate. If you like a visual explanation [check out this video by Jeffrey Way on Laracasts](https://laracasts.com/series/building-laracasts/episodes/3).
+
+## Requirements
+
+Packager 3 requires PHP 8.2 or higher and Laravel 11, 12 or 13. Use Packager 2 for older versions.
 
 ## Installation
 
@@ -15,14 +18,8 @@ Via Composer
 composer require jeroen-g/laravel-packager --dev
 ```
 
-If you do not run Laravel 5.5 (or higher), then add the service provider in `config/app.php`:
-
-```php
-JeroenG\Packager\PackagerServiceProvider::class,
-```
-
-If you do run the package on Laravel 5.5+, [package auto-discovery](https://medium.com/@taylorotwell/package-auto-discovery-in-laravel-5-5-ea9e3ab20518) takes care of the magic of adding the service provider.
-Be aware that the auto-discovery also means that this package is loaded in your production environment. Therefore you may [disable auto-discovery](https://laravel.com/docs/5.5/packages#package-discovery) and instead put in your `AppServiceProvider` something like this:
+[Package auto-discovery](https://laravel.com/docs/packages#package-discovery) takes care of registering the service provider.
+Be aware that the auto-discovery also means that this package is loaded in your production environment. Therefore you may [disable auto-discovery](https://laravel.com/docs/packages#package-discovery) and instead put in your `AppServiceProvider` something like this:
 
 ```php
 if ($this->app->environment('local')) {
@@ -73,7 +70,7 @@ php artisan packager:git https://github.com/author/repository
 
 **Result:**
 This will register the package in the app's `composer.json` file.
-If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository. This also works with Bitbucket repositories, but you have to provide the flag `--host=bitbucket` for the `packager:get` command.
+If the `packager:git` command is used, the entire Git repository is cloned. If `packager:get` is used, the package will be downloaded, without a repository.
 
 **Options:**
 ```bash
@@ -81,7 +78,7 @@ php artisan packager:get https://github.com/author/repository --branch=develop
 php artisan packager:get https://github.com/author/repository my-vendor my-package
 php artisan packager:git https://github.com/author/repository my-vendor my-package
 ```
-It is possible to specify a branch with the `--branch` option. If you specify a vendor and name directly after the url, those will be used instead of the pieces of the url.
+It is possible to specify a branch with the `--branch` option; `packager:get` downloads the default branch of the repository otherwise. If you specify a vendor and name directly after the url, those will be used for the directory in `packages/` instead of the last two parts of the url (`author/repository` in the examples above). `packager:git` accepts any url that git can clone, such as a `git@github.com:author/repository.git` or a local `file:///path/to/author/repository.git`; provide the vendor and name when its path has fewer than two parts. Composer installs the package by the `name` in its `composer.json`.
 
 ### Tests
 **Command:**
@@ -128,7 +125,17 @@ php artisan packager:remove my-vendor my-package
 ```
 
 **Result:**
-The `my-vendor\my-package` package is deleted, including its references in `composer.json` and `config/app.php`.
+The `my-vendor\my-package` package is removed from the app's `composer.json` (with `composer remove`) and its directory is deleted. You will be asked whether the vendor directory should be removed as well, which only happens when it is empty.
+
+### Enable & Disable
+**Command:**
+```bash
+php artisan packager:disable my-vendor my-package
+php artisan packager:enable my-vendor my-package
+```
+
+**Result:**
+`packager:disable` removes the package from the app's `composer.json` without deleting its files, so you can temporarily work without it. `packager:enable` registers it again as a path repository and requires it.
 
 ### Publish
 **Command:**
@@ -139,23 +146,6 @@ php artisan packager:publish my-vendor my-package https://github.com/my-vendor/m
 **Result:**
 The `my-vendor\my-package` package will be published to Github using the provided url.
 
-### Check
-**Command:**
-```bash
-php artisan packager:check my-vendor my-package
-```
-
-**Result:**
-The `my-vendor\my-package` package will be checked for security vulnerabilities using SensioLabs security checker.
-
-**Remarks**
-You first need to run
-
-```bash
-composer require sensiolabs/security-checker
-```
-
-
 ## Issues with cURL SSL certificate
 It turns out that, especially on Windows, there might arise some problems with the downloading of the skeleton, due to a file regarding SSL certificates missing on the OS. This can be solved by opening up your .env file and putting this in it:
 ```
@@ -164,7 +154,16 @@ CURL_VERIFY=false
 Of course this means it will be less secure, but then again you are not supposed to run this package anywhere near a production environment.
 
 ## Issues with timeout
-If you are having problems with timeouts when creating new packages, you can now change the config variable timeout in config/packager.php to fix this.
+All `composer` and `git` commands that Packager runs (for example installing a package or cloning and pushing a repository) are stopped after the number of seconds in the `timeout` config variable, which defaults to 60. On slow connections or for large repositories you can increase it in config/packager.php.
+
+## Upgrading from 2.x to 3.0
+- Packager now requires PHP 8.2+ and Laravel 11, 12 or 13.
+- The `packager:check` command has been removed, because the SensioLabs security checker it relied on is abandoned. Run `composer audit` in the package directory instead.
+- `git` commands of `packager:git` and `packager:publish` now respect the `timeout` config variable.
+- `packager:publish` pushes the current branch instead of `master`.
+- `packager:get` downloads the default branch of the repository instead of `master` when no `--branch` is given.
+- Bitbucket is no longer supported: the `--host` option of `packager:get` has been removed.
+- If you extended Packager's classes: the `FileHandler` trait is now a `FileHandler` class implementing `FileHandlerInterface`, its path methods take the vendor and package as arguments, the interface has new methods that your own implementation must provide, and `Conveyor` is a final class that is resolved from the container. See [pull request #152](https://github.com/Jeroen-G/laravel-packager/pull/152) for all changes.
 
 ## Changelog
 
@@ -186,12 +185,10 @@ The EU Public License. Please see [license.md](license.md) for more information.
 
 [ico-version]: https://poser.pugx.org/jeroen-g/laravel-packager/v/stable?format=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/jeroen-g/laravel-packager.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/Jeroen-G/laravel-packager/master.svg?style=flat-square
-[ico-styleci]: https://styleci.io/repos/37218114/shield
+[ico-actions]: https://img.shields.io/github/actions/workflow/status/Jeroen-G/laravel-packager/main.yml?branch=master&style=flat-square
 
 [link-packagist]: https://packagist.org/packages/jeroen-g/laravel-packager
 [link-downloads]: https://packagist.org/packages/jeroen-g/laravel-packager
-[link-travis]: https://travis-ci.org/Jeroen-G/laravel-packager
-[link-styleci]: https://styleci.io/repos/37218114
+[link-actions]: https://github.com/Jeroen-G/laravel-packager/actions
 [link-author]: https://github.com/Jeroen-G
 [link-contributors]: ../../contributors
