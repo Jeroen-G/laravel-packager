@@ -6,6 +6,7 @@ namespace JeroenG\Packager\Commands;
 
 use Illuminate\Console\Command;
 use JeroenG\Packager\Conveyor;
+use JeroenG\Packager\FileHandlerInterface;
 use JeroenG\Packager\ProgressBar;
 
 /**
@@ -28,10 +29,13 @@ class EnablePackage extends Command
      */
     protected Conveyor $conveyor;
 
-    public function __construct(Conveyor $conveyor)
+    protected FileHandlerInterface $fileHandler;
+
+    public function __construct(Conveyor $conveyor, FileHandlerInterface $fileHandler)
     {
         parent::__construct();
         $this->conveyor = $conveyor;
+        $this->fileHandler = $fileHandler;
     }
 
     public function handle(): int
@@ -42,6 +46,15 @@ class EnablePackage extends Command
         // Defining vendor/package
         $this->conveyor->vendor($this->requiredArgument('vendor'));
         $this->conveyor->package($this->requiredArgument('name'));
+
+        // Composer fails on every command while a path repository points to a missing directory.
+        $path = $this->fileHandler->packagePath($this->conveyor->vendor(), $this->conveyor->package());
+        if (!$this->fileHandler->exists($path)) {
+            $this->abortProgress();
+            $this->error("The package {$this->conveyor->vendor()}/{$this->conveyor->package()} does not exist in {$path}.");
+
+            return self::FAILURE;
+        }
 
         // Start removing the package
         $this->info('Enabling package '.$this->conveyor->vendor().'\\'.$this->conveyor->package().'...');

@@ -11,6 +11,7 @@ final class EnableDisablePackageTest extends CommandTestCase
     public function test_it_enables_a_package(): void
     {
         $path = $this->packagePath('acme', 'rocket');
+        mkdir($path, 0777, true);
 
         $this->commandRunner->expectRun([
             'composer',
@@ -37,8 +38,20 @@ final class EnableDisablePackageTest extends CommandTestCase
             ->assertExitCode(0);
     }
 
+    public function test_it_does_not_enable_a_missing_package(): void
+    {
+        // Package directories are case sensitive on most filesystems.
+        mkdir($this->packagePath('Acme', 'Rocket'), 0777, true);
+
+        $this->command('packager:enable', ['vendor' => 'acme', 'name' => 'rocket'])
+            ->expectsOutputToContain('The package acme/rocket does not exist in '.$this->packagePath('acme', 'rocket').'.')
+            ->doesntExpectOutputToContain('Installing package...')
+            ->assertExitCode(1);
+    }
+
     public function test_it_reports_a_failing_enable(): void
     {
+        mkdir($this->packagePath('acme', 'rocket'), 0777, true);
         $this->commandRunner->getMock()->allows('run')->andReturnFalse();
 
         $this->command('packager:enable', ['vendor' => 'acme', 'name' => 'rocket'])
@@ -59,6 +72,7 @@ final class EnableDisablePackageTest extends CommandTestCase
 
     public function test_it_uses_a_lowercase_composer_package_name(): void
     {
+        mkdir($this->packagePath('MyVendor', 'MyPackage'), 0777, true);
         $this->commandRunner->getMock()->allows('run')->with(\Mockery::on(static fn (array $command): bool => $command[1] === 'config'))->andReturnTrue();
         $this->commandRunner->expectRun(['composer', 'require', 'myvendor/mypackage:@dev']);
 

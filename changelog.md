@@ -41,6 +41,7 @@ All Notable changes to Packager will be documented in this file.
 - A command that times out is reported as a failure instead of crashing with an exception
 - `packager:remove` without a package name shows an error and returns a failure exit code
 - `packager:publish` reports a missing package directory
+- `packager:enable` refuses a package directory that does not exist, instead of adding a path repository that makes every composer command fail
 - Removing a package whose directory is already gone no longer crashes
 - `packager:get` failed for repositories with uppercase letters in their name or branches with a slash
 - `packager:get` with a url ending in `.git` created a package named `<name>.git`
