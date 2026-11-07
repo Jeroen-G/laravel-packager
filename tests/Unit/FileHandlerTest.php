@@ -11,6 +11,10 @@ use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 
+/**
+ * Only ever pass paths inside temporary directories to removeDir(): mutation testing runs these
+ * tests against mutants that disable its guard, which would then delete whatever path is given.
+ */
 final class FileHandlerTest extends UnitTestCase
 {
     private string $workDir;
@@ -108,9 +112,8 @@ final class FileHandlerTest extends UnitTestCase
         $this->assertFalse($this->fileHandler->makeDir($path));
     }
 
-    public function test_it_refuses_to_remove_protected_directories(): void
+    public function test_it_refuses_to_remove_the_packages_directory_itself(): void
     {
-        $this->assertFalse($this->fileHandler->removeDir('/'));
         $this->assertFalse($this->fileHandler->removeDir($this->workDir));
         $this->assertFalse($this->fileHandler->removeDir($this->workDir.'/'));
         $this->assertDirectoryExists($this->workDir);
@@ -128,7 +131,7 @@ final class FileHandlerTest extends UnitTestCase
             $this->assertDirectoryExists($this->workDir.'/MyVendor');
             $this->assertDirectoryExists($outside);
         } finally {
-            rmdir($outside);
+            (new Filesystem())->deleteDirectory($outside);
         }
     }
 
@@ -144,8 +147,7 @@ final class FileHandlerTest extends UnitTestCase
             $this->assertTrue($this->fileHandler->removeDir($this->workDir.'/MyVendor/MyPackage'));
             $this->assertFileExists($target.'/keep.txt');
         } finally {
-            unlink($target.'/keep.txt');
-            rmdir($target);
+            (new Filesystem())->deleteDirectory($target);
         }
     }
 
