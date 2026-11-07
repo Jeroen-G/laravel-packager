@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace JeroenG\Packager\Tests\Unit\Commands;
 
-use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Psr7\Request;
 use JeroenG\Packager\CommandRunnerInterface;
 use JeroenG\Packager\Tests\PackagerTestCase;
 use JeroenG\Packager\Tests\Support\CommandRunnerExpectation;
@@ -243,14 +244,14 @@ final class NewPackageTest extends PackagerTestCase
 
     public function test_it_reports_a_failing_skeleton_download(): void
     {
-        $this->files->expects('download')->andThrow(new TransferException("Client error: 404 Not Found\nresponse body"));
+        $this->files->expects('download')->andThrow(new ConnectException("Connection refused\nmore details", new Request('GET', 'https://example.com/missing.zip')));
         $this->files->shouldNotReceive('extract', 'move');
         $this->expectCleanUp();
 
         $this->command('packager:new', ['vendor' => 'Acme', 'name' => 'Rocket', '--skeleton' => 'https://example.com/missing.zip'])
             ->expectsOutputToContain('Unable to download https://example.com/missing.zip')
-            ->expectsOutputToContain('Client error: 404 Not Found')
-            ->doesntExpectOutputToContain('response body')
+            ->expectsOutputToContain('Connection refused')
+            ->doesntExpectOutputToContain('more details')
             ->doesntExpectOutputToContain('Package created successfully!')
             ->assertExitCode(1);
     }

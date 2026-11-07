@@ -59,7 +59,12 @@ class GitPackage extends Command
         $origin = mb_strtolower(rtrim($source, '/'));
 
         if (is_null($this->stringArgument('vendor')) || is_null($this->stringArgument('name'))) {
-            $this->setGitVendorAndPackage($origin);
+            if (!$this->setGitVendorAndPackage($origin)) {
+                $this->abortProgress();
+                $this->error("Unable to determine the vendor and package from {$source}, please provide them: packager:git <url> <vendor> <name>");
+
+                return self::FAILURE;
+            }
         } else {
             $this->conveyor->vendor($this->stringArgument('vendor'));
             $this->conveyor->package($this->stringArgument('name'));
@@ -111,21 +116,30 @@ class GitPackage extends Command
         return self::SUCCESS;
     }
 
-    protected function setGitVendorAndPackage(string $origin): void
+    /**
+     * Use the last two parts of the repository path as vendor and package, as in https://host/vendor/package,
+     * git@host:vendor/package.git or file:///path/to/vendor/package.git. Returns false when there are none.
+     */
+    protected function setGitVendorAndPackage(string $origin): bool
     {
-        $pieces = explode('/', $origin);
+        // Drop the scheme and host of a url, or the user@host: of the scp-like syntax.
+        $path = preg_replace(['{^[a-z][a-z0-9+.-]*://[^/]*}i', '{^[^/]*:}'], '', $origin) ?? '';
+        $segments = array_values(array_filter(explode('/', $path), static fn (string $segment): bool => $segment !== ''));
 
-        if (Str::contains($origin, 'https')) {
-            $vendor = $pieces[3];
-            $package = $pieces[4];
-        } else {
-            $vendor = explode(':', $pieces[0])[1];
-            $package = $pieces[1];
+        if (count($segments) < 2) {
+            return false;
         }
 
-        $package = Str::replaceEnd('.git', '', $package);
+        $vendor = $segments[count($segments) - 2];
+        $package = Str::replaceEnd('.git', '', $segments[count($segments) - 1]);
+
+        if ($package === '' || in_array($vendor, ['.', '..'], true) || in_array($package, ['.', '..'], true)) {
+            return false;
+        }
 
         $this->conveyor->vendor($vendor);
         $this->conveyor->package($package);
+
+        return true;
     }
 }

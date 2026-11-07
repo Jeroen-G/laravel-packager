@@ -78,7 +78,7 @@ php artisan packager:get https://github.com/author/repository --branch=develop
 php artisan packager:get https://github.com/author/repository my-vendor my-package
 php artisan packager:git https://github.com/author/repository my-vendor my-package
 ```
-It is possible to specify a branch with the `--branch` option; `packager:get` downloads the default branch of the repository otherwise. If you specify a vendor and name directly after the url, those will be used for the directory in `packages/` instead of the pieces of the url. Composer installs the package by the `name` in its `composer.json`.
+It is possible to specify a branch with the `--branch` option; `packager:get` downloads the default branch of the repository otherwise. If you specify a vendor and name directly after the url, those will be used for the directory in `packages/` instead of the last two parts of the url (`author/repository` in the examples above). `packager:git` accepts any url that git can clone, such as a `git@github.com:author/repository.git` or a local `file:///path/to/author/repository.git`; provide the vendor and name when its path has fewer than two parts. Composer installs the package by the `name` in its `composer.json`.
 
 ### Tests
 **Command:**

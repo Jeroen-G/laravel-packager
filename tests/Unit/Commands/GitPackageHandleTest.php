@@ -35,6 +35,28 @@ final class GitPackageHandleTest extends CommandTestCase
             ->assertExitCode(0);
     }
 
+    public function test_it_asks_for_vendor_and_name_when_the_url_has_none(): void
+    {
+        $this->command('packager:git', ['url' => 'file:///rocket.git'])
+            ->expectsOutputToContain('Unable to determine the vendor and package from file:///rocket.git, please provide them: packager:git <url> <vendor> <name>')
+            ->doesntExpectOutputToContain('Creating package')
+            ->assertExitCode(1);
+
+        $this->assertDirectoryDoesNotExist($this->basePath.'/packages');
+    }
+
+    public function test_it_clones_a_local_repository_by_its_path(): void
+    {
+        $path = $this->packagePath('acme', 'rocket');
+
+        $this->commandRunner->expectRun(['git', 'clone', '-q', 'file:///repositories/acme/rocket.git', $path], true);
+        $this->commandRunner->getMock()->allows('run')->andReturnTrue();
+
+        $this->command('packager:git', ['url' => 'file:///repositories/acme/rocket.git'])
+            ->expectsOutputToContain('Package cloned successfully!')
+            ->assertExitCode(0);
+    }
+
     public function test_it_fails_when_the_repository_cannot_be_cloned(): void
     {
         $path = $this->packagePath('acme', 'rocket');

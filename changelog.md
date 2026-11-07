@@ -24,6 +24,7 @@ All Notable changes to Packager will be documented in this file.
 - Packages are required and removed by the `name` in their `composer.json`, falling back to the lowercase vendor/package
 
 ### Updated
+- Supports Guzzle 7 and 8, so Packager installs in a new Laravel application
 - Moved to GitHub actions
 - Added PHPStan (Larastan, level 8) static analysis and mutation testing annotations on pull requests
 - CI also tests against the lowest allowed dependency versions
@@ -32,6 +33,7 @@ All Notable changes to Packager will be documented in this file.
 - Class name validation accepted characters like `` ` `` and `{` and rejected multibyte names
 - `packager:git` cut off package names ending in `.`, `g`, `i` or `t` when stripping `.git`
 - `packager:git` no longer passes the repository url through a shell
+- `packager:git` takes the vendor and package from the last two parts of any git url (such as `http://`, `ssh://` and `file://`) and asks for them when the url has none, instead of failing with "Package already exists"
 - `packager:list` threw a TypeError when showing the commit difference of a git package
 - `packager:publish` and `packager:git` now report failures and return a failure exit code
 - `packager:publish` updates an existing `origin` remote instead of failing silently
