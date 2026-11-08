@@ -1,0 +1,65 @@
+
+name: Main
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  php-tests:
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+
+    strategy:
+      matrix:
+        php: [8.2, 8.3, 8.4]
+        experimental: [ false ]
+        dependencies: [ highest ]
+        include:
+          - php: 8.2
+            experimental: false
+            dependencies: lowest
+          - php: 8.5
+            experimental: true
+            dependencies: highest
+
+    name: PHP${{ matrix.php }}${{ matrix.dependencies == 'lowest' && ' (lowest dependencies)' || '' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: xdebug
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-scripts ${{ matrix.dependencies == 'lowest' && '--prefer-lowest --prefer-stable' || '' }}
+        if: ${{ matrix.experimental == false }}
+
+      - name: Install experimental dependencies
+        run: composer update --prefer-dist --no-interaction --no-scripts --ignore-platform-reqs
+        if: ${{ matrix.experimental == true }}
+
+      # Run on the lowest supported PHP version only: on newer versions ECS suggests
+      # functions (e.g. mb_rtrim) that do not exist on PHP 8.2.
+      - name: Check codestyle
+        run: vendor/bin/ecs check --config=easy-coding-standard.php --no-progress-bar .
+        if: ${{ matrix.php == '8.2' && matrix.dependencies == 'highest' }}
+
+      - name: Execute unit tests
+        run: vendor/bin/phpunit --testsuite unit --testdox --colors=always
+
+      - name: Execute integration tests
+        run: vendor/bin/phpunit --testsuite integration --testdox --colors=always
+
+      - name: Execute mutation tests
+        run: vendor/bin/infection --threads=4 --min-covered-msi=75 --min-msi=75
+        if: ${{ matrix.dependencies == 'highest' }}
+
+      - name: PHPStan analysis
+        run: vendor/bin/phpstan analyse --no-progress
+        if: ${{ matrix.experimental == false && matrix.dependencies == 'highest' }}

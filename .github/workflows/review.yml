@@ -1,0 +1,28 @@
+name: Autoreview
+
+on:
+  pull_request:
+
+jobs:
+  fight-mutants:
+    runs-on: ubuntu-latest
+
+    name: Mutation testing annotations
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          coverage: xdebug
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-scripts
+
+      - name: Run Infection for added and modified files only
+        run: |
+          git fetch --depth=1 origin $GITHUB_BASE_REF
+          vendor/bin/infection --threads=4 --git-diff-base=origin/$GITHUB_BASE_REF --git-diff-filter=AM --logger-github --ignore-msi-with-no-mutations

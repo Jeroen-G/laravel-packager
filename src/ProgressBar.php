@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager;
+
+use Symfony\Component\Console\Helper\ProgressBar as SymfonyProgressBar;
 
 trait ProgressBar
 {
-    /**
-     * Symfony ProgressBar instance.
-     *
-     * @var object \Symfony\Component\Console\Helper\ProgressBar
-     */
-    protected $bar;
+    protected ?SymfonyProgressBar $bar = null;
 
     /**
      * Setting custom formatting for the progress bar.
@@ -17,7 +16,7 @@ trait ProgressBar
      * @param  int  $steps  The number of steps the progress bar has.
      * @return void
      */
-    public function startProgressBar($steps)
+    public function startProgressBar(int $steps): void
     {
         // create the bar
         $this->bar = $this->output->createProgressBar($steps);
@@ -43,9 +42,20 @@ trait ProgressBar
      *
      * @return void
      */
-    public function makeProgress()
+    public function makeProgress(): void
     {
-        $this->bar->advance();
+        $this->bar?->advance();
+    }
+
+    /**
+     * Remove the progress bar without finishing it, e.g. when a step failed.
+     *
+     * @return void
+     */
+    public function abortProgress(): void
+    {
+        $this->bar?->clear();
+        $this->bar = null;
     }
 
     /**
@@ -54,9 +64,9 @@ trait ProgressBar
      * @param  string  $message
      * @return void
      */
-    public function finishProgress($message)
+    public function finishProgress(string $message): void
     {
-        $this->bar->finish();
+        $this->bar?->finish();
         $this->info($message);
         $this->output->newLine(2);
         $this->bar = null;

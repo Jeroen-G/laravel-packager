@@ -1,54 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace JeroenG\Packager\Tests;
 
+use JeroenG\Packager\Tests\Support\RunsCommands;
 use Orchestra\Testbench\TestCase as TestBench;
 
-abstract class TestCase extends TestBench
+abstract class IntegrationTestCase extends TestBench
 {
+    use RunsCommands;
     use TestHelper;
 
     protected const TEST_APP_TEMPLATE = __DIR__.'/../testbench/template';
-    protected const TEST_APP = __DIR__.'/../testbench/laravel';
 
     public static function setUpBeforeClass(): void
     {
-        if (! file_exists(self::TEST_APP_TEMPLATE)) {
+        if (!file_exists(self::TEST_APP_TEMPLATE)) {
             self::setUpLocalTestbench();
         }
         parent::setUpBeforeClass();
     }
 
-    protected function getBasePath()
-    {
-        return self::TEST_APP;
-    }
-
-    /**
-     * Setup before each test.
-     */
     public function setUp(): void
     {
         $this->installTestApp();
         parent::setUp();
     }
 
-    /**
-     * Tear down after each test.
-     */
     public function tearDown(): void
     {
         $this->uninstallTestApp();
         parent::tearDown();
     }
 
+    public static function applicationBasePath(): string
+    {
+        return static::testApp();
+    }
+
     /**
-     * Tell Testbench to use this package.
-     *
-     * @param $app
-     * @return array
+     * Each process gets its own application, so parallel runs (e.g. Infection threads)
+     * cannot see each other's packages and composer.json changes.
      */
-    protected function getPackageProviders($app)
+    protected static function testApp(): string
+    {
+        return __DIR__.'/../testbench/laravel-'.getmypid();
+    }
+
+    protected function getPackageProviders($app): array
     {
         return ['JeroenG\Packager\PackagerServiceProvider'];
     }

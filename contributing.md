@@ -5,16 +5,17 @@ Contributions are **welcome** via Pull Requests on [Github](https://github.com/J
 An interesting read is [Contributing to a Github Project](http://jasonlewis.me/article/contributing-to-a-github-project).
 
 Also try to code in the same style as Laravel (which followes the [PSR standard](http://www.php-fig.org/) guidelines).
-StyleCI is set up to fix any discrepancies automatically!
+The code style is checked with Easy Coding Standard in GitHub Actions; run `make codestyle-fix` to fix it locally.
 
-If you want to run the test suite of Laravel Packager, try out the `composer test` or `composer test-coverage` commands.
+Before sending a pull request, run:
+- `make test` for the unit and integration tests (with coverage),
+- `make phpstan` for static analysis,
+- `make infection` for mutation testing,
+- `make codestyle` for the code style.
 
 ## Things To Do
 If you want to contribute but do not know where to start, this list provides some starting points.
-- Test for several commands, as well as the different options.
-- Test the Conveyor and Wrapping on their own.
-- Test `publish` and `tests` command.
-- Removing a package leaves (multiple) whitespaces in app.php and composer.json. Can this be done differently?
+- Raise the mutation score and the minimum MSI in CI.
 
 ## Pull Requests
 
