@@ -24,9 +24,6 @@ class EnablePackage extends Command
 
     protected $description = 'Add a package to composer.json and the providers config.';
 
-    /**
-     * Packages roll off of the conveyor.
-     */
     protected Conveyor $conveyor;
 
     protected FileHandlerInterface $fileHandler;

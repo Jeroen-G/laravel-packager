@@ -15,14 +15,6 @@ use JeroenG\Packager\Commands\NewPackage;
 use JeroenG\Packager\Commands\PublishPackage;
 use JeroenG\Packager\Commands\RemovePackage;
 
-/**
- * This is the service provider.
- *
- * Place the line below in the providers array inside app/config/app.php
- * <code>'JeroenG\Packager\PackagerServiceProvider',</code>
- *
- * @author JeroenG
- **/
 class PackagerServiceProvider extends ServiceProvider
 {
     /** @var list<class-string<\Illuminate\Console\Command>> */

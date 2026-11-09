@@ -22,9 +22,6 @@ trait ReportsComposerFailures
         return self::FAILURE;
     }
 
-    /**
-     * Stop the progress after a failed download, or an unusable archive, and explain what happened.
-     */
     protected function downloadFailed(string $url, RuntimeException $exception): int
     {
         $this->abortProgress();
@@ -34,9 +31,6 @@ trait ReportsComposerFailures
         return self::FAILURE;
     }
 
-    /**
-     * Report that a package was put in place, but could not be installed.
-     */
     protected function installFailed(string $packagePath): int
     {
         $vendor = $this->conveyor->vendor();

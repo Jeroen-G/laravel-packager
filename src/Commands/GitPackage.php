@@ -29,9 +29,6 @@ class GitPackage extends Command
 
     protected $description = 'Retrieve an existing package with git.';
 
-    /**
-     * Packages roll off of the conveyor.
-     */
     protected Conveyor $conveyor;
 
     protected FileHandlerInterface $fileHandler;

@@ -20,9 +20,6 @@ final class Manager
     }
 
     /**
-     * @param  string  $archiveExtension
-     * @return Extractor
-     *
      * @throws InvalidArgumentException
      */
     public function getExtractor(string $archiveExtension): Extractor
@@ -36,11 +33,6 @@ final class Manager
         return $extractor;
     }
 
-    /**
-     * @param  string  $archiveExtension
-     * @param  Extractor  $instance
-     * @return self
-     */
     public function addExtractor(string $archiveExtension, Extractor $instance): self
     {
         $this->extractorsMap[$archiveExtension] = $instance;

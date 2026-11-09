@@ -29,14 +29,8 @@ class NewPackage extends Command
 
     protected $description = 'Create a new package.';
 
-    /**
-     * Packages roll off of the conveyor.
-     */
     protected Conveyor $conveyor;
 
-    /**
-     * Packages are packed in wrappings to personalise them.
-     */
     protected Wrapping $wrapping;
 
     protected FileHandlerInterface $fileHandler;
@@ -173,11 +167,6 @@ class NewPackage extends Command
         return self::SUCCESS;
     }
 
-    /**
-     * Use the interactive CLI to replace certain placeholders.
-     *
-     * @return void
-     */
     protected function interactiveReplace(): void
     {
         $author = $this->ask('Who is the author?', config('packager.author_name'));

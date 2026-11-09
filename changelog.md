@@ -2,7 +2,7 @@
 
 All Notable changes to Packager will be documented in this file.
 
-## Version 3
+## Version 3.0
 
 ### Breaking changes
 - Requires PHP 8.2+ and Laravel 11, 12 or 13

@@ -8,9 +8,6 @@ use PharData;
 
 class TarGz extends Extractor
 {
-    /**
-     * {@inheritdoc}
-     */
     public function extract(string $pathToArchive, string $pathToDirectory): void
     {
         $pathToTarArchive = $this->extractTarPathFromGz($pathToArchive);
@@ -20,12 +17,6 @@ class TarGz extends Extractor
         unlink($pathToTarArchive);
     }
 
-    /**
-     * Get the path to the tar within the gz folder.
-     *
-     * @param  string  $pathToArchive
-     * @return string
-     */
     private function extractTarPathFromGz(string $pathToArchive): string
     {
         $phar = new PharData($pathToArchive);

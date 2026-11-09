@@ -30,9 +30,6 @@ class GetPackage extends Command
 
     protected $description = 'Retrieve an existing package from Github.';
 
-    /**
-     * Packages roll off of the conveyor.
-     */
     protected Conveyor $conveyor;
 
     protected FileHandlerInterface $fileHandler;

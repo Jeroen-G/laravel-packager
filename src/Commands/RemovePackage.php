@@ -24,9 +24,6 @@ class RemovePackage extends Command
 
     protected $description = 'Remove an existing package.';
 
-    /**
-     * Packages roll off of the conveyor.
-     */
     protected Conveyor $conveyor;
 
     protected FileHandlerInterface $fileHandler;
@@ -98,7 +95,6 @@ class RemovePackage extends Command
         }
         $this->makeProgress();
 
-        // Finished removing the package, end of the progress bar
         $this->finishProgress('Package removed successfully!');
 
         return self::SUCCESS;

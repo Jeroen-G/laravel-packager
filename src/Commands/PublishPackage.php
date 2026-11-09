@@ -27,9 +27,6 @@ class PublishPackage extends Command
 
     protected $description = 'Publish your package to Github with git.';
 
-    /**
-     * Packages roll off of the conveyor.
-     */
     protected Conveyor $conveyor;
 
     protected FileHandlerInterface $fileHandler;

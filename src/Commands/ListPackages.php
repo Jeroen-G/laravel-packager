@@ -44,9 +44,7 @@ class ListPackages extends Command
     }
 
     /**
-     * Get all of the packages installed with Packager, as [vendor, package] pairs.
-     *
-     * @return array<int, array{0: string, 1: string}>
+     * @return array<int, array{0: string, 1: string}> all packages as [vendor, package] pairs.
      */
     private function getPackagesList(): array
     {
@@ -72,8 +70,6 @@ class ListPackages extends Command
     }
 
     /**
-     * Render the list, but with git status if the package has git initialised.
-     *
      * @param  array<int, array{0: string, 1: string}>  $packages
      */
     private function renderGitTable(array $packages): void
@@ -87,8 +83,6 @@ class ListPackages extends Command
     }
 
     /**
-     * If a package has a git history, add its status.
-     *
      * @return array{0: int|string, 1: string}
      */
     private function getGitStatus(string $path): array
@@ -102,9 +96,6 @@ class ListPackages extends Command
         return [$this->getCommitDifference($path) ?? '-', $this->getCurrentBranch($path) ?? '-'];
     }
 
-    /**
-     * The number of commits the local package is behind on the origin remote, or null when unknown.
-     */
     private function getCommitDifference(string $path): ?int
     {
         $count = $this->commandRunner->output(['git', 'rev-list', 'HEAD..origin', '--count'], $path);

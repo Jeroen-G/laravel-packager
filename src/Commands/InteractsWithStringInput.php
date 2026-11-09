@@ -6,9 +6,6 @@ namespace JeroenG\Packager\Commands;
 
 use InvalidArgumentException;
 
-/**
- * Typed access to command input, which Symfony Console returns as mixed.
- */
 trait InteractsWithStringInput
 {
     protected function stringArgument(string $key): ?string

@@ -81,28 +81,18 @@ final class Conveyor
         $this->downloadArchive($archiveUrl);
     }
 
-    /**
-     * Register the package as a path repository and require it. Returns false when composer failed.
-     */
     public function installPackage(): bool
     {
         return $this->addPathRepository() && $this->requirePackage();
     }
 
-    /**
-     * Remove the package and its path repository. Returns false when composer failed.
-     */
     public function uninstallPackage(): bool
     {
         return $this->removePackage() && $this->removePathRepository();
     }
 
-    /**
-     * Download and extract an archive, and move the directory it contains to the package path.
-     */
     private function downloadArchive(string $archiveUrl): void
     {
-        // A temporary directory of its own, so leftovers of an interrupted run never get in the way.
         $tempPath = $this->fileHandler->tempPath($this->vendor());
         $archive = $this->fileHandler->makeFilename($this->fileHandler->getArchiveExtension($archiveUrl));
 
@@ -110,7 +100,6 @@ final class Conveyor
             $this->fileHandler->download($archive, $archiveUrl)
                 ->extract($archive, $tempPath);
 
-            // Archives from GitHub contain a single directory (tarballs may also hold a pax_global_header file).
             $extracted = $this->fileHandler->directories($tempPath);
 
             if (count($extracted) !== 1) {

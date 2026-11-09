@@ -23,9 +23,6 @@ class DisablePackage extends Command
 
     protected $description = 'Remove a package from composer.json and the providers config.';
 
-    /**
-     * Packages roll off of the conveyor.
-     */
     protected Conveyor $conveyor;
 
     public function __construct(Conveyor $conveyor)

@@ -101,9 +101,6 @@ class FileHandler implements FileHandlerInterface
         return false;
     }
 
-    /**
-     * Recursively remove a directory, but only one inside the packages directory.
-     */
     public function removeDir(string $path): bool
     {
         $realPath = realpath($path);
@@ -196,7 +193,6 @@ class FileHandler implements FileHandlerInterface
         $pathParts = pathinfo($archiveFilePath);
         $extension = $pathParts['extension'] ?? '';
 
-        // Here we check if it actually is supposed to be .tar.gz/.tar.xz
         if (in_array($extension, ['gz', 'xz'], true)) {
             $subExtension = pathinfo($pathParts['filename'], PATHINFO_EXTENSION);
 
